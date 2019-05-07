@@ -1,0 +1,110 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>@ViewBag.Title | ParkEasy</title>
+    @Scripts.Render("~/bundles/modernizr")
+
+    <link href="~/Content/bootstrap-parkeasy.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+</head>
+<body>
+    <nav class="navbar navbar-expand-md bg-dark-blue">
+        <a class="navbar-brand" href="@Url.Action("Index", "Home")">
+            <img src="/images/100x230.png" width="230" height="100" alt="ParkEasy Airport Parking Logo">
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse w-100 flex-md-column" id="navbarCollapse">
+            <!--<ul class="navbar-nav ml-auto small mb-2 mb-md-0" style="position: relative; top: -10px;">
+                <li>
+                    <button class="btn btn-outline-white btn-sm my-2 my-sm-0 mr-sm-2 text-white font-weight-bold" type="submit">Book Online</button>
+                    <button type="submit" onclick="location.href='@Url.Action("Action", "Controller")'" class="btn btn-outline-white btn-sm my-2 my-sm-0 mr-sm-2 text-white font-weight-bold">Book Online</button>
+                </li>
+                <li>
+                    <button class="btn btn-outline-white btn-sm my-2 my-sm-0 mr-sm-2 text-white font-weight-bold" type="submit">Login</button>
+                    <button type="submit" onclick="location.href='@Url.Action("Action", "Controller")'" class="btn btn-outline-white btn-sm my-2 my-sm-0 mr-sm-2 text-white font-weight-bold">Login</button>
+                </li>
+            </ul>-->
+            @Html.Partial("_LoginPartial")
+            <ul class="navbar-nav ml-auto" style="position: relative; bottom: -20px; padding-left: 20px;">
+                <li class="nav-item">
+                    @Html.ActionLink("Book", "Create", "Bookings", new { area = "" }, new { @class = "nav-link text-white font-weight-bold" })
+                </li>
+                <li class="nav-item">
+                    @Html.ActionLink("Prices", "Index", "Home", new { area = "" }, new { @class = "nav-link text-white font-weight-bold" })
+                </li>
+                <li class="nav-item">
+                    @Html.ActionLink("Services", "Index", "Home", new { area = "" }, new { @class = "nav-link text-white font-weight-bold" })
+                </li>
+                <li class="nav-item">
+                    @Html.ActionLink("About Us", "Index", "Home", new { area = "" }, new { @class = "nav-link text-white font-weight-bold" })
+                </li>
+                <li class="nav-item">
+                    @Html.ActionLink("Contact Us", "Index", "Home", new { area = "" }, new { @class = "nav-link text-white font-weight-bold" })
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+
+
+    <div class="container body-content">
+        @RenderBody()
+    </div>
+
+        <footer class="bg-dark-blue">
+            <div class="container text-white" style="padding-top: 20px;">
+                <div class="row">
+                    <div class="col-sm">
+                        <h6>About Us</h6>
+                        <p class="small">ParkEasy Airport Parking are situated four miles from Glasgow Airport and have been providing safe and secure airport parking for travellers for almost a decade.</p><br />
+                        <a href="#"><img src="/images/100x230.png" width="115" height="50" alt="ParkEasy Airport Parking Logo" href="#"></a>
+                        <a href="https://www.paypal.com/"><img src="/images/paypal-braintreee.png" width="200" height="100" alt="PayPal Powered By BrainTree"></a>
+                    </div>
+                    <div class="col-sm">
+                        <h6>ParkEasy Airport Parking</h6>
+                        <p class="small">
+                            ParkEasy Airport Parking Ltd.<br>
+                            190 Airport Road,<br>
+                            Glasgow,<br>
+                            G4 0ND,<br>
+                            UK
+                        </p>
+                    </div>
+                    <div class="col-sm">
+                        <h6>Contact &amp; Business Hours</h6>
+                        <p class="small">
+                            Monday - Friday: 09:00 - 17:00<br>
+                            Saturday - Sunday: Closed<br><br>
+
+                            Tel: <strong><a class="text-white" href="tel:+441415550204">0141 555 0204</a></strong><br>
+                            Email: <strong><a class="text-white" href="mailto: contact@parkeasy.co.uk">contact@parkeasy.co.uk</a></strong>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12 col-md-8 text-white small">&copy; @DateTime.Now.Year ParkEasy Airport Parking</div>
+                    <div class="col-6 col-md-4 text-right small">
+                            @Html.ActionLink("Terms & Conditions", "Index", "Home", new { area = "" }, new { @class = "text-white font-weight-bold" }) &nbsp; &nbsp;
+                            @Html.ActionLink("Accessibility", "Index", "Home", new { area = "" }, new { @class = "text-white font-weight-bold" }) &nbsp; &nbsp;
+                            @Html.ActionLink("Sitemap", "Index", "Home", new { area = "" }, new { @class = "text-white font-weight-bold" }) &nbsp; &nbsp;
+                            @Html.ActionLink("FAQs", "Index", "Home", new { area = "" }, new { @class = "text-white font-weight-bold" }) &nbsp; &nbsp;
+                    </div>
+                </div>
+            </div>
+                
+           
+        </footer>
+
+
+    <script src="~/Scripts/jquery-3.4.1.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <script src="~/Scripts/popper.min.js"></script>
+    @RenderSection("scripts", required: false)
+</body>
+</html>

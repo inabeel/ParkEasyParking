@@ -1,0 +1,120 @@
+﻿@model ParkEasyV1.Models.Booking
+
+@{
+    ViewBag.Title = "Delete";
+}
+
+<h2>Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>Booking</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Flight.DepartureFlightNo)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Flight.DepartureFlightNo)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Invoice.CustomerID)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Invoice.CustomerID)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ParkingSlot.ID)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ParkingSlot.ID)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Tariff.Type)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Tariff.Type)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.User.FirstName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.User.FirstName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DateBooked)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DateBooked)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Duration)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Duration)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Total)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Total)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.BookingStatus)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.BookingStatus)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ValetService)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ValetService)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.CheckedIn)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.CheckedIn)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.CheckedOut)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.CheckedOut)
+        </dd>
+
+    </dl>
+
+    @using (Html.BeginForm()) {
+        @Html.AntiForgeryToken()
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Delete" class="btn btn-default" /> |
+            @Html.ActionLink("Back to List", "Index")
+        </div>
+    }
+</div>

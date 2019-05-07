@@ -1,0 +1,80 @@
+﻿@model ParkEasyV1.Models.Flight
+
+@{
+    ViewBag.Title = "Delete";
+}
+
+<h2>Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>Flight</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.DepartureFlightNo)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DepartureFlightNo)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DepartureTime)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DepartureTime)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ReturnFlightNo)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ReturnFlightNo)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ReturnFlightTime)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ReturnFlightTime)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DepartureDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DepartureDate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ReturnDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ReturnDate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DestinationAirport)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DestinationAirport)
+        </dd>
+
+    </dl>
+
+    @using (Html.BeginForm()) {
+        @Html.AntiForgeryToken()
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Delete" class="btn btn-default" /> |
+            @Html.ActionLink("Back to List", "Index")
+        </div>
+    }
+</div>

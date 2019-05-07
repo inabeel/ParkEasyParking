@@ -1,0 +1,38 @@
+﻿@model IEnumerable<Microsoft.AspNet.Identity.EntityFramework.IdentityRole>
+
+
+@{
+    ViewBag.Title = "Display Roles";
+}
+
+<h2>Display Roles</h2>
+
+<p>
+    @Html.ActionLink("View All Users ", "Index") |
+    @Html.ActionLink("Create a New Role", "CreateRole")
+</p>
+<table class="table">
+    <tr>
+
+        <th>
+            @Html.DisplayNameFor(model => model.Name)
+        </th>
+
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+
+            <td>
+
+                @Html.ActionLink("Delete Role", "DeleteRole", new { id = item.Id })|
+
+            </td>
+        </tr>
+    }
+
+</table>

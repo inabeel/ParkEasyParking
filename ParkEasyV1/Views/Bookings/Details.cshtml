@@ -1,0 +1,114 @@
+﻿@model ParkEasyV1.Models.Booking
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Booking</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Flight.DepartureFlightNo)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Flight.DepartureFlightNo)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Invoice.CustomerID)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Invoice.CustomerID)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ParkingSlot.ID)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ParkingSlot.ID)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Tariff.Type)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Tariff.Type)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.User.FirstName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.User.FirstName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DateBooked)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DateBooked)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Duration)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Duration)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Total)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Total)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.BookingStatus)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.BookingStatus)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ValetService)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ValetService)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.CheckedIn)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.CheckedIn)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.CheckedOut)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.CheckedOut)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.ID }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

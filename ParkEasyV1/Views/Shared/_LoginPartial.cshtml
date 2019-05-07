@@ -1,0 +1,34 @@
+﻿@using Microsoft.AspNet.Identity
+@if (Request.IsAuthenticated)
+{
+    using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "ml-auto small mb-2 mb-md-0" }))
+    {
+    @Html.AntiForgeryToken()
+
+    <ul class="navbar-nav ml-auto small mb-2 mb-md-0" style="position: relative; top: -10px;">
+        <li><button type="submit" onclick="location.href='@Url.Action("Create", "Bookings")'" class="btn btn-outline-white btn-sm my-2 my-sm-0 mr-sm-2 text-white font-weight-bold">Book Online</button></li>
+        <li>
+            <button type="button" id="navAccountDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="btn btn-outline-white dropdown-toggle btn-sm my-2 my-sm-0 mr-sm-2 text-white font-weight-bold">My Account</button>
+            <div class="dropdown-menu" aria-labelledby="navAccountDropdown">
+                <a class="dropdown-item" href="#">Action</a>
+                <a class="dropdown-item" href="#">Another action</a>
+                <a class="dropdown-item" href="#">Something else here</a>
+            </div>
+        </li>
+        <li><button type="submit" onclick="javascript:document.getElementById('logoutForm').submit()" class="btn btn-outline-white btn-sm my-2 my-sm-0 mr-sm-2 text-white font-weight-bold">Logout</button></li>
+    </ul>
+    }
+}
+else
+{
+    <ul class="navbar-nav ml-auto small mb-2 mb-md-0" style="position: relative; top: -10px;">
+        <li>
+            <!--<button class="btn btn-outline-white btn-sm my-2 my-sm-0 mr-sm-2 text-white font-weight-bold" type="submit">Book Online</button>-->
+            <button type="submit" onclick="location.href='@Url.Action("Create", "Bookings")'" class="btn btn-outline-white btn-sm my-2 my-sm-0 mr-sm-2 text-white font-weight-bold">Book Online</button>
+        </li>
+        <li>
+            <!--<button class="btn btn-outline-white btn-sm my-2 my-sm-0 mr-sm-2 text-white font-weight-bold" type="submit">Login</button>-->
+            <button type="submit" onclick="location.href='@Url.Action("Login", "Account", null)'" class="btn btn-outline-white btn-sm my-2 my-sm-0 mr-sm-2 text-white font-weight-bold">Login</button>
+        </li>
+    </ul>
+}
