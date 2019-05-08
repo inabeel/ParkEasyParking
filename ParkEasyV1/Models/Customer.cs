@@ -7,7 +7,7 @@ namespace ParkEasyV1.Models
 {
     public class Customer : User
     {
-        public DateTime RegistrationDate { get; set; }
+        public DateTime? RegistrationDate { get; set; }
         public bool Corporate { get; set; }
     }
 }

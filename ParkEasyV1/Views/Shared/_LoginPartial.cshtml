@@ -6,7 +6,7 @@
     @Html.AntiForgeryToken()
 
     <ul class="navbar-nav ml-auto small mb-2 mb-md-0" style="position: relative; top: -10px;">
-        <li><button type="submit" onclick="location.href='@Url.Action("Create", "Bookings")'" class="btn btn-outline-white btn-sm my-2 my-sm-0 mr-sm-2 text-white font-weight-bold">Book Online</button></li>
+        <li><button type="button" onclick="location.href='@Url.Action("Create", "Bookings")'" class="btn btn-outline-white btn-sm my-2 my-sm-0 mr-sm-2 text-white font-weight-bold">Book Online</button></li>
         <li>
             <button type="button" id="navAccountDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="btn btn-outline-white dropdown-toggle btn-sm my-2 my-sm-0 mr-sm-2 text-white font-weight-bold">My Account</button>
             <div class="dropdown-menu" aria-labelledby="navAccountDropdown">

@@ -39,13 +39,7 @@ namespace ParkEasyV1.Controllers
             }
             return View(payment);
         }
-
-        // GET: Payments/Create
-        public ActionResult Create()
-        {
-            ViewBag.UserID = new SelectList(db.Users, "Id", "FirstName");
-            return View();
-        }
+        
 
         // POST: Payments/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
@@ -73,45 +67,7 @@ namespace ParkEasyV1.Controllers
 
             ViewBag.UserID = new SelectList(db.Users, "Id", "FirstName", payment.UserID);
             return View(payment);
-        }
-
-        //
-        // POST: /Payments/Pay
-        [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Pay(PaymentViewModel model)
-        {
-            UserManager<User> userManager = new UserManager<User>(new UserStore<User>(db));
-
-            if (ModelState.IsValid)
-            {
-                db.Payments.Add(new Card()
-                {
-                    PaymentDate = DateTime.Now,
-                    Amount = db.Bookings.Find(TempData["bookingID"]).Total,
-                    User = userManager.FindByName(User.Identity.Name),
-                    Type = model.Type,
-                    CardNumber = model.CardNumber,
-                    NameOnCard = model.NameOnCard,
-                    ExpiryDate = model.ExpiryDate,
-                    CVV = model.CVV
-                });
-
-                Booking booking = db.Bookings.Find(TempData["bookingID"]);
-
-                booking.BookingStatus = BookingStatus.Confirmed;
-
-                db.SaveChanges();
-
-
-                return RedirectToAction("Index", "Bookings");
-
-            }
-
-            // If we got this far, something failed, redisplay form
-            return View("Index", "Bookings");
-        }
+        }                     
 
 
         // GET: Payments/Edit/5

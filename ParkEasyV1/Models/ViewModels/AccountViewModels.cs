@@ -6,8 +6,40 @@ namespace ParkEasyV1.Models
     public class ExternalLoginConfirmationViewModel
     {
         [Required]
+        [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 1)]
+        [Display(Name = "First Name")]
+        public string FirstName { get; set; }
+
+        [Required]
+        [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 1)]
+        public string Surname { get; set; }
+
+        [Required]
+        [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 1)]
+        [Display(Name = "Address")]
+        public string AddressLine1 { get; set; }
+
+        [Display(Name = "")]
+        public string AddressLine2 { get; set; }
+
+        [Required]
+        [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 1)]
+        public string City { get; set; }
+
+        [Required]
+        [StringLength(7, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 7)]
+        [DataType(DataType.PostalCode)]
+        public string Postcode { get; set; }
+
+        [Required]
+        [EmailAddress]
         [Display(Name = "Email")]
         public string Email { get; set; }
+
+        [Required]
+        [MustBeTrue(ErrorMessage = "You must agree to the ParkEasy Terms & Conditions")]
+        public bool TermsConditions { get; set; }
+
     }
 
     public class ExternalLoginListViewModel

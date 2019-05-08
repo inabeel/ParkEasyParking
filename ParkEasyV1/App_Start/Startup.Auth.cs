@@ -46,23 +46,23 @@ namespace ParkEasyV1
             app.UseTwoFactorRememberBrowserCookie(DefaultAuthenticationTypes.TwoFactorRememberBrowserCookie);
 
             // Uncomment the following lines to enable logging in with third party login providers
-            //app.UseMicrosoftAccountAuthentication(
-            //    clientId: "",
-            //    clientSecret: "");
+            app.UseMicrosoftAccountAuthentication(
+                clientId: "***REMOVED***",
+                clientSecret: "***REMOVED***");
 
             //app.UseTwitterAuthentication(
             //   consumerKey: "",
             //   consumerSecret: "");
 
-            //app.UseFacebookAuthentication(
-            //   appId: "",
-            //   appSecret: "");
+            app.UseFacebookAuthentication(
+               appId: "***REMOVED***",
+               appSecret: "***REMOVED***");
 
-            //app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions()
-            //{
-            //    ClientId = "",
-            //    ClientSecret = ""
-            //});
+            app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions()
+            {
+                ClientId = "***REMOVED***",
+                ClientSecret = "***REMOVED***"
+            });
         }
     }
 }

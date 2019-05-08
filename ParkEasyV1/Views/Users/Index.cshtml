@@ -29,36 +29,28 @@
         @foreach (var item in Model)
         {
             <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.UserName)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Email)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.CurrentRole)
-                    </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.UserName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Email)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CurrentRole)
+                </td>
 
 
-                    <td>
-                        <div class="btn-group">
-                            <button class="btn btn-primary" type="button" onclick="location.href='@Url.Action("Edit" + (item is Staff ? "Staff" : "Customer"), new { id = item.Id })'">Edit</button>
-                            <button class="btn btn-primary" type="button" onclick="location.href='@Url.Action("Details", new { id = item.Id })'">Details</button>
-                            <button class="btn btn-primary" type="button" onclick="location.href='@Url.Action("Delete", new { id = item.Id })'">Delete</button>
-                            <button class="btn btn-primary" type="button" onclick="location.href='@Url.Action("ChangeRole", new { id = item.Id })'">Change Role</button>
-                        </div>
-                    </td>
+                <td>
+                    <div class="btn-group">
+                        <button class="btn btn-primary" type="button" onclick="location.href='@Url.Action("Edit" + (item is Staff ? "Staff" : "Customer"), new { id = item.Id })'">Edit</button>
+                        <button class="btn btn-primary" type="button" onclick="location.href='@Url.Action("Details", new { id = item.Id })'">Details</button>
+                        <button class="btn btn-primary" type="button" onclick="location.href='@Url.Action("Delete", new { id = item.Id })'">Delete</button>
+                        <button class="btn btn-primary" type="button" onclick="location.href='@Url.Action("ChangeRole", new { id = item.Id })'">Change Role</button>
+                    </div>
+                </td>
             </tr>
 
         }
 
     </table>
 </div>
-
-
-
-
-
-
-
-

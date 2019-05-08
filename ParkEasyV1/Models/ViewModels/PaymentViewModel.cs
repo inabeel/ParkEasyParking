@@ -23,10 +23,12 @@ namespace ParkEasyV1.Models.ViewModels
         public string NameOnCard { get; set; }
 
         [Required]
-        [Display(Name = "Expiry Date")]
-        [DataType(DataType.Date)]
-        [DisplayFormat(DataFormatString = "{0:yyyy-MM}", ApplyFormatInEditMode = true)]
-        public DateTime ExpiryDate { get; set; }
+        [Display(Name ="Expiry Month")]
+        public int ExpiryMonth { get; set; }
+
+        [Required]
+        [Display(Name ="Expiry Year")]
+        public int ExpiryYear { get; set; }
 
         [Required]
         public int CVV { get; set; }

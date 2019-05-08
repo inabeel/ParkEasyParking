@@ -45,11 +45,11 @@ namespace ParkEasyV1.Controllers
         // GET: Bookings/Create
         public ActionResult Create()
         {
-            ViewBag.FlightID = new SelectList(db.Flights, "ID", "DepartureFlightNo");
-            ViewBag.ID = new SelectList(db.Invoices, "ID", "CustomerID");
-            ViewBag.ParkingSlotID = new SelectList(db.ParkingSlots, "ID", "ID");
-            ViewBag.TariffID = new SelectList(db.Tariffs, "ID", "Type");
-            ViewBag.UserID = new SelectList(db.Users, "Id", "FirstName");
+            //ViewBag.FlightID = new SelectList(db.Flights, "ID", "DepartureFlightNo");
+            //ViewBag.ID = new SelectList(db.Invoices, "ID", "CustomerID");
+            //ViewBag.ParkingSlotID = new SelectList(db.ParkingSlots, "ID", "ID");
+            //ViewBag.TariffID = new SelectList(db.Tariffs, "ID", "Type");
+            //ViewBag.UserID = new SelectList(db.Users, "Id", "FirstName");
             return View();
         }
 
@@ -258,7 +258,52 @@ namespace ParkEasyV1.Controllers
             db.SaveChanges();
 
 
-            return RedirectToAction("Create", "Payments");
+            return RedirectToAction("Pay");
+        }
+
+        // GET: Payments/Pay
+        public ActionResult Pay()
+        {
+            //ViewBag.UserID = new SelectList(db.Users, "Id", "FirstName");
+            return View();
+        }
+
+        //
+        // POST: /Payments/Pay
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Pay(PaymentViewModel model)
+        {
+            UserManager<User> userManager = new UserManager<User>(new UserStore<User>(db));
+
+            if (ModelState.IsValid)
+            {
+                db.Payments.Add(new Card()
+                {
+                    PaymentDate = DateTime.Now,
+                    Amount = db.Bookings.Find(TempData["bookingID"]).Total,
+                    User = userManager.FindByName(User.Identity.Name),
+                    Type = model.Type,
+                    CardNumber = model.CardNumber,
+                    NameOnCard = model.NameOnCard,
+                    ExpiryDate = new DateTime(model.ExpiryYear, model.ExpiryMonth, DateTime.Now.Day),
+                    CVV = model.CVV
+                });
+
+                Booking booking = db.Bookings.Find(TempData["bookingID"]);
+
+                booking.BookingStatus = BookingStatus.Confirmed;
+
+                db.SaveChanges();
+
+
+                return RedirectToAction("Index", "Bookings");
+
+            }
+
+            // If we got this far, something failed, redisplay form
+            return View("Index", "Bookings");
         }
 
         private int GetLastBookingId()

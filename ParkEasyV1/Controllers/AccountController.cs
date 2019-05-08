@@ -370,15 +370,19 @@ namespace ParkEasyV1.Controllers
                 {
                     return View("ExternalLoginFailure");
                 }
-                var user = new Customer { UserName = model.Email, Email = model.Email };
+                var user = new Customer { UserName = model.Email, Email = model.Email, RegistrationDate = DateTime.Now, Corporate = false, FirstName = model.FirstName, LastName = model.Surname, AddressLine1 = model.AddressLine1, AddressLine2 = model.AddressLine2, City = model.City, Postcode = model.Postcode };
+                //CREATE NEW CUSTOMER - ALL USERS REGISTERING WILL BE CUSTOMERS
+                //var user = new Customer { UserName = model.Email, Email = model.Email, RegistrationDate = DateTime.Now, Corporate = false, FirstName = model.FirstName, LastName = model.Surname, AddressLine1 = model.AddressLine1, AddressLine2 = model.AddressLine2, City = model.City, Postcode = model.Postcode };
                 var result = await UserManager.CreateAsync(user);
                 if (result.Succeeded)
                 {
                     result = await UserManager.AddLoginAsync(user.Id, info.Login);
                     if (result.Succeeded)
                     {
+                        //ADD USER TO THE CUSTOMER ROLE
+                        await UserManager.AddToRoleAsync(user.Id, "Customer");
                         await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
-                        return RedirectToLocal(returnUrl);
+                        return RedirectToAction("Index", "Home");
                     }
                 }
                 AddErrors(result);
