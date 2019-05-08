@@ -15,14 +15,56 @@ namespace ParkEasyV1.Controllers
 
         public ActionResult About()
         {
-            ViewBag.Message = "Your application description page.";
+            //ViewBag.Message = "Your application description page.";
 
             return View();
         }
 
         public ActionResult Contact()
         {
-            ViewBag.Message = "Your contact page.";
+            //ViewBag.Message = "Your contact page.";
+
+            return View();
+        }
+
+        public ActionResult Prices()
+        {
+            //ViewBag.Message = "Your contact page.";
+
+            return View();
+        }
+
+        public ActionResult Services()
+        {
+            //ViewBag.Message = "Your contact page.";
+
+            return View();
+        }
+
+        public ActionResult TermsAndConditions()
+        {
+            //ViewBag.Message = "Your contact page.";
+
+            return View();
+        }
+
+        public ActionResult Accessibility()
+        {
+            //ViewBag.Message = "Your contact page.";
+
+            return View();
+        }
+
+        public ActionResult Sitemap()
+        {
+            //ViewBag.Message = "Your contact page.";
+
+            return View();
+        }
+
+        public ActionResult FAQs()
+        {
+            //ViewBag.Message = "Your contact page.";
 
             return View();
         }

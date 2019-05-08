@@ -1,31 +1,85 @@
-﻿@{
+﻿@model ParkEasyV1.Models.ViewModels.CreateBookingViewModel
+
+@{
     ViewBag.Title = "Home Page";
 }
 
-<div class="jumbotron">
-    <h1>ASP.NET</h1>
-    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-    <p><a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
-</div>
+<h4 class="text-center">ParkEasy Airport Parking - Glasgow</h4>
+<h6 class="text-center">Check our availability and prices for parking your vehicle with our safe and secure storage while you travel!</h6>
 
-<div class="row">
-    <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>
-            ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
-            enables a clean separation of concerns and gives you full control over markup
-            for enjoyable, agile development.
-        </p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
+<center>
+    <div class="col-md-8 bg-dark-blue rounded" style="margin-bottom: 40px; margin-top: 20px;">
+        <div class="row">
+            @using (Html.BeginForm("CreateBooking", "Bookings", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+            {
+                @Html.AntiForgeryToken()
+
+                <div class="row" style="padding-bottom: 20px;">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.DepartureDate, htmlAttributes: new { @class = "control-label col-md-12 text-white offset-1" })
+                        <div class="col-md-12 offset-1">
+                            @Html.EditorFor(model => model.DepartureDate, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.DepartureDate, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.DepartureTime, htmlAttributes: new { @class = "control-label col-md-12 text-white offset-1" })
+                        <div class="col-md-12 offset-1">
+                            @Html.EditorFor(model => model.DepartureTime, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.DepartureTime, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.ReturnDate, htmlAttributes: new { @class = "control-label col-md-12 text-white offset-1" })
+                        <div class="col-md-12 offset-1">
+                            @Html.EditorFor(model => model.ReturnDate, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.ReturnDate, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.ReturnTime, htmlAttributes: new { @class = "control-label col-md-12 text-white offset-1" })
+                        <div class="col-md-12 offset-1">
+                            @Html.EditorFor(model => model.ReturnTime, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.ReturnTime, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+            <center>
+                    <div class="form-group">
+                        <center><input type="submit" class="offset-1 btn btn-white font-weight-bold" value="Search" /></center>
+                    </div>
+                </center>
+            }
+        </div>
     </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
+</center>
+
+<h4 class="text-center">What We Offer</h4>
+
+<div class="row col-md-12" style="margin-bottom: 40px;">
+    <div class="col-md-4 bg-light rounded thinborder">
+            <h6 class="text-center text-darkblue">Safe &amp; Secure Parking</h6><br />
+            <p>
+                <i class="fas fa-check text-darkblue"></i> CCTV <br />
+                <i class="fas fa-check text-darkblue"></i> 24/7 Security Staff <br />
+                <i class="fas fa-check text-darkblue"></i> Controlled Entry/Exit Barriers <br />
+                <i class="fas fa-check text-darkblue"></i> Fully Insured Parking <br />
+            </p>
     </div>
-    <div class="col-md-4">
-        <h2>Web Hosting</h2>
-        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
+
+    <div class="col-md-4 bg-light rounded thinborder">
+            <h6 class="text-center text-darkblue">Professional Valet Service</h6><br />
+            <p>
+                We offer a new professional 5-star valet service that is carried out on-site by our quality valet staff. Make your return home even better with a spotless and sparkling clean valet.
+            </p><br />
+            <center style="padding-bottom: 20px;"><button class="btn btn-darkblue font-weight-bold">Learn More</button></center>
+    </div>
+
+    <div class="col-md-4 bg-light rounded thinborder">
+            <h6 class="text-center text-darkblue">Online Booking Management</h6><br />
+            <p>
+                View and amend your booking with ease using our simple online web system. Have full control of your booking and make changes hassle free.
+            </p><br />
+            <center style="padding-bottom: 20px;"><button class="btn btn-darkblue font-weight-bold">Manage My Booking</button></centerstyle="padding-bottom:>
     </div>
 </div>
