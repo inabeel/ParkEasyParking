@@ -1,5 +1,6 @@
 ﻿@model IEnumerable<ParkEasyV1.Models.User>
 @using ParkEasyV1.Models
+
 <!-- Page Content -->
 <div class="container-fluid" style="padding: 0 0 0 0;">
     <div class="row">
@@ -7,11 +8,10 @@
             <center><i class="fas fa-user fa-5x text-white" style="padding-bottom: 20px;"></i></center>
 
             <center>
-                <button type="button" id="testDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="btn btn-darkblue dropdown-toggle btn-sm my-2 my-sm-0 mr-sm-2 text-white font-weight-bold">@User.Identity.Name</button>
-                <div class="dropdown-menu" aria-labelledby="testDropDown">
-                    <a class="dropdown-item" href="#">Action</a>
-                    <a class="dropdown-item" href="#">Another action</a>
-                    <a class="dropdown-item" href="#">Something else here</a>
+                <button type="button" id="sidebarDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="btn btn-darkblue-sidebar dropdown-toggle btn-sm my-2 my-sm-0 mr-sm-2 text-white font-weight-bold">@User.Identity.Name</button>
+                <div class="dropdown-menu" aria-labelledby="sidebarDropdown">
+                    <a class="dropdown-item" href="#">My Details</a>
+                    <a class="dropdown-item" href="#" onclick="javascript:document.getElementById('logoutForm').submit()"><i class="fas fa-sign-out-alt"></i> Logout</a>
                 </div>
                 <p class="text-white" style="font-size: small;">Staff ID: @ViewBag.UserID</p>
             </center>
@@ -20,15 +20,13 @@
                 @Html.ActionLink("Dashboard", "Index", "Users", new { area = "" }, new { @class = "list-group-item active" })
                 @Html.ActionLink("Manage Users", "Manage", "Users", new { area = "" }, new { @class = "list-group-item" })
                 @Html.ActionLink("Manage Bookings", "Index", "Bookings", new { area = "" }, new { @class = "list-group-item" })
-                @Html.ActionLink("Customer Check In", "Index", "Users", new { area = "" }, new { @class = "list-group-item" })
-                @Html.ActionLink("Customer Check Out", "Index", "Users", new { area = "" }, new { @class = "list-group-item" })
+                @Html.ActionLink("Customer Departures", "Departures", "Users", new { area = "" }, new { @class = "list-group-item" })
+                @Html.ActionLink("Customer Returns", "Returns", "Users", new { area = "" }, new { @class = "list-group-item" })
 
                 @if (User.IsInRole("Invoice Clerk"))
                 {
-                    @Html.ActionLink("Manage Invoices", "Index", "Users", new { area = "" }, new { @class = "list-group-item" })
+                    @Html.ActionLink("Manage Invoices", "Manage", "Tariffs", new { area = "" }, new { @class = "list-group-item" })
                 }
-
-
 
                 @if (User.IsInRole("Manager"))
                 {
@@ -179,3 +177,4 @@
     <!-- /.container -->
 </div>
 
+<script src="~/Scripts/umd/popper.min.js"></script>

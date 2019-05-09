@@ -371,6 +371,11 @@
     <Content Include="Views\Users\_CustomerHomePartial.cshtml" />
     <Content Include="Views\Users\_StaffHomePartial.cshtml" />
     <Content Include="Views\Users\_AdminHomePartial.cshtml" />
+    <Content Include="Views\Users\Manage.cshtml" />
+    <Content Include="Views\Bookings\Manage.cshtml" />
+    <Content Include="Views\Users\Departures.cshtml" />
+    <Content Include="Views\Users\Returns.cshtml" />
+    <Content Include="Views\Tariffs\Manage.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

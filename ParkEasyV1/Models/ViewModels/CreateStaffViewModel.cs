@@ -34,6 +34,7 @@ namespace ParkEasyV1.Models.ViewModels
         /// Staff address line 1
         /// </summary>
         [Required]
+        [Display(Name ="Address Line 1")]
         public string AddressLine1 { get; set; }
 
         /// <summary>

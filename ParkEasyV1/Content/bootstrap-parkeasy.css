@@ -2678,6 +2678,18 @@ fieldset:disabled a.btn {
   border-color: #222e50;
 }
 
+.btn-darkblue-sidebar {
+    color: #fff;
+    background-color: #222e50;
+    border-color: #222e50;
+}
+
+.btn-darkblue-sidebar:hover {
+    color: #fff;
+    background-color: #222e50;
+    border-color: #222e50;
+}
+
 .btn-dark:focus, .btn-dark.focus {
   box-shadow: 0 0 0 0.2rem rgba(82, 88, 93, 0.5);
 }

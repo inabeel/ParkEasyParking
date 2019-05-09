@@ -27,6 +27,13 @@ namespace ParkEasyV1.Controllers
             return View(bookings.ToList());
         }
 
+        // GET: Bookings/Manage
+        public ActionResult Manage()
+        {
+            ViewBag.UserID = User.Identity.GetUserId();
+            return View(db.Bookings.OrderBy(b=>b.DateBooked).ToList());
+        }
+
         // GET: Bookings/Details/5
         public ActionResult Details(int? id)
         {

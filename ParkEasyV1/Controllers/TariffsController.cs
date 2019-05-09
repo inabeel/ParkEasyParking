@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
+using Microsoft.AspNet.Identity;
 using ParkEasyV1.Models;
 
 namespace ParkEasyV1.Controllers
@@ -17,6 +18,13 @@ namespace ParkEasyV1.Controllers
         // GET: Tariffs
         public ActionResult Index()
         {
+            return View(db.Tariffs.ToList());
+        }
+
+        // GET: Tariffs/Manage
+        public ActionResult Manage()
+        {
+            ViewBag.UserID = User.Identity.GetUserId();
             return View(db.Tariffs.ToList());
         }
 

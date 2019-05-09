@@ -48,12 +48,14 @@ namespace ParkEasyV1.Models.ViewModels
         /// user address line 1
         /// </summary>
         [Required]
+        [Display(Name ="Address")]
         public string AddressLine1 { get; set; }
 
         /// <summary>
         /// user address line 2
         /// </summary>
         [Required]
+        [Display(Name ="")]
         public string AddressLine2 { get; set; }
 
         /// <summary>

@@ -43,14 +43,45 @@ namespace ParkEasyV1.Controllers
             TempData["Bookings"] = bookings;
 
             ViewBag.BookingCount = bookings.Count;
-            ViewBag.BookingsToday = bookings.Where(b => b.DateBooked.Equals(DateTime.Today.Day)).Count();
+            ViewBag.BookingsToday = bookings.Where(b => b.DateBooked.Day.Equals(DateTime.Today.Day)).Count();
 
             var flights = db.Flights.ToList();
-            ViewBag.DepartingToday = flights.Where(f=>f.DepartureDate.Equals(DateTime.Today.Day)).Count();
-            ViewBag.ReturningToday = flights.Where(f => f.ReturnDate.Equals(DateTime.Today.Day)).Count();
+            ViewBag.DepartingToday = flights.Where(f=>f.DepartureDate.Day.Equals(DateTime.Today.Day)).Count();
+            ViewBag.ReturningToday = flights.Where(f => f.ReturnDate.Day.Equals(DateTime.Today.Day)).Count();
 
             ViewBag.UserID = User.Identity.GetUserId();
             return View(db.Users.ToList());
+        }
+
+        // GET: Users/Manage
+        public ActionResult Manage()
+        {
+            ViewBag.UserID = User.Identity.GetUserId();
+            List<Customer> customers = new List<Customer>();
+
+            foreach (var user in db.Users.ToList())
+            {
+                if (user is Customer)
+                {
+                    customers.Add(user as Customer);
+                }
+            }
+
+            return View(customers);
+        }
+
+        // GET: Users/Departures
+        public ActionResult Departures()
+        {
+            ViewBag.UserID = User.Identity.GetUserId();
+            return View(db.Bookings.Where(b=>b.Flight.DepartureDate.Day.Equals(DateTime.Today.Day)).ToList());
+        }
+
+        //  GET: Users/Returns
+        public ActionResult Returns()
+        {
+            ViewBag.UserID = User.Identity.GetUserId();
+            return View(db.Bookings.Where(b => b.Flight.ReturnDate.Day.Equals(DateTime.Today.Day)).ToList());
         }
 
         // GET: Users/Details/5
