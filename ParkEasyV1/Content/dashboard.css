@@ -1,0 +1,124 @@
+﻿.stats {
+    padding: 18px 23px;
+    font-family: "Nunito", sans-serif;
+    -webkit-box-shadow: 0 0 5px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.25);
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    min-height: 170px;
+    margin-bottom: 30px;
+}
+
+.stats-content {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    margin-top: auto;
+    -webkit-box-align: end;
+    -webkit-align-items: flex-end;
+    -ms-flex-align: end;
+    align-items: flex-end;
+}
+
+.stats-title {
+    font-size: 26px;
+    font-weight: 600;
+    letter-spacing: .04em;
+}
+
+.stats-icon {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: end;
+    -webkit-align-items: flex-end;
+    -ms-flex-align: end;
+    align-items: flex-end;
+    font-size: 20px;
+}
+
+.stats-data {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -webkit-box-align: end;
+    -webkit-align-items: flex-end;
+    -ms-flex-align: end;
+    align-items: flex-end;
+    margin-left: auto;
+}
+
+.stats-number {
+    font-size: 33px;
+    line-height: 33px;
+    font-weight: 600;
+    letter-spacing: .04em;
+}
+
+.stats-change {
+    margin-top: 5px;
+    font-family: "Open Sans", sans-serif;
+}
+
+.stats-percentage {
+    opacity: 1;
+}
+
+.stats-timeframe {
+    opacity: .5;
+}
+
+.stats-primary {
+    color: #fff;
+    background: #3F84FC;
+}
+
+.stats-secondary {
+    color: #fff;
+    background: #727F94;
+}
+
+.stats-success {
+    color: #fff;
+    background: #1DAB47;
+}
+
+.stats-info {
+    color: #fff;
+    background: #8A3FFC;
+}
+
+.stats-warning {
+    color: #212529;
+    background: #FCAE3F;
+}
+
+.stats-danger {
+    color: #fff;
+    background: #FC413F;
+}
+
+.stats-light {
+    color: #212529;
+    background: #f8f9fa;
+}
+
+.stats-dark {
+    color: #fff;
+    background: #1E232D;
+}

@@ -8,7 +8,6 @@
 
     <link href="~/Content/bootstrap-parkeasy.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
-    <link href="~/Content/dashboard.css" rel="stylesheet" />
 </head>
 <body>
     <nav class="navbar navbar-expand-md bg-dark-blue">
@@ -50,11 +49,26 @@
         </div>
     </nav>
 
+    @if (ViewBag.Title == "Staff Home Page")
+    {
+        <div class="container-fluid">
+            @RenderBody()
+        </div>
+    }
+    else if (ViewBag.Title == "Customer Home Page")
+    {
+        <div class="container-fluid">
+            @RenderBody()
+        </div>
+    }
+    else
+    {
+        <div class="container body-content">
+            @RenderBody()
+        </div>
+    }
 
 
-    <div class="container body-content">
-        @RenderBody()
-    </div>
 
     <footer class="bg-dark-blue">
         <div class="container text-white" style="padding-top: 20px;">
@@ -105,46 +119,7 @@
 
     <script src="~/Scripts/jquery-3.4.1.min.js"></script>
     <script src="~/Scripts/bootstrap.min.js"></script>
-    <script src="~/Scripts/popper.min.js"></script>
-
-    <!-- Icons -->
-    <script src="https://unpkg.com/feather-icons/dist/feather.min.js"></script>
-    <script>
-        feather.replace()
-    </script>
-
-    <!-- Graphs -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
-    <script>
-        var ctx = document.getElementById("myChart");
-        var myChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-                datasets: [{
-                    data: [15339, 21345, 18483, 24003, 23489, 24092, 12034],
-                    lineTension: 0,
-                    backgroundColor: 'transparent',
-                    borderColor: '#007bff',
-                    borderWidth: 4,
-                    pointBackgroundColor: '#007bff'
-                }]
-            },
-            options: {
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero: false
-                        }
-                    }]
-                },
-                legend: {
-                    display: false,
-                }
-            }
-        });
-    </script>
-
+    <script src="~/Scripts/umd/popper.min.js"></script>
 
     @RenderSection("scripts", required: false)
 </body>

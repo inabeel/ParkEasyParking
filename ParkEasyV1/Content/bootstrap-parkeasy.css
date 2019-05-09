@@ -5388,8 +5388,9 @@ a.badge-dark:hover, a.badge-dark:focus {
   display: block;
   padding: 0.75rem 1.25rem;
   margin-bottom: -1px;
-  background-color: #fff;
+  background-color: #222e50;
   border: 1px solid rgba(0, 0, 0, 0.125);
+  color: #fff;
 }
 
 .list-group-item:first-child {
@@ -5414,12 +5415,12 @@ a.badge-dark:hover, a.badge-dark:focus {
   background-color: #fff;
 }
 
-.list-group-item.active {
-  z-index: 2;
-  color: #fff;
-  background-color: #007bff;
-  border-color: #007bff;
-}
+    .list-group-item.active {
+        z-index: 2;
+        color: #fff;
+        background-color: #151d33;
+        border-color: #151d33;
+    }
 
 .list-group-flush .list-group-item {
   border-right: 0;

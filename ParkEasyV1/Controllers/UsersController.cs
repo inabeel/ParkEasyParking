@@ -39,6 +39,17 @@ namespace ParkEasyV1.Controllers
         // GET: Users
         public ActionResult Index()
         {
+            var bookings = db.Bookings.ToList();
+            TempData["Bookings"] = bookings;
+
+            ViewBag.BookingCount = bookings.Count;
+            ViewBag.BookingsToday = bookings.Where(b => b.DateBooked.Equals(DateTime.Today.Day)).Count();
+
+            var flights = db.Flights.ToList();
+            ViewBag.DepartingToday = flights.Where(f=>f.DepartureDate.Equals(DateTime.Today.Day)).Count();
+            ViewBag.ReturningToday = flights.Where(f => f.ReturnDate.Equals(DateTime.Today.Day)).Count();
+
+            ViewBag.UserID = User.Identity.GetUserId();
             return View(db.Users.ToList());
         }
 

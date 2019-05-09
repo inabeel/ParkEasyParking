@@ -1,56 +1,28 @@
-﻿@model IEnumerable<ParkEasyV1.Models.User>
-@using ParkEasyV1.Models
+﻿@using ParkEasyV1.Models
 
 @{
-    ViewBag.Title = "Admin Home Page";
+    if (User.IsInRole("Customer"))
+    {
+        ViewBag.Title = "Customer Home Page";
+    }
+    else
+    {
+        ViewBag.Title = "Staff Home Page";
+    }
+
+
 }
+<link href="~/Content/dashboard.css" rel="stylesheet" />
 
-<h2>Admin Home Page</h2>
-<br />
-<h2>Manage Users</h2>
-<p>
-    <button class="btn btn-primary" type="button" onclick="location.href='@Url.Action("CreateStaff")'">Create Staff Member</button>
-    <button class="btn btn-primary" type="button" onclick="location.href='@Url.Action("CreateRole")'">Create Role</button>
-</p>
-<div class="table-responsive">
-    <table class="table table-bordered table-striped">
-        <tr>
-
-            <th>
-                Username
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Email)
-            </th>
-            <th>Role</th>
-            <th></th>
-        </tr>
-
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.UserName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Email)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.CurrentRole)
-                </td>
-
-
-                <td>
-                    <div class="btn-group">
-                        <button class="btn btn-primary" type="button" onclick="location.href='@Url.Action("Edit" + (item is Staff ? "Staff" : "Customer"), new { id = item.Id })'">Edit</button>
-                        <button class="btn btn-primary" type="button" onclick="location.href='@Url.Action("Details", new { id = item.Id })'">Details</button>
-                        <button class="btn btn-primary" type="button" onclick="location.href='@Url.Action("Delete", new { id = item.Id })'">Delete</button>
-                        <button class="btn btn-primary" type="button" onclick="location.href='@Url.Action("ChangeRole", new { id = item.Id })'">Change Role</button>
-                    </div>
-                </td>
-            </tr>
-
-        }
-
-    </table>
-</div>
+@if (User.IsInRole("Admin"))
+{
+    Html.RenderPartial("_AdminHomePartial");
+}
+else if (User.IsInRole("Customer"))
+{
+    Html.RenderPartial("_CustomerHomePartial");
+}
+else
+{
+    Html.RenderPartial("_StaffHomePartial");
+}

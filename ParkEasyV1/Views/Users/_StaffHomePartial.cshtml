@@ -1,0 +1,181 @@
+﻿@model IEnumerable<ParkEasyV1.Models.User>
+@using ParkEasyV1.Models
+<!-- Page Content -->
+<div class="container-fluid" style="padding: 0 0 0 0;">
+    <div class="row">
+        <div class="col-lg-2 bg-dark-blue d-none d-sm-block" style="padding-top: 10px; padding-bottom: 20px;">
+            <center><i class="fas fa-user fa-5x text-white" style="padding-bottom: 20px;"></i></center>
+
+            <center>
+                <button type="button" id="testDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="btn btn-darkblue dropdown-toggle btn-sm my-2 my-sm-0 mr-sm-2 text-white font-weight-bold">@User.Identity.Name</button>
+                <div class="dropdown-menu" aria-labelledby="testDropDown">
+                    <a class="dropdown-item" href="#">Action</a>
+                    <a class="dropdown-item" href="#">Another action</a>
+                    <a class="dropdown-item" href="#">Something else here</a>
+                </div>
+                <p class="text-white" style="font-size: small;">Staff ID: @ViewBag.UserID</p>
+            </center>
+
+            <div class="list-group text-left font-weight-bold" style="padding-top: 30px;">
+                @Html.ActionLink("Dashboard", "Index", "Users", new { area = "" }, new { @class = "list-group-item active" })
+                @Html.ActionLink("Manage Users", "Manage", "Users", new { area = "" }, new { @class = "list-group-item" })
+                @Html.ActionLink("Manage Bookings", "Index", "Bookings", new { area = "" }, new { @class = "list-group-item" })
+                @Html.ActionLink("Customer Check In", "Index", "Users", new { area = "" }, new { @class = "list-group-item" })
+                @Html.ActionLink("Customer Check Out", "Index", "Users", new { area = "" }, new { @class = "list-group-item" })
+
+                @if (User.IsInRole("Invoice Clerk"))
+                {
+                    @Html.ActionLink("Manage Invoices", "Index", "Users", new { area = "" }, new { @class = "list-group-item" })
+                }
+
+
+
+                @if (User.IsInRole("Manager"))
+                {
+                    @Html.ActionLink("Manage Tariffs", "Index", "Users", new { area = "" }, new { @class = "list-group-item" })
+                }
+
+                @Html.ActionLink("Analytic Reports", "Index", "Users", new { area = "" }, new { @class = "list-group-item" })
+            </div>
+        </div>
+        <!-- /.col-lg-3 -->
+        <div class="col-lg-9" style="padding-bottom: 50px;">
+            <h3 class="font-weight-bold" style="padding-top: 50px; padding-bottom: 30px;">Staff Dashboard</h3>
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="stats stats-primary ">
+                        <h3 class="stats-title"> Users </h3>
+                        <div class="stats-content">
+                            <div class="stats-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stats-data">
+                                <div class="stats-number">@Model.Count()</div>
+                                <div class="stats-change">
+                                    <span class="stats-timeframe">Total registered users</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats stats-secondary">
+                        <h3 class="stats-title"> Bookings </h3>
+                        <div class="stats-content">
+                            <div class="stats-icon">
+                                <i class="fas fa-folder-open"></i>
+                            </div>
+                            <div class="stats-data">
+                                <div class="stats-number">@ViewBag.BookingCount</div>
+                                <div class="stats-timeframe">@ViewBag.BookingsToday New bookings today</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="stats stats-success ">
+                        <h3 class="stats-title"> Check-Ins </h3>
+                        <div class="stats-content">
+                            <div class="stats-icon">
+                                <i class="fas fa-plane-departure"></i>
+                            </div>
+                            <div class="stats-data">
+                                <div class="stats-number">@ViewBag.DepartingToday</div>
+                                <div class="stats-timeframe">Customers departing today</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats stats-danger">
+                        <h3 class="stats-title"> Check-Outs </h3>
+                        <div class="stats-content">
+                            <div class="stats-icon">
+                                <i class="fas fa-plane-arrival"></i>
+                            </div>
+                            <div class="stats-data">
+                                <div class="stats-number">@ViewBag.ReturningToday</div>
+                                <div class="stats-timeframe">Customers returning today</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <h3 class="font-weight-bold text-center" style="padding-top: 20px;">Bookings</h3>
+
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped table-hover">
+                    <tr>
+
+                        <th>
+                            Customer
+                        </th>
+                        <th>Booking Placed</th>
+                        <th>Departure Date</th>
+                        <th>Return Date</th>
+                        <th>Valet</th>
+                        <th>Total Cost</th>
+                        <th>Status</th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+
+                    @foreach (var item in TempData["Bookings"] as List<Booking>)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.User.Email)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.DateBooked)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Flight.DepartureDate)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Flight.ReturnDate)
+                            </td>
+                            <td>
+                                @if (item.ValetService == true)
+                                {
+                                    <i class="fas fa-check text-success"></i>
+                                }
+                                else
+                                {
+                                    <i class="fas fa-times text-danger"></i>
+                                }
+                            </td>
+                            <td>
+                                £@Html.DisplayFor(modelItem => item.Total)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.BookingStatus)
+                            </td>
+
+
+                            <td>
+                                <center><button class="btn btn-darkblue font-weight-bold" type="button" onclick="location.href='@Url.Action("Edit", "Bookings")'">View</button></center>
+                            </td>
+                            <td>
+                                <center><button class="btn btn-danger font-weight-bold" type="button" onclick="location.href='@Url.Action("Cancel", "Bookings")'">Cancel</button></center>
+                            </td>
+                        </tr>
+
+                    }
+
+                </table>
+                <button class="btn btn-darkblue font-weight-bold" type="button" onclick="location.href='@Url.Action("Create", "Bookings")'">Create New Booking</button>
+
+
+
+            </div>
+
+
+
+        </div>
+        <!-- /.col-lg-9 -->
+    </div>
+    <!-- /.container -->
+</div>
+
