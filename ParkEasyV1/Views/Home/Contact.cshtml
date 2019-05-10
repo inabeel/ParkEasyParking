@@ -1,17 +1,25 @@
 ﻿@{
     ViewBag.Title = "Contact";
 }
-<h2>@ViewBag.Title.</h2>
-<h3>@ViewBag.Message</h3>
+<div class="container body-content">
+    <h3 class="text-center mx-3">Contact Us</h3>
+    <p class="text-center">If you require any additional help or advice, then please do not hesitate to get in touch with us. We aim to reply to all enquiries within 1-2 working days.</p>
 
-<address>
-    One Microsoft Way<br />
-    Redmond, WA 98052-6399<br />
-    <abbr title="Phone">P:</abbr>
-    425.555.0100
-</address>
+    <div class="row">
+        <div class="col-md-6">
+            <p class="text-center">General Enquiry</p>
+            <div class="col-md-6 thinborder rounded">
+                <p>Please use the form below for any general enquiries.</p>
+                <div class="alert alert-secondary" role="alert">
+                    Our @Html.ActionLink("FAQs", "FAQs", null, htmlAttributes: new { @class="text-darkblue font-weight-bold"}) may also be of use to you. 
+                </div>
 
-<address>
-    <strong>Support:</strong>   <a href="mailto:Support@example.com">Support@example.com</a><br />
-    <strong>Marketing:</strong> <a href="mailto:Marketing@example.com">Marketing@example.com</a>
-</address>
+            </div>
+        </div>
+
+
+    </div>
+
+
+
+</div>

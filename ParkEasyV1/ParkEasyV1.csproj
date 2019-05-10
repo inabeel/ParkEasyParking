@@ -376,6 +376,7 @@
     <Content Include="Views\Users\Departures.cshtml" />
     <Content Include="Views\Users\Returns.cshtml" />
     <Content Include="Views\Tariffs\Manage.cshtml" />
+    <Content Include="Views\Home\Accessibility.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
