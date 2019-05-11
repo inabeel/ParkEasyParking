@@ -394,8 +394,8 @@ namespace ParkEasyV1.Controllers
             return View(model);
         }
 
-        // GET: Account/Manage
-        public ActionResult Manage(string Id)
+        // GET: Account/ManageDetails
+        public ActionResult ManageDetails(string Id)
         {
             //check if id is null
             if (Id == null)
@@ -415,7 +415,7 @@ namespace ParkEasyV1.Controllers
             }
 
             //return view with new view model and user details
-            return View(new ManageDetailsViewModel
+            return View("Manage", (new ManageDetailsViewModel
             {
                 FirstName = user.FirstName,
                 LastName = user.LastName,
@@ -425,7 +425,7 @@ namespace ParkEasyV1.Controllers
                 Postcode = user.Postcode,
                 Email = user.Email,
                 PhoneNo = user.PhoneNumber
-            });
+            }));
         }
 
         [HttpPost]

@@ -10,7 +10,7 @@
             <center>
                 <button type="button" id="sidebarDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="btn btn-darkblue-sidebar dropdown-toggle btn-sm my-2 my-sm-0 mr-sm-2 text-white font-weight-bold">@User.Identity.Name</button>
                 <div class="dropdown-menu" aria-labelledby="sidebarDropdown">
-                    <a class="dropdown-item" href="@Url.Action("Manage", "Accounts", new { id=ViewBag.UserID})">My Details</a>
+                    <a class="dropdown-item" href="@Url.Action("ManageDetails", "Accounts", new { id=ViewBag.UserID})">My Details</a>
                     <a class="dropdown-item" href="" onclick="javascript:document.getElementById('logoutForm').submit()"><i class="fas fa-sign-out-alt"></i> Logout</a>
                 </div>
                 <p class="text-white" style="font-size: small;">Staff ID: @ViewBag.UserID</p>
