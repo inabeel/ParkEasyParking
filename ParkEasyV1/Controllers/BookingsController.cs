@@ -30,7 +30,14 @@ namespace ParkEasyV1.Controllers
         // GET: Bookings/Manage
         public ActionResult Manage()
         {
-            ViewBag.UserID = User.Identity.GetUserId();
+            foreach (var user in db.Users.ToList())
+            {
+                if (user.Email.Equals(User.Identity.Name))
+                {
+                    ViewBag.UserID = user.Id;
+                }
+            }
+
             return View(db.Bookings.OrderBy(b => b.DateBooked).ToList());
         }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
+using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
@@ -17,6 +18,7 @@ namespace ParkEasyV1.Controllers
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
+        private ApplicationDbContext db = new ApplicationDbContext();
 
         public AccountController()
         {
@@ -389,6 +391,66 @@ namespace ParkEasyV1.Controllers
             }
 
             ViewBag.ReturnUrl = returnUrl;
+            return View(model);
+        }
+
+        // GET: Account/Manage
+        public ActionResult Manage(string Id)
+        {
+            //check if id is null
+            if (Id == null)
+            {
+                //return error
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+
+            //find user by id
+            User user = db.Users.Find(Id);
+
+            //if user is null
+            if (user == null)
+            {
+                //return error
+                return HttpNotFound();
+            }
+
+            //return view with new view model and user details
+            return View(new ManageDetailsViewModel
+            {
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                AddressLine1 = user.AddressLine1,
+                AddressLine2 = user.AddressLine2,
+                City = user.City,
+                Postcode = user.Postcode,
+                Email = user.Email,
+                PhoneNo = user.PhoneNumber
+            });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Manage(string id, [Bind(Include = "Email, FirstName, LastName, AddressLine1, AddressLine2, City, Postcode, PhoneNo")] ManageDetailsViewModel model)
+        {
+            //if model is valid
+            if (ModelState.IsValid)
+            {
+                //find staff by id
+                User user = await UserManager.FindByIdAsync(id);
+                UpdateModel(user); //update staff model
+
+                //get result for update staff
+                IdentityResult result = await UserManager.UpdateAsync(user);
+
+                //if update is successful
+                if (result.Succeeded)
+                {
+                    //success message and redirect
+                    //TempData["Success"] = "Staff member successfully edited";
+                    return RedirectToAction("Index", "Users");
+                }
+                AddErrors(result);
+            }
             return View(model);
         }
 

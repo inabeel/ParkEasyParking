@@ -381,6 +381,8 @@
     <Content Include="Views\Home\Prices.cshtml" />
     <Content Include="Views\Home\ToS.cshtml" />
     <Content Include="Views\Home\FAQs.cshtml" />
+    <Content Include="Views\Account\Manage.cshtml" />
+    <Content Include="Views\Users\MyBookings.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

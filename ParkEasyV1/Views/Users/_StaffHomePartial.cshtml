@@ -10,8 +10,8 @@
             <center>
                 <button type="button" id="sidebarDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="btn btn-darkblue-sidebar dropdown-toggle btn-sm my-2 my-sm-0 mr-sm-2 text-white font-weight-bold">@User.Identity.Name</button>
                 <div class="dropdown-menu" aria-labelledby="sidebarDropdown">
-                    <a class="dropdown-item" href="#">My Details</a>
-                    <a class="dropdown-item" href="#" onclick="javascript:document.getElementById('logoutForm').submit()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    <a class="dropdown-item" href="@Url.Action("Manage", "Accounts", new { id=ViewBag.UserID})">My Details</a>
+                    <a class="dropdown-item" href="" onclick="javascript:document.getElementById('logoutForm').submit()"><i class="fas fa-sign-out-alt"></i> Logout</a>
                 </div>
                 <p class="text-white" style="font-size: small;">Staff ID: @ViewBag.UserID</p>
             </center>
@@ -19,18 +19,18 @@
             <div class="list-group text-left font-weight-bold" style="padding-top: 30px;">
                 @Html.ActionLink("Dashboard", "Index", "Users", new { area = "" }, new { @class = "list-group-item active" })
                 @Html.ActionLink("Manage Users", "Manage", "Users", new { area = "" }, new { @class = "list-group-item" })
-                @Html.ActionLink("Manage Bookings", "Index", "Bookings", new { area = "" }, new { @class = "list-group-item" })
+                @Html.ActionLink("Manage Bookings", "Manage", "Bookings", new { area = "" }, new { @class = "list-group-item" })
                 @Html.ActionLink("Customer Departures", "Departures", "Users", new { area = "" }, new { @class = "list-group-item" })
                 @Html.ActionLink("Customer Returns", "Returns", "Users", new { area = "" }, new { @class = "list-group-item" })
 
                 @if (User.IsInRole("Invoice Clerk"))
                 {
-                    @Html.ActionLink("Manage Invoices", "Manage", "Tariffs", new { area = "" }, new { @class = "list-group-item" })
+                    @Html.ActionLink("Manage Invoices", "Manage", "Invoices", new { area = "" }, new { @class = "list-group-item" })
                 }
 
                 @if (User.IsInRole("Manager"))
                 {
-                    @Html.ActionLink("Manage Tariffs", "Index", "Users", new { area = "" }, new { @class = "list-group-item" })
+                    @Html.ActionLink("Manage Tariffs", "Manage", "Tariffs", new { area = "" }, new { @class = "list-group-item" })
                 }
 
                 @Html.ActionLink("Analytic Reports", "Index", "Users", new { area = "" }, new { @class = "list-group-item" })

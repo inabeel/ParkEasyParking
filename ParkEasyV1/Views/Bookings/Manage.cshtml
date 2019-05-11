@@ -42,11 +42,11 @@
             </div>
             <!-- /.col-lg-3 -->
             <div class="col-lg-9" style="padding-bottom: 50px;">
-                <h3 class="font-weight-bold" style="padding-top: 50px; padding-bottom: 20px;">Manage Users</h3>
+                <h3 class="font-weight-bold" style="padding-top: 50px; padding-bottom: 20px;">Manage Bookings</h3>
                 <div class="pr-3" style="padding-bottom: 20px;">
-                    <button class="btn btn-darkblue font-weight-bold" type="button" onclick="location.href='@Url.Action("CreateStaff", "Users")'">Place New Booking</button>
-                    <button class="btn btn-darkblue font-weight-bold" type="button" onclick="location.href='@Url.Action("CreateStaff", "Users")'">Check-In Customers</button>
-                    <button class="btn btn-darkblue font-weight-bold" type="button" onclick="location.href='@Url.Action("CreateStaff", "Users")'">Check-Out Customers</button>
+                    <button class="btn btn-darkblue font-weight-bold" type="button" onclick="location.href='@Url.Action("Create", "Bookings")'">Place New Booking</button>
+                    <button class="btn btn-darkblue font-weight-bold" type="button" onclick="location.href='@Url.Action("Departures", "Users")'">Check-In Customers</button>
+                    <button class="btn btn-darkblue font-weight-bold" type="button" onclick="location.href='@Url.Action("Returns", "Users")'">Check-Out Customers</button>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-bordered table-striped table-hover">

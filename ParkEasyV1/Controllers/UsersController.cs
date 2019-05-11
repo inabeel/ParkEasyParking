@@ -49,14 +49,28 @@ namespace ParkEasyV1.Controllers
             ViewBag.DepartingToday = flights.Where(f=>f.DepartureDate.Day.Equals(DateTime.Today.Day)).Count();
             ViewBag.ReturningToday = flights.Where(f => f.ReturnDate.Day.Equals(DateTime.Today.Day)).Count();
 
-            ViewBag.UserID = User.Identity.GetUserId();
+            foreach (var user in db.Users.ToList())
+            {
+                if (user.Email.Equals(User.Identity.Name))
+                {
+                    ViewBag.UserID = user.Id;
+                }
+            }
+
             return View(db.Users.ToList());
         }
 
         // GET: Users/Manage
         public ActionResult Manage()
         {
-            ViewBag.UserID = User.Identity.GetUserId();
+            foreach (var user in db.Users.ToList())
+            {
+                if (user.Email.Equals(User.Identity.Name))
+                {
+                    ViewBag.UserID = user.Id;
+                }
+            }
+
             List<Customer> customers = new List<Customer>();
 
             foreach (var user in db.Users.ToList())
@@ -73,15 +87,44 @@ namespace ParkEasyV1.Controllers
         // GET: Users/Departures
         public ActionResult Departures()
         {
-            ViewBag.UserID = User.Identity.GetUserId();
+            foreach (var user in db.Users.ToList())
+            {
+                if (user.Email.Equals(User.Identity.Name))
+                {
+                    ViewBag.UserID = user.Id;
+                }
+            }
             return View(db.Bookings.Where(b => b.Flight.DepartureDate.Day.Equals(DateTime.Today.Day)).ToList());
         }
 
         //  GET: Users/Returns
         public ActionResult Returns()
         {
-            ViewBag.UserID = User.Identity.GetUserId();
+            foreach (var user in db.Users.ToList())
+            {
+                if (user.Email.Equals(User.Identity.Name))
+                {
+                    ViewBag.UserID = user.Id;
+                }
+            }
             return View(db.Bookings.Where(b => b.Flight.ReturnDate.Day.Equals(DateTime.Today.Day)).ToList());
+        }
+
+        // GET: Users/MyBookings
+        public ActionResult MyBookings()
+        {
+            string id = null;
+
+            foreach (var user in db.Users.ToList())
+            {
+                if (user.Email.Equals(User.Identity.Name))
+                {
+                    ViewBag.UserID = user.Id;
+                    id = user.Id;
+                }
+            }
+
+            return View(db.Bookings.Where(b=>b.UserID.Equals(id)).ToList());
         }
 
         // GET: Users/Details/5
@@ -142,7 +185,7 @@ namespace ParkEasyV1.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "Id,FirstName,LastName,AddressLine1,AddressLine2,City,Postcode,Email,EmailConfirmed,PasswordHash,SecurityStamp,PhoneNumber,PhoneNumberConfirmed,TwoFactorEnabled,LockoutEndDateUtc,LockoutEnabled,AccessFailedCount,UserName")] User user)
+        public ActionResult Edit([Bind(Include = "Id,FirstName,LastName,AddressLine1,AddressLine2,City,Postcode,Email,PhoneNumber")] User user)
         {
             if (ModelState.IsValid)
             {

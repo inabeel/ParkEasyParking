@@ -180,4 +180,37 @@ namespace ParkEasyV1.Models
             return value is bool && (bool)value;
         }
     }
+
+    public class ManageDetailsViewModel
+    {
+        [Required]
+        [Display(Name ="First Name")]
+        public string FirstName { get; set; }
+
+        [Required]
+        [Display(Name = "Last Name")]
+        public string LastName { get; set; }
+
+        [Required]
+        [DataType(DataType.EmailAddress)]
+        public string Email { get; set; }
+
+        [Display(Name = "Phone Number")]
+        [DataType(DataType.PhoneNumber)]
+        public string PhoneNo { get; set; }
+
+        [Required]
+        [Display(Name = "Address")]
+        public string AddressLine1 { get; set; }
+
+        [Display(Name = "")]
+        public string AddressLine2 { get; set; }
+        
+        [Required]
+        public string City { get; set; }
+
+        [Required]
+        [DataType(DataType.PostalCode)]
+        public string Postcode { get; set; }
+    }
 }
