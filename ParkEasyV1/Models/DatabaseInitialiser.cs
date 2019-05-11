@@ -234,7 +234,7 @@ namespace ParkEasyV1.Models
             {
                 ID = 1,
                 Type = "Parking Slot",
-                Amount = 7.99
+                Amount = 4.96
             });
 
             context.Tariffs.Add(new Tariff()

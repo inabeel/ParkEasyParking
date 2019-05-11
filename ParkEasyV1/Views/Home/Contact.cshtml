@@ -1,23 +1,60 @@
-﻿@{
+﻿@model ParkEasyV1.Models.ViewModels.ContactViewModel
+
+@{
     ViewBag.Title = "Contact";
 }
 <div class="container body-content">
     <h3 class="text-center mx-3">Contact Us</h3>
     <p class="text-center">If you require any additional help or advice, then please do not hesitate to get in touch with us. We aim to reply to all enquiries within 1-2 working days.</p>
 
-    <div class="row">
-        <div class="col-md-6">
-            <p class="text-center">General Enquiry</p>
-            <div class="col-md-6 thinborder rounded">
-                <p>Please use the form below for any general enquiries.</p>
-                <div class="alert alert-secondary" role="alert">
-                    Our @Html.ActionLink("FAQs", "FAQs", null, htmlAttributes: new { @class="text-darkblue font-weight-bold"}) may also be of use to you. 
-                </div>
+    <div class="row offset-1" style="padding-bottom: 30px;">
+            <div class="col-6 thinborder rounded m-1">
+                <p class="text-center">General Enquiry</p>
+                <p>Please use the form below for any general enquiries</p>
+                <center><div class="alert alert-secondary col-md-10 justify-content-center" role="alert">Our @Html.ActionLink("FAQs", "FAQs", null, htmlAttributes: new { @class = "font-weight-bold text-darkblue" }) page may also be of help to you.</div></center>
 
+                @using (Html.BeginForm("Contact", "Home", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+                {
+                    @Html.AntiForgeryToken()
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label" })
+                        <div>
+                            @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control col-md-8" } })
+                            @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Email, htmlAttributes: new { @class = "control-label" })
+                        <div>
+                            @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control col-md-8" } })
+                            @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Message, htmlAttributes: new { @class = "control-label" })
+                        <div>
+                            @Html.TextAreaFor(model => model.Message, 6, 65, new { htmlAttributes = new { @class = "form-control col-md-6" } })
+                            @Html.ValidationMessageFor(model => model.Message, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <center style="padding-bottom: 20px;"><input type="submit" class="btn btn-darkblue font-weight-bold" value="Send Message" /></center>
+                }
             </div>
-        </div>
-
-
+            <div class="col-4 thinborder rounded m-1">
+                <p class="text-center">Our Details</p>
+                <p>
+                    ParkEasy Airport Parking Ltd.<br>
+                    190 Airport Road,<br>
+                    Glasgow, <br>
+                    G4 0ND,<br>
+                    UK
+                </p>
+                <p>
+                    Tel: <strong><a class="text-darkblue" href="tel:+441415550204">0141 555 0204</a></strong><br>
+                    Email: <strong><a class="text-darkblue" href="mailto: contact@parkeasy.co.uk">contact@parkeasy.co.uk</a></strong>
+                </p>
+            </div>
     </div>
 
 

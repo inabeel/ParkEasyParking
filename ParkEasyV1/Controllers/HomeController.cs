@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ParkEasyV1.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -8,6 +9,8 @@ namespace ParkEasyV1.Controllers
 {
     public class HomeController : Controller
     {
+        private ApplicationDbContext db = new ApplicationDbContext();
+
         public ActionResult Index()
         {
             return View();
@@ -15,56 +18,85 @@ namespace ParkEasyV1.Controllers
 
         public ActionResult About()
         {
-            //ViewBag.Message = "Your application description page.";
 
             return View();
         }
 
         public ActionResult Contact()
         {
-            //ViewBag.Message = "Your contact page.";
 
             return View();
         }
 
         public ActionResult Prices()
         {
-            //ViewBag.Message = "Your contact page.";
+            //get tarrifs from db
+            var tariffs = db.Tariffs.ToList();
+
+            //loop through tariffs and get current prices
+            foreach (var tariff in tariffs)
+            {
+                if (tariff.Type.Equals("Parking Slot"))
+                {
+                    ViewBag.SlotPrice = tariff.Amount*8;
+                }
+
+                if (tariff.Type.Equals("Mini Valet"))
+                {
+                    ViewBag.MiniValetPrice = tariff.Amount;
+                }
+
+                if (tariff.Type.Equals("Full Valet"))
+                {
+                    ViewBag.FullValetPrice = tariff.Amount;
+                }
+            }
 
             return View();
         }
 
         public ActionResult Services()
         {
-            //ViewBag.Message = "Your contact page.";
 
             return View();
         }
 
-        public ActionResult TermsAndConditions()
+        public ActionResult ToS()
         {
-            //ViewBag.Message = "Your contact page.";
 
             return View();
         }
 
         public ActionResult Accessibility()
         {
-            //ViewBag.Message = "Your contact page.";
 
             return View();
         }
 
         public ActionResult Sitemap()
         {
-            //ViewBag.Message = "Your contact page.";
 
             return View();
         }
 
         public ActionResult FAQs()
         {
-            //ViewBag.Message = "Your contact page.";
+            //get tariffs from db
+            var tariffs = db.Tariffs.ToList();
+
+            //loop through tariffs and get valet prices
+            foreach (var tariff in tariffs)
+            {
+                if (tariff.Type.Equals("Mini Valet"))
+                {
+                    ViewBag.MiniValetPrice = tariff.Amount;
+                }
+
+                if (tariff.Type.Equals("Full Valet"))
+                {
+                    ViewBag.FullValetPrice = tariff.Amount;
+                }
+            }
 
             return View();
         }
