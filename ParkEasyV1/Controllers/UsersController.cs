@@ -74,7 +74,7 @@ namespace ParkEasyV1.Controllers
         public ActionResult Departures()
         {
             ViewBag.UserID = User.Identity.GetUserId();
-            return View(db.Bookings.Where(b=>b.Flight.DepartureDate.Day.Equals(DateTime.Today.Day)).ToList());
+            return View(db.Bookings.Where(b => b.Flight.DepartureDate.Day.Equals(DateTime.Today.Day)).ToList());
         }
 
         //  GET: Users/Returns

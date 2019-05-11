@@ -65,42 +65,42 @@
 
                         @foreach (var item in Model)
                         {
-                        <tr>
-                            <td>@Html.DisplayFor(modelItem => item.User.Email)</td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.DateBooked)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.Flight.DepartureDate)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.Flight.ReturnDate)
-                            </td>
-                            <td>
-                                @if (item.ValetService == true)
-                                {
-                                    <i class="fas fa-check text-success"></i>
-                                }
-                                else
-                                {
-                                    <i class="fas fa-times text-danger"></i>
-                                }
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.Total)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.BookingStatus)
-                            </td>
-                            <td>
-                                <center><button class="btn btn-darkblue font-weight-bold" type="button" onclick="location.href='@Url.Action("Edit", "Bookings", new { id = item.ID})'">View</button></center>
-                            </td>
-                            <td>
-                                <center><button class="btn btn-danger font-weight-bold" type="button" onclick="location.href='@Url.Action("Cancel", "Bookings", new { id = item.ID})'">Cancel</button></center>
-                            </td>
-                        </tr>
+                            <tr>
+                                <td>@Html.DisplayFor(modelItem => item.User.Email)</td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.DateBooked)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Flight.DepartureDate)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Flight.ReturnDate)
+                                </td>
+                                <td>
+                                    @if (item.ValetService == true)
+                                    {
+                                        <i class="fas fa-check text-success"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="fas fa-times text-danger"></i>
+                                    }
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Total)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.BookingStatus)
+                                </td>
+                                <td>
+                                    <center><button class="btn btn-darkblue font-weight-bold" type="button" onclick="location.href='@Url.Action("Edit", "Bookings", new { id = item.ID})'">View</button></center>
+                                </td>
+                                <td>
+                                    <center><button class="btn btn-danger font-weight-bold" type="button" onclick="location.href='@Url.Action("Cancel", "Bookings", new { id = item.ID})'">Cancel</button></center>
+                                </td>
+                            </tr>
                         }
-                    </table>                  
+                    </table>
                 </div>
             </div>
             <!-- /.col-lg-9 -->
@@ -110,4 +110,4 @@
 </div>
 
 
-<script src="~/Scripts/umd/popper.min.js"></script>
+<script src="~/Scripts/umd/popper.min.js"></script> 

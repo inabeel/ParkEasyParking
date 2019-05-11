@@ -58,49 +58,49 @@
                             <th>Address Line 2</th>
                             <th>@Html.DisplayNameFor(model => model.City)</th>
                             <th>@Html.DisplayNameFor(model => model.Postcode)</th>
-                            <th>@Html.DisplayNameFor(model=>model.Corporate)</th>
+                            <th>@Html.DisplayNameFor(model => model.Corporate)</th>
                             <th></th>
                         </tr>
 
                         @foreach (var item in Model)
                         {
-                        <tr>
-                            <td>@Html.DisplayFor(modelItem => item.RegistrationDate)</td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.Email)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.FirstName)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.LastName)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.AddressLine1)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.AddressLine2)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.City)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.Postcode)
-                            </td>
-                            <td>
-                                @if (item.Corporate == true)
-                                {
-                                    <i class="fas fa-check text-success"></i>
-                                }
-                                else
-                                {
-                                    <i class="fas fa-times text-danger"></i>
-                                }
-                            </td>
-                            <td>
-                                <center><button class="btn btn-darkblue font-weight-bold" type="button" onclick="location.href='@Url.Action("Edit" + (item is Staff ? "Staff" : "Customer"), new { id = item.Id })'">View</button></center>
-                            </td>
-                        </tr>
+                            <tr>
+                                <td>@Html.DisplayFor(modelItem => item.RegistrationDate)</td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Email)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.FirstName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.LastName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.AddressLine1)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.AddressLine2)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.City)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Postcode)
+                                </td>
+                                <td>
+                                    @if (item.Corporate == true)
+                                    {
+                                        <i class="fas fa-check text-success"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="fas fa-times text-danger"></i>
+                                    }
+                                </td>
+                                <td>
+                                    <center><button class="btn btn-darkblue font-weight-bold" type="button" onclick="location.href='@Url.Action("Edit" + (item is Staff ? "Staff" : "Customer"), new { id = item.Id })'">View</button></center>
+                                </td>
+                            </tr>
                         }
                     </table>
                     <button class="btn btn-darkblue font-weight-bold" type="button" onclick="location.href='@Url.Action("CreateStaff", "Users")'">Create New User</button>
@@ -113,4 +113,4 @@
 </div>
 
 
-<script src="~/Scripts/umd/popper.min.js"></script>
+<script src="~/Scripts/umd/popper.min.js"></script> 

@@ -3,41 +3,13 @@
 {
     using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "ml-auto small mb-2 mb-md-0" }))
     {
-    @Html.AntiForgeryToken()
+        @Html.AntiForgeryToken()
 
     <ul class="navbar-nav ml-auto small mb-2 mb-md-0" style="position: relative; top: -10px;">
         <li><button type="button" onclick="location.href='@Url.Action("Create", "Bookings")'" class="btn btn-outline-white btn-sm my-2 my-sm-0 mr-sm-2 text-white font-weight-bold">Book Online</button></li>
         <li>
             <button type="button" id="navAccountDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="btn btn-outline-white dropdown-toggle btn-sm my-2 my-sm-0 mr-sm-2 text-white font-weight-bold">My Account</button>
-            @if (User.IsInRole("Customer"))
-            {
-                <div class="dropdown-menu" aria-labelledby="navAccountDropdown">
-                    <a class="dropdown-item" href="#">Customer Dashboard</a>
-                    <a class="dropdown-item" href="#">My Details</a>
-                    <a class="dropdown-item" href="#">My Bookings</a>
-                </div>
-            }
-            else
-            {
-                <div class="dropdown-menu" aria-labelledby="navAccountDropdown">
-                    <a class="dropdown-item" href="@Url.Action("Index", "Users")">Staff Dashboard</a>
-                    <a class="dropdown-item" href="#">My Details</a>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="@Html.Action("Manage", "Users")">Manage Users</a>
-                    <a class="dropdown-item" href="@Html.Action("Manage", "Bookings")">Manage Bookings</a>
-                    <a class="dropdown-item" href="@Html.Action("Departures", "Users")">Customer Departures</a>
-                    <a class="dropdown-item" href="@Html.Action("Returns", "Users")">Customer Returns</a>
-                    @if (User.IsInRole("Invoice Clerk"))
-                    {
-                        <a class="dropdown-item" href="#">Manage Invoices</a>
-                    }                    
-                    @if (User.IsInRole("Manager"))
-                    {
-                        <a class="dropdown-item" href="@Html.Action("Manage", "Tariffs")">Manage Tariffs</a>
-                    }                    
-                    <a class="dropdown-item" href="#">Analytic Reports</a>
-                </div>
-            }
+            
 
         </li>
         <li><button type="submit" onclick="javascript:document.getElementById('logoutForm').submit()" class="btn btn-outline-white btn-sm my-2 my-sm-0 mr-sm-2 text-white font-weight-bold"><i class="fas fa-sign-out-alt"></i> Logout</button></li>
@@ -57,3 +29,4 @@ else
         </li>
     </ul>
 }
+
