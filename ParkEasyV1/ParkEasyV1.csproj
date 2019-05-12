@@ -48,6 +48,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DayPilot.Web.Mvc, Version=2019.1.5978.0, Culture=neutral, PublicKeyToken=b8d928e6588028e4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\DayPilot.Web.Mvc.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -227,6 +231,34 @@
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\dashboard.css" />
+    <Content Include="Content\DayPilot\areas.css" />
+    <Content Include="Content\DayPilot\areas\icons.png" />
+    <Content Include="Content\DayPilot\bubble_default.css" />
+    <Content Include="Content\DayPilot\calendar_blue.css" />
+    <Content Include="Content\DayPilot\calendar_g.css" />
+    <Content Include="Content\DayPilot\calendar_green.css" />
+    <Content Include="Content\DayPilot\calendar_traditional.css" />
+    <Content Include="Content\DayPilot\calendar_transparent.css" />
+    <Content Include="Content\DayPilot\calendar_white.css" />
+    <Content Include="Content\DayPilot\menu_default.css" />
+    <Content Include="Content\DayPilot\month_blue.css" />
+    <Content Include="Content\DayPilot\month_g.css" />
+    <Content Include="Content\DayPilot\month_green.css" />
+    <Content Include="Content\DayPilot\month_traditional.css" />
+    <Content Include="Content\DayPilot\month_transparent.css" />
+    <Content Include="Content\DayPilot\month_white.css" />
+    <Content Include="Content\DayPilot\navigator_8.css" />
+    <Content Include="Content\DayPilot\navigator_blue.css" />
+    <Content Include="Content\DayPilot\navigator_g.css" />
+    <Content Include="Content\DayPilot\navigator_green.css" />
+    <Content Include="Content\DayPilot\navigator_transparent.css" />
+    <Content Include="Content\DayPilot\navigator_white.css" />
+    <Content Include="Content\DayPilot\scheduler_8.css" />
+    <Content Include="Content\DayPilot\scheduler_blue.css" />
+    <Content Include="Content\DayPilot\scheduler_green.css" />
+    <Content Include="Content\DayPilot\scheduler_traditional.css" />
+    <Content Include="Content\DayPilot\scheduler_transparent.css" />
+    <Content Include="Content\DayPilot\scheduler_white.css" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
@@ -234,6 +266,7 @@
     <Content Include="Scripts\bootstrap.bundle.min.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
+    <Content Include="Scripts\daypilot-all.min.js" />
     <Content Include="Scripts\esm\popper-utils.js" />
     <Content Include="Scripts\esm\popper-utils.min.js" />
     <Content Include="Scripts\esm\popper.js" />
@@ -386,6 +419,8 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Views\Reservation\" />
+    <Folder Include="Views\Scheduler\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

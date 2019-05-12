@@ -27,6 +27,6 @@ namespace ParkEasyV1.Models
         public static ApplicationDbContext Create()
         {
             return new ApplicationDbContext();
-        }
+        }        
     }
 }
