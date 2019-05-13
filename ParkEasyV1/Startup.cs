@@ -1,5 +1,7 @@
 ﻿using Microsoft.Owin;
 using Owin;
+using Stripe;
+using System.Configuration;
 
 [assembly: OwinStartupAttribute(typeof(ParkEasyV1.Startup))]
 namespace ParkEasyV1

@@ -23,8 +23,8 @@
 
             <div class="list-group text-left font-weight-bold" style="padding-top: 30px;">
                 @Html.ActionLink("Dashboard", "Index", "Users", new { area = "" }, new { @class = "list-group-item active" })
-                @Html.ActionLink("My Details", "Manage", "Accounts", new { id = ViewBag.UserID }, new { @class = "list-group-item" })
-                @Html.ActionLink("Manage Bookings", "Manage", "Bookings", new { area = "" }, new { @class = "list-group-item" })
+                @Html.ActionLink("My Details", "ManageDetails", "Account", new { id = ViewBag.UserID }, new { @class = "list-group-item" })
+                @Html.ActionLink("Manage Bookings", "MyBookings", "Users", new { area = "" }, new { @class = "list-group-item" })
             </div>
         </div>
         <!-- /.col-lg-3 -->

@@ -13,7 +13,7 @@
 
         <div class="form-horizontal">
             <hr />
-            <div class="h4 text-center col-md-10">Total: £0.00</div>
+            <div class="h4 text-center col-md-10">Total: £@ViewBag.Total</div>
             @Html.ValidationSummary(true, "", new { @class = "text-danger" })
             <div class="form-group">
                 @Html.LabelFor(model => model.Type, htmlAttributes: new { @class = "control-label col-md-2" })
@@ -70,7 +70,7 @@
 
             <div class="form-group">
                 <div class="col-md-offset-2 col-md-10">
-                    <center><input type="submit" value="Pay" onclick="location.href='@Url.Action("Index", "Bookings")'" class="btn btn-darkblue font-weight-bold" /></center>
+                    <center><input type="submit" value="Pay" onclick="location.href='@Url.Action("MyBookings", "Users")'" class="btn btn-darkblue font-weight-bold" /></center>
                 </div>
             </div>
         </div>

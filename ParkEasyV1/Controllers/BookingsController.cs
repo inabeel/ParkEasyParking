@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
 using System.Data.Entity;
 using System.Linq;
@@ -59,11 +60,6 @@ namespace ParkEasyV1.Controllers
         // GET: Bookings/Create
         public ActionResult Create()
         {
-            //ViewBag.FlightID = new SelectList(db.Flights, "ID", "DepartureFlightNo");
-            //ViewBag.ID = new SelectList(db.Invoices, "ID", "CustomerID");
-            //ViewBag.ParkingSlotID = new SelectList(db.ParkingSlots, "ID", "ID");
-            //ViewBag.TariffID = new SelectList(db.Tariffs, "ID", "Type");
-            //ViewBag.UserID = new SelectList(db.Users, "Id", "FirstName");
             return View();
         }
 
@@ -92,7 +88,7 @@ namespace ParkEasyV1.Controllers
         //
         // POST: /Bookings/CreateBooking
         [HttpPost]
-        [AllowAnonymous]
+        [Authorize]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> CreateBooking(CreateBookingViewModel model)
         {
@@ -150,12 +146,6 @@ namespace ParkEasyV1.Controllers
                     ValetService = false,
                     CheckedIn = false,
                     CheckedOut = false,
-
-                    //add booking lines
-                    //BookingLines = new List<BookingLine>()
-                    //{
-                    //    new BookingLine() {Booking = db.Bookings.Find(uniqueBookingId), Vehicle = db.Vehicles.Find(uniqueVehicleId)},
-                    //},
                 });
 
                 db.SaveChanges();
@@ -170,7 +160,6 @@ namespace ParkEasyV1.Controllers
 
                 TempData["bookingID"] = createdBooking.ID;
 
-                //return RedirectToAction("Valet", createdBooking.ID);
                 return RedirectToAction("Valet");
 
             }
@@ -181,17 +170,6 @@ namespace ParkEasyV1.Controllers
 
         public ActionResult Valet()
         {
-            //if (id==null)
-            //{
-            //    return new HttpStatusCodeResult(HttpStatusCode.BadGateway);
-            //}
-
-            //Booking booking = db.Bookings.Find(id);
-            //if (booking==null)
-            //{
-            //    return HttpNotFound();
-            //}
-
             return View();
         }
 
@@ -264,7 +242,7 @@ namespace ParkEasyV1.Controllers
 
         public ActionResult PurchaseValet(int valetID)
         {
-            Booking booking = db.Bookings.Find(TempData["BookingID"]);
+            Booking booking = db.Bookings.Find(TempData["bookingID"]);
 
             booking.ValetService = true;
             booking.Total = booking.Total + db.Tariffs.Find(valetID).Amount;
@@ -272,52 +250,61 @@ namespace ParkEasyV1.Controllers
             db.SaveChanges();
 
 
-            return RedirectToAction("Pay");
+            return RedirectToAction("Charge", "Payments");
         }
 
-        // GET: Payments/Pay
-        public ActionResult Pay()
+        public ActionResult CheckIn(int id)
         {
-            //ViewBag.UserID = new SelectList(db.Users, "Id", "FirstName");
-            return View();
-        }
-
-        //
-        // POST: /Payments/Pay
-        [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Pay(PaymentViewModel model)
-        {
-            UserManager<User> userManager = new UserManager<User>(new UserStore<User>(db));
-
-            if (ModelState.IsValid)
+            if (CheckInBooking(id))
             {
-                db.Payments.Add(new Card()
-                {
-                    PaymentDate = DateTime.Now,
-                    Amount = db.Bookings.Find(TempData["bookingID"]).Total,
-                    User = userManager.FindByName(User.Identity.Name),
-                    Type = model.Type,
-                    CardNumber = model.CardNumber,
-                    NameOnCard = model.NameOnCard,
-                    ExpiryDate = new DateTime(model.ExpiryYear, model.ExpiryMonth, DateTime.Now.Day),
-                    CVV = model.CVV
-                });
-
-                Booking booking = db.Bookings.Find(TempData["bookingID"]);
-
-                booking.BookingStatus = BookingStatus.Confirmed;
-
-                db.SaveChanges();
-
-
-                return RedirectToAction("Index", "Bookings");
-
+                TempData["Message"] = "Booking Checked In Successfully";
+                return RedirectToAction("Manage");
             }
+            else
+            {
+                return RedirectToAction("Index");
+            }            
+        }
 
-            // If we got this far, something failed, redisplay form
-            return View("Index", "Bookings");
+        public ActionResult CheckOut(int id)
+        {
+            if (CheckOutBooking(id))
+            {
+                TempData["Message"] = "Booking Checked Out Successfully";
+                return RedirectToAction("Manage");
+            }
+            else
+            {
+                return RedirectToAction("Index");
+            }
+        }
+
+        private bool CheckInBooking(int id)
+        {
+            foreach (var booking in db.Bookings.ToList())
+            {
+                if (booking.ID == id)
+                {
+                    booking.CheckedOut = false;
+                    booking.CheckedIn = true;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private bool CheckOutBooking(int id)
+        {
+            foreach (var booking in db.Bookings.ToList())
+            {
+                if (booking.ID == id)
+                {
+                    booking.CheckedIn = false;
+                    booking.CheckedOut = true;
+                    return true;
+                }
+            }
+            return false;
         }
 
         private int GetLastBookingId()

@@ -1,0 +1,45 @@
+﻿@{
+    ViewBag.Title = "Charge";
+}
+
+<div class="container body-content">
+    <h2 class="text-center my-3">Booking Payment</h2>
+    <h3 class="text-center font-weight-bold my-2" style="padding-bottom: 40px;">Total: £@ViewBag.Total</h3>
+<center>
+    <div class="col-md-10">
+        <form action="/Payments/Charge" method="POST">
+            <script src="//checkout.stripe.com/v2/checkout.js"
+                    class="stripe-button"
+                    data-key="@ViewBag.StripePublishableKey"
+                    data-locale="auto"
+                    data-name="ParkEasy Airport Parking"
+                    data-description="ParkEasy Parking Charge"
+                    data-email="@User.Identity.Name"
+                    data-billing-address="true"
+                    data-currency="GBP"
+                    data-image="/images/concept3.png"
+                    data-amount="@ViewBag.StripeTotal">
+            </script>
+        </form>
+        <p class="text-center" style="padding-top: 40px;">We accept</p>
+        <div class="row justify-content-center my-4">
+            
+            <i class="fab fa-cc-visa fa-3x px-2"></i>
+            <i class="fab fa-cc-mastercard fa-3x px-2"></i>
+            <i class="fab fa-cc-amex fa-3x px-2"></i>
+            <i class="fab fa-cc-discover fa-3x px-2"></i>
+            <i class="fab fa-cc-jcb fa-3x px-2"></i>
+        </div>
+        
+    </div>
+</center>
+<center>
+    <div class="col-md-10">
+        <hr />
+        <p>or</p>
+        <h4>Checkout with PayPal</h4>
+        <center class="my-5"><button class="btn btn-darkblue"><img src="~/images/paypal-braintreee.png" height="70" width="150" /></button></center>
+    </div>
+</center>
+
+</div>

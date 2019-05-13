@@ -60,57 +60,108 @@
 
 
 
-    <footer class="bg-dark-blue">
-        <div class="container text-white" style="padding-top: 20px;">
-            <div class="row">
-                <div class="col-sm">
-                    <h6>About Us</h6>
-                    <p class="small">ParkEasy Airport Parking are situated four miles from Glasgow Airport and have been providing safe and secure airport parking for travellers for almost a decade.</p><br />
-                    <a href="#"><img src="/images/100x230.png" width="115" height="50" alt="ParkEasy Airport Parking Logo" href="#"></a>
-                    <a href="https://www.paypal.com/"><img src="/images/paypal-braintreee.png" width="200" height="100" alt="PayPal Powered By BrainTree"></a>
-                </div>
-                <div class="col-sm">
-                    <h6>ParkEasy Airport Parking</h6>
-                    <p class="small">
-                        ParkEasy Airport Parking Ltd.<br>
-                        190 Airport Road,<br>
-                        Glasgow,<br>
-                        G4 0ND,<br>
-                        UK
-                    </p>
-                </div>
-                <div class="col-sm">
-                    <h6>Contact &amp; Business Hours</h6>
-                    <p class="small">
-                        Monday - Friday: 09:00 - 17:00<br>
-                        Saturday - Sunday: Closed<br><br>
+    @if (ViewBag.Title.Equals("Charge"))
+    {
+        <footer class="bg-dark-blue position-sticky">
+            <div class="container text-white" style="padding-top: 20px;">
+                <div class="row">
+                    <div class="col-sm">
+                        <h6>About Us</h6>
+                        <p class="small">ParkEasy Airport Parking are situated four miles from Glasgow Airport and have been providing safe and secure airport parking for travellers for almost a decade.</p><br />
+                        <a href="#"><img src="/images/100x230.png" width="115" height="50" alt="ParkEasy Airport Parking Logo" href="#"></a>
+                        <a href="https://www.paypal.com/"><img src="/images/paypal-braintreee.png" width="200" height="100" alt="PayPal Powered By BrainTree"></a>
+                    </div>
+                    <div class="col-sm">
+                        <h6>ParkEasy Airport Parking</h6>
+                        <p class="small">
+                            ParkEasy Airport Parking Ltd.<br>
+                            190 Airport Road,<br>
+                            Glasgow,<br>
+                            G4 0ND,<br>
+                            UK
+                        </p>
+                    </div>
+                    <div class="col-sm">
+                        <h6>Contact &amp; Business Hours</h6>
+                        <p class="small">
+                            Monday - Friday: 09:00 - 17:00<br>
+                            Saturday - Sunday: Closed<br><br>
 
-                        Tel: <strong><a class="text-white" href="tel:+441415550204">0141 555 0204</a></strong><br>
-                        Email: <strong><a class="text-white" href="mailto: contact@parkeasy.co.uk">contact@parkeasy.co.uk</a></strong>
-                    </p>
-                </div>
-            </div>
-        </div>
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-12 col-md-8 text-white small">&copy; @DateTime.Now.Year ParkEasy Airport Parking</div>
-                <div class="col-6 col-md-4 text-right small">
-                    @Html.ActionLink("Terms & Conditions", "ToS", "Home", new { area = "" }, new { @class = "text-white font-weight-bold" }) &nbsp; &nbsp;
-                    @Html.ActionLink("Accessibility", "Accessibility", "Home", new { area = "" }, new { @class = "text-white font-weight-bold" }) &nbsp; &nbsp;
-                    @Html.ActionLink("Sitemap", "Sitemap", "Home", new { area = "" }, new { @class = "text-white font-weight-bold" }) &nbsp; &nbsp;
-                    @Html.ActionLink("FAQs", "FAQs", "Home", new { area = "" }, new { @class = "text-white font-weight-bold" }) &nbsp; &nbsp;
+                            Tel: <strong><a class="text-white" href="tel:+441415550204">0141 555 0204</a></strong><br>
+                            Email: <strong><a class="text-white" href="mailto: contact@parkeasy.co.uk">contact@parkeasy.co.uk</a></strong>
+                        </p>
+                    </div>
                 </div>
             </div>
-        </div>
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12 col-md-8 text-white small">&copy; @DateTime.Now.Year ParkEasy Airport Parking</div>
+                    <div class="col-6 col-md-4 text-right small">
+                        @Html.ActionLink("Terms & Conditions", "ToS", "Home", new { area = "" }, new { @class = "text-white font-weight-bold" }) &nbsp; &nbsp;
+                        @Html.ActionLink("Accessibility", "Accessibility", "Home", new { area = "" }, new { @class = "text-white font-weight-bold" }) &nbsp; &nbsp;
+                        @Html.ActionLink("Sitemap", "Sitemap", "Home", new { area = "" }, new { @class = "text-white font-weight-bold" }) &nbsp; &nbsp;
+                        @Html.ActionLink("FAQs", "FAQs", "Home", new { area = "" }, new { @class = "text-white font-weight-bold" }) &nbsp; &nbsp;
+                    </div>
+                </div>
+            </div>
+            </footer>
+    }
+    else
+    { 
+        <footer class="bg-dark-blue">
+            <div class="container text-white" style="padding-top: 20px;">
+                <div class="row">
+                    <div class="col-sm">
+                        <h6>About Us</h6>
+                        <p class="small">ParkEasy Airport Parking are situated four miles from Glasgow Airport and have been providing safe and secure airport parking for travellers for almost a decade.</p><br />
+                        <a href="#"><img src="/images/100x230.png" width="115" height="50" alt="ParkEasy Airport Parking Logo" href="#"></a>
+                        <a href="https://www.paypal.com/"><img src="/images/paypal-braintreee.png" width="200" height="100" alt="PayPal Powered By BrainTree"></a>
+                    </div>
+                    <div class="col-sm">
+                        <h6>ParkEasy Airport Parking</h6>
+                        <p class="small">
+                            ParkEasy Airport Parking Ltd.<br>
+                            190 Airport Road,<br>
+                            Glasgow,<br>
+                            G4 0ND,<br>
+                            UK
+                        </p>
+                    </div>
+                    <div class="col-sm">
+                        <h6>Contact &amp; Business Hours</h6>
+                        <p class="small">
+                            Monday - Friday: 09:00 - 17:00<br>
+                            Saturday - Sunday: Closed<br><br>
+
+                            Tel: <strong><a class="text-white" href="tel:+441415550204">0141 555 0204</a></strong><br>
+                            Email: <strong><a class="text-white" href="mailto: contact@parkeasy.co.uk">contact@parkeasy.co.uk</a></strong>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12 col-md-8 text-white small">&copy; @DateTime.Now.Year ParkEasy Airport Parking</div>
+                    <div class="col-6 col-md-4 text-right small">
+                        @Html.ActionLink("Terms & Conditions", "ToS", "Home", new { area = "" }, new { @class = "text-white font-weight-bold" }) &nbsp; &nbsp;
+                        @Html.ActionLink("Accessibility", "Accessibility", "Home", new { area = "" }, new { @class = "text-white font-weight-bold" }) &nbsp; &nbsp;
+                        @Html.ActionLink("Sitemap", "Sitemap", "Home", new { area = "" }, new { @class = "text-white font-weight-bold" }) &nbsp; &nbsp;
+                        @Html.ActionLink("FAQs", "FAQs", "Home", new { area = "" }, new { @class = "text-white font-weight-bold" }) &nbsp; &nbsp;
+                    </div>
+                </div>
+            </div>
 
 
-    </footer>
+        </footer>
+    }
+
+            
 
 
-    <script src="~/Scripts/jquery-3.4.1.min.js"></script>
-    <script src="~/Scripts/bootstrap.min.js"></script>
-    <script src="~/Scripts/umd/popper.min.js"></script>
+            <script src="~/Scripts/jquery-3.4.1.min.js"></script>
+            <script src="~/Scripts/bootstrap.min.js"></script>
+            <script src="~/Scripts/umd/popper.min.js"></script>
 
-    @RenderSection("scripts", required: false)
+            @RenderSection("scripts", required: false)
 </body>
 </html>

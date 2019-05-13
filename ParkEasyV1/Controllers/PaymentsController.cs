@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
 using System.Data.Entity;
 using System.Linq;
@@ -11,6 +12,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using ParkEasyV1.Models;
 using ParkEasyV1.Models.ViewModels;
+using Stripe;
 
 namespace ParkEasyV1.Controllers
 {
@@ -23,6 +25,59 @@ namespace ParkEasyV1.Controllers
         {
             var payments = db.Payments.Include(p => p.User);
             return View(payments.ToList());
+        }
+
+        // GET: Payments/Charge
+        public ActionResult Charge()
+        {
+            ViewBag.StripePublishableKey = ConfigurationManager.AppSettings["StripePublishableKey"];
+
+            Booking booking = db.Bookings.Find(TempData["bookingID"]);
+
+            ViewBag.Total = booking.Total;
+            ViewBag.StripeTotal = (int)booking.Total*100;
+
+            TempData["bID"] = booking.ID;
+            return View();
+        }
+
+        // POST: Payments/Charge
+        [HttpPost]
+        public ActionResult Charge(string stripeEmail, string stripeToken)
+        {
+            Booking booking = db.Bookings.Find(TempData["bID"]);
+
+            var customers = new CustomerService();
+            var charges = new ChargeService();
+
+            var customer = customers.Create(new CustomerCreateOptions
+            {
+                Email = stripeEmail,
+                SourceToken = stripeToken,
+            });
+
+            var charge = charges.Create(new ChargeCreateOptions
+            {
+                Amount = (int)booking.Total * 100,
+                Description = "ParkEasy Airport Parking Charge",
+                Currency = "gbp",
+                CustomerId = customer.Id,
+                ReceiptEmail = customer.Email,
+            });
+
+            booking.BookingStatus = BookingStatus.Confirmed;
+
+            db.Payments.Add(new StripePayment()
+            {
+                PaymentDate = DateTime.Now,
+                Amount = charge.Amount,
+                User = booking.User,
+                TransactionID = charge.ReceiptNumber
+            });
+
+            db.SaveChanges();
+
+            return RedirectToAction("MyBookings", "Users");
         }
 
         // GET: Payments/Details/5
