@@ -90,13 +90,9 @@ namespace ParkEasyV1.Controllers
         [HttpPost]
         [Authorize]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> CreateBooking(CreateBookingViewModel model)
+        public ActionResult CreateBooking(CreateBookingViewModel model)
         {
             UserManager<User> userManager = new UserManager<User>(new UserStore<User>(db));
-
-            //int uniqueBookingId = GenerateUniqueBookingId();
-            //int uniqueVehicleId = GenerateUniqueVehicleId();
-            //int uniqueFlightId = GenerateUniqueFlightId();
 
             if (ModelState.IsValid)
             {
@@ -127,7 +123,6 @@ namespace ParkEasyV1.Controllers
 
                 //CREATE NEW BOOKING
 
-
                 int uniqueVehicleId = GetLastVehicleId();
                 int uniqueFlightId = GetLastFlightId();
 
@@ -155,6 +150,9 @@ namespace ParkEasyV1.Controllers
                 Booking createdBooking = db.Bookings.Find(uniqueBookingId);
 
                 createdBooking.BookingLines = new List<BookingLine>() { new BookingLine() { Booking = db.Bookings.Find(uniqueBookingId), Vehicle = db.Vehicles.Find(uniqueVehicleId) } };
+
+                User user = userManager.FindByName(User.Identity.Name);
+                user.PhoneNumber = model.PhoneNo;
 
                 db.SaveChanges();
 
@@ -185,12 +183,46 @@ namespace ParkEasyV1.Controllers
             {
                 return HttpNotFound();
             }
-            ViewBag.FlightID = new SelectList(db.Flights, "ID", "DepartureFlightNo", booking.FlightID);
-            ViewBag.ID = new SelectList(db.Invoices, "ID", "CustomerID", booking.ID);
-            ViewBag.ParkingSlotID = new SelectList(db.ParkingSlots, "ID", "ID", booking.ParkingSlotID);
-            ViewBag.TariffID = new SelectList(db.Tariffs, "ID", "Type", booking.TariffID);
-            ViewBag.UserID = new SelectList(db.Users, "Id", "FirstName", booking.UserID);
-            return View(booking);
+
+            int vehicleID=0;
+
+            //get bookingline vehicle id
+            foreach (var line in db.BookingLines.ToList())
+            {
+                if (line.BookingID == id)
+                {
+                    vehicleID = line.VehicleID;
+                }
+            }
+
+            Vehicle vehicle = db.Vehicles.Find(vehicleID);
+
+            ViewBookingViewModel model = new ViewBookingViewModel
+            {
+                BookingID = booking.ID,
+                DepartureDate = booking.Flight.DepartureDate,
+                DepartureTime = booking.Flight.DepartureTime,
+                ReturnDate = booking.Flight.ReturnDate,
+                ReturnTime = booking.Flight.ReturnFlightTime,
+                Duration = booking.Duration,
+                Total = booking.Total,
+                Valet = booking.ValetService,
+                FirstName = booking.User.FirstName,
+                Surname = booking.User.LastName,
+                AddressLine1 = booking.User.AddressLine1,
+                AddressLine2 = booking.User.AddressLine2,
+                City = booking.User.City,
+                Postcode = booking.User.Postcode,
+                Email = booking.User.Email,
+                PhoneNo = booking.User.PhoneNumber,
+                VehicleMake = vehicle.Make,
+                VehicleModel  = vehicle.Model,
+                VehicleColour = vehicle.Colour,
+                VehicleRegistration = vehicle.RegistrationNumber,
+                NoOfPassengers = vehicle.NoOfPassengers
+            };
+
+            return View(model);
         }
 
         // POST: Bookings/Edit/5
@@ -198,20 +230,47 @@ namespace ParkEasyV1.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "ID,DateBooked,Duration,Total,BookingStatus,ValetService,CheckedIn,CheckedOut,UserID,FlightID,ParkingSlotID,TariffID")] Booking booking)
+        public ActionResult Edit(ViewBookingViewModel model)
         {
             if (ModelState.IsValid)
             {
-                db.Entry(booking).State = EntityState.Modified;
-                db.SaveChanges();
-                return RedirectToAction("Index");
+                //get the booking
+                Booking booking = db.Bookings.Find(model.BookingID);
+
+                //initialize vehicle id
+                int vehicleID = 0;
+
+                //get bookingline vehicle id
+                foreach (var line in db.BookingLines.ToList())
+                {
+                    if (line.BookingID == model.BookingID)
+                    {
+                        vehicleID = line.VehicleID;
+                    }
+                }
+
+                //get the vehicle linked to booking
+                Vehicle vehicle = db.Vehicles.Find(vehicleID);
+
+                //update booking
+                booking.User.FirstName = model.FirstName;
+                booking.User.LastName = model.Surname;
+                booking.User.AddressLine1 = model.AddressLine1;
+                booking.User.AddressLine2 = model.AddressLine2;
+                booking.User.City = model.City;
+                booking.User.Email = model.Email;
+                booking.User.PhoneNumber = model.PhoneNo;
+                vehicle.Make = model.VehicleMake;
+                vehicle.Model = model.VehicleModel;
+                vehicle.Colour = model.VehicleColour;
+                vehicle.RegistrationNumber = model.VehicleRegistration;
+                vehicle.NoOfPassengers = model.NoOfPassengers;
+
+                TempData["Success"] = "Booking Successfully Updated";
+
+                return RedirectToAction("Index", "Users");
             }
-            ViewBag.FlightID = new SelectList(db.Flights, "ID", "DepartureFlightNo", booking.FlightID);
-            ViewBag.ID = new SelectList(db.Invoices, "ID", "CustomerID", booking.ID);
-            ViewBag.ParkingSlotID = new SelectList(db.ParkingSlots, "ID", "ID", booking.ParkingSlotID);
-            ViewBag.TariffID = new SelectList(db.Tariffs, "ID", "Type", booking.TariffID);
-            ViewBag.UserID = new SelectList(db.Users, "Id", "FirstName", booking.UserID);
-            return View(booking);
+            return View(model);
         }
 
         // GET: Bookings/Delete/5
@@ -257,7 +316,7 @@ namespace ParkEasyV1.Controllers
         {
             if (CheckInBooking(id))
             {
-                TempData["Message"] = "Booking Checked In Successfully";
+                TempData["Success"] = "Booking Checked In Successfully";
                 return RedirectToAction("Manage");
             }
             else
@@ -270,7 +329,7 @@ namespace ParkEasyV1.Controllers
         {
             if (CheckOutBooking(id))
             {
-                TempData["Message"] = "Booking Checked Out Successfully";
+                TempData["Success"] = "Booking Checked Out Successfully";
                 return RedirectToAction("Manage");
             }
             else
