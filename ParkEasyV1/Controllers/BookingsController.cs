@@ -266,9 +266,18 @@ namespace ParkEasyV1.Controllers
                 vehicle.RegistrationNumber = model.VehicleRegistration;
                 vehicle.NoOfPassengers = model.NoOfPassengers;
 
+                db.SaveChanges();
+
                 TempData["Success"] = "Booking Successfully Updated";
 
-                return RedirectToAction("Index", "Users");
+                if (User.IsInRole("Customer"))
+                {
+                    return RedirectToAction("MyBookings", "Users");
+                }
+                else
+                {
+                    return RedirectToAction("Manage", "Bookings");
+                }
             }
             return View(model);
         }
@@ -317,7 +326,7 @@ namespace ParkEasyV1.Controllers
             if (CheckInBooking(id))
             {
                 TempData["Success"] = "Booking Checked In Successfully";
-                return RedirectToAction("Manage");
+                return RedirectToAction("Departures", "Users");
             }
             else
             {
@@ -330,7 +339,7 @@ namespace ParkEasyV1.Controllers
             if (CheckOutBooking(id))
             {
                 TempData["Success"] = "Booking Checked Out Successfully";
-                return RedirectToAction("Manage");
+                return RedirectToAction("Returns", "Users");
             }
             else
             {
@@ -346,6 +355,7 @@ namespace ParkEasyV1.Controllers
                 {
                     booking.CheckedOut = false;
                     booking.CheckedIn = true;
+                    db.SaveChanges();
                     return true;
                 }
             }
@@ -360,6 +370,7 @@ namespace ParkEasyV1.Controllers
                 {
                     booking.CheckedIn = false;
                     booking.CheckedOut = true;
+                    db.SaveChanges();
                     return true;
                 }
             }

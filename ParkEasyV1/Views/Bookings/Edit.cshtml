@@ -1,16 +1,25 @@
 ﻿@model ParkEasyV1.Models.ViewModels.ViewBookingViewModel
 
 @{
-    ViewBag.Title = "My Booking";
+    ViewBag.Title = "View Booking";
 }
 
 <div class="container body-content">
-    <h2 class="text-center" style="margin-top: 20px; margin-bottom: 30px;">My Booking</h2>
+    @if (User.IsInRole("Customer"))
+    {
+        <h2 class="text-center" style="margin-top: 20px; margin-bottom: 30px;">My Booking</h2>
+    }
+    else
+    {
+        <h2 class="text-center" style="margin-top: 20px; margin-bottom: 30px;">Manage Booking</h2>
+    }
+
     <h4 class="text-center" style="margin-top: 20px; margin-bottom: 30px;">Booking ID: #@Model.BookingID</h4>
 
     @using (Html.BeginForm("Edit", "Bookings", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
     {
         @Html.AntiForgeryToken()
+        @Html.HiddenFor(model => model.BookingID)
 
         <div class="row" style="padding-bottom: 20px;">
             <div class="col-md-3">
@@ -50,27 +59,7 @@
                 </div>
             </div>
         </div>
-        
-            <div class="row" style="padding-bottom: 30px;">
-                        <div class="col-md-3">
-                            <h6>Duration: @Model.Duration Days</h6>
-                        </div>
-                        <div class="col-md-3">
-                            @if (Model.Valet)
-                            {
-                                <h6>Valet Service: <i class="fas fa-check text-success"></i></h6>
-                            }
-                            else
-                            {
-                                <h6>Valet Service: <i class="fas fa-times text-danger"></i></h6>
-                            }
-                        </div>
-                        <div class="col-md-3">
-                            <h6>Status: @Model.Status</h6>
-                        </div>
-                        <div class="col-md-3"><h6>Total: £@Model.Total</h6></div>
-            </div>
-        
+
         <div class="row">
             <div class="col-md-6">
                 <div class="form-group">
@@ -181,19 +170,39 @@
             </div>
         </div>
 
-        <div class="row offset-1">
-            <div class="col-md-12">
-                @if (User.IsInRole("Customer"))
+        <div class="row offset-1 my-3" style="padding-bottom: 30px;">
+            <div class="col-md-3">
+                <h6>Duration: @Model.Duration Days</h6>
+            </div>
+            <div class="col-md-3">
+                @if (Model.Valet)
                 {
-                    <button class="btn btn-darkblue font-weight-bold mr-5" onclick="location.href='@Url.Action("MyBookings", "Users")'">Back</button>
+                    <h6>Valet Service: <i class="fas fa-check text-success"></i></h6>
                 }
                 else
                 {
-                    <button class="btn btn-darkblue font-weight-bold mr-5" onclick="location.href='@Url.Action("Manage", "Bookings")'">Back</button>
+                    <h6>Valet Service: <i class="fas fa-times text-danger"></i></h6>
+                }
+            </div>
+            <div class="col-md-3">
+                <h6>Status: @Model.Status</h6>
+            </div>
+            <div class="col-md-3"><h6>Total: £@Model.Total</h6></div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                @if (User.IsInRole("Customer"))
+                {
+                    <button class="btn btn-darkblue font-weight-bold m-3" onclick="location.href='@Url.Action("MyBookings", "Users")'">Back</button>
+                }
+                else
+                {
+                    <button class="btn btn-darkblue font-weight-bold m-3" onclick="location.href='@Url.Action("Manage", "Bookings")'">Back</button>
                 }
 
-                <input type="submit" class="btn btn-darkblue font-weight-bold mr-5" value="Save" />
-                <button class="btn btn-danger font-weight-bold mr-5" onclick="location.href='@Url.Action("Cancel", "Bookings", new { id = Model.BookingID })'">Cancel</button>
+                <input type="submit" class="btn btn-darkblue font-weight-bold m-3" value="Save" />
+                <button class="btn btn-danger font-weight-bold m-3" onclick="location.href='@Url.Action("Cancel", "Bookings", new { id = Model.BookingID })'">Cancel</button>
             </div>
         </div>
 

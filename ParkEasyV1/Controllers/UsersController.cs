@@ -94,7 +94,10 @@ namespace ParkEasyV1.Controllers
                     ViewBag.UserID = user.Id;
                 }
             }
-            return View(db.Bookings.Where(b => b.Flight.DepartureDate.Day.Equals(DateTime.Today.Day)).ToList());
+            return View(db.Bookings.Where(b => 
+                b.Flight.DepartureDate.Day.Equals(DateTime.Today.Day)
+                &&b.CheckedIn==false)
+                .ToList());
         }
 
         //  GET: Users/Returns
@@ -107,7 +110,10 @@ namespace ParkEasyV1.Controllers
                     ViewBag.UserID = user.Id;
                 }
             }
-            return View(db.Bookings.Where(b => b.Flight.ReturnDate.Day.Equals(DateTime.Today.Day)).ToList());
+            return View(db.Bookings.Where(b => 
+                b.Flight.ReturnDate.Day.Equals(DateTime.Today.Day) 
+                && b.CheckedOut == false)
+                .ToList());
         }
 
         // GET: Users/MyBookings

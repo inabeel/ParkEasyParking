@@ -153,10 +153,10 @@
 
 
                             <td>
-                                <center><button class="btn btn-darkblue font-weight-bold" type="button" onclick="location.href='@Url.Action("Edit", "Bookings")'">View</button></center>
+                                <center><button class="btn btn-darkblue font-weight-bold" type="button" onclick="location.href='@Url.Action("Edit", "Bookings", new { id=item.ID})'">View</button></center>
                             </td>
                             <td>
-                                <center><button class="btn btn-danger font-weight-bold" type="button" onclick="location.href='@Url.Action("Cancel", "Bookings")'">Cancel</button></center>
+                                <center><button class="btn btn-danger font-weight-bold" type="button" onclick="location.href='@Url.Action("Cancel", "Bookings", new { id=item.ID})'">Cancel</button></center>
                             </td>
                         </tr>
 
