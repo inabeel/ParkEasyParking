@@ -321,6 +321,37 @@ namespace ParkEasyV1.Controllers
             return RedirectToAction("Charge", "Payments");
         }
 
+        // GET: Bookings/Cancel/5
+        public ActionResult Cancel(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            Booking booking = db.Bookings.Find(id);
+            if (booking == null)
+            {
+                return HttpNotFound();
+            }
+            return View(booking);
+        }
+
+        // POST: Bookings/Cancel/5
+        [HttpPost, ActionName("Cancel")]
+        [ValidateAntiForgeryToken]
+        public ActionResult CancelConfirmed(int id)
+        {
+            Booking booking = db.Bookings.Find(id);
+            booking.BookingStatus = BookingStatus.Cancelled;
+
+            booking.ParkingSlot.Status = Status.Available;
+
+            db.SaveChanges();
+            TempData["Success"] = "Booking No: " + id + "has been successfully cancelled";
+            return RedirectToAction("Index", "Users");
+        }
+
+
         public ActionResult CheckIn(int id)
         {
             if (CheckInBooking(id))
@@ -355,6 +386,7 @@ namespace ParkEasyV1.Controllers
                 {
                     booking.CheckedOut = false;
                     booking.CheckedIn = true;
+                    booking.ParkingSlot.Status = Status.Occupied;
                     db.SaveChanges();
                     return true;
                 }
@@ -370,6 +402,7 @@ namespace ParkEasyV1.Controllers
                 {
                     booking.CheckedIn = false;
                     booking.CheckedOut = true;
+                    booking.ParkingSlot.Status = Status.Available;
                     db.SaveChanges();
                     return true;
                 }

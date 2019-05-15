@@ -1,0 +1,136 @@
+﻿@model ParkEasyV1.Models.Booking
+
+@{
+    ViewBag.Title = "Cancel Booking";
+}
+
+<div class="container body-content">
+    <h3 class="text-center">Are you sure you want to cancel this booking?</h3>
+    <div>
+        <h4 class="text-center">Booking ID: #@Model.ID</h4>
+        <hr />
+        <center>
+            <div class="row">
+                <div class="col-md-4">
+                    <dl class="dl-horizontal">
+                        <dt>
+                            Customer Email
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.User.Email)
+                        </dd>
+
+                        <dt>
+                            First Name
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.User.FirstName)
+                        </dd>
+
+                        <dt>
+                            Last Name
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.User.LastName)
+                        </dd>
+
+                        @if (Model.User.PhoneNumber != null)
+                        {
+                            <dt>
+                                Contact Phone Number
+                            </dt>
+
+                            <dd>
+                                @Html.DisplayFor(model => model.User.PhoneNumber)
+                            </dd>
+                        }
+
+                        <dt>
+                            Booking Date
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.DateBooked)
+                        </dd>
+                    </dl>
+                </div>
+                <div class="col-md-4">
+                    <dl class="dl-horizontal">
+                        <dt>
+                            Booking Duration
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.Duration) days
+                        </dd>
+
+                        <dt>
+                            Departure Date
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.Flight.DepartureDate)
+                        </dd>
+
+                        <dt>
+                            Return Date
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.Flight.ReturnDate)
+                        </dd>
+                    </dl>
+                </div>
+                <div class="col-md-4">
+                    <dl class="dl-horizontal">
+                        <dt>
+                            @Html.DisplayNameFor(model => model.Total)
+                        </dt>
+
+                        <dd>
+                            £@Html.DisplayFor(model => model.Total)
+                        </dd>
+
+                        <dt>
+                            Valet Service
+                        </dt>
+
+                        <dd>
+                            @if (Model.ValetService == true)
+                            {
+                                <i class="fas fa-check text-success"></i>
+                            }
+                            else
+                            {
+                                <i class="fas fa-times text-danger"></i>
+                            }
+                        </dd>
+
+                    </dl>
+                </div>
+            </div>
+        </center>
+
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+
+        <center>
+            <div class="form-actions no-color">
+                @if (User.IsInRole("Customer"))
+                {
+                    <button class="btn btn-darkblue font-weight-bold my-3" onclick="location.href='@Url.Action("MyBookings", "Users")'">Back</button>
+                }
+                else
+                {
+                    <button class="btn btn-darkblue font-weight-bold my-3" onclick="location.href='@Url.Action("Manage", "Bookings")'">Back</button>
+                }
+                <input type="submit" value="Cancel" class="btn btn-danger font-weight-bold my-3" />
+            </div>
+        </center>
+        }
+    </div>
+</div>
