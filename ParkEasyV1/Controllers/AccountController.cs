@@ -431,7 +431,8 @@ namespace ParkEasyV1.Controllers
                 City = user.City,
                 Postcode = user.Postcode,
                 Email = user.Email,
-                PhoneNo = user.PhoneNumber
+                PhoneNo = user.PhoneNumber,
+                TwoFactor = user.TwoFactorEnabled
             }));
         }
 

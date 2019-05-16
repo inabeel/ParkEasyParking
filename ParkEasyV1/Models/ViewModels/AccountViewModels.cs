@@ -196,7 +196,6 @@ namespace ParkEasyV1.Models
         public string Email { get; set; }
 
         [Display(Name = "Phone Number")]
-        [DataType(DataType.PhoneNumber)]
         public string PhoneNo { get; set; }
 
         [Required]
@@ -212,5 +211,7 @@ namespace ParkEasyV1.Models
         [Required]
         [DataType(DataType.PostalCode)]
         public string Postcode { get; set; }
+
+        public bool TwoFactor { get; set; }
     }
 }

@@ -60,7 +60,13 @@
 
 
 
-    @if (ViewBag.Title.Equals("Charge") || ViewBag.Title.Equals("Forgot your password?") || ViewBag.Title.Equals("Forgot Password Confirmation") || ViewBag.Title.Equals("Reset password") || ViewBag.Title.Equals("Reset password confirmation"))
+    @if (ViewBag.Title.Equals("Charge") 
+        || ViewBag.Title.Equals("Forgot your password?") 
+        || ViewBag.Title.Equals("Forgot Password Confirmation") 
+        || ViewBag.Title.Equals("Reset password") 
+        || ViewBag.Title.Equals("Reset password confirmation")
+        || ViewBag.Title.Equals("Phone Number")
+        || ViewBag.Title.Equals("Verify Phone Number"))
     {
         <footer class="bg-dark-blue" style="position: absolute; bottom: 0; width: 100%;">
             <div class="container text-white" style="padding-top: 20px;">

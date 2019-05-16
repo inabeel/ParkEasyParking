@@ -39,12 +39,12 @@
                     using (Html.BeginForm("RemovePhoneNumber", "Manage", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
                     {
                         @Html.AntiForgeryToken()
-                        [<input type="submit" value="Remove" class="btn-link" />]<
+                        <input type="submit" value="Remove" class="btn-link" />
                     }
                 }
                 else
                 {
-                    <text>[&nbsp;&nbsp;@Html.ActionLink("Add", "AddPhoneNumber")
+                    @Html.ActionLink("Add", "AddPhoneNumber")
                 }
             </dd>
         

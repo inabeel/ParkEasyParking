@@ -15,6 +15,7 @@ namespace ParkEasyV1.Controllers
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
+        private ApplicationDbContext db = new ApplicationDbContext();
 
         public ManageController()
         {
@@ -116,8 +117,19 @@ namespace ParkEasyV1.Controllers
             {
                 return View(model);
             }
+
+            string userId = null;
+
+            foreach (var user in db.Users.ToList())
+            {
+                if (user.Email.Equals(User.Identity.GetUserName()))
+                {
+                    userId = user.Id;
+                }
+            }
+
             // Generate the token and send it
-            var code = await UserManager.GenerateChangePhoneNumberTokenAsync(User.Identity.GetUserId(), model.Number);
+            var code = await UserManager.GenerateChangePhoneNumberTokenAsync(userId, model.Number);
             if (UserManager.SmsService != null)
             {
                 var message = new IdentityMessage
@@ -136,13 +148,23 @@ namespace ParkEasyV1.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> EnableTwoFactorAuthentication()
         {
-            await UserManager.SetTwoFactorEnabledAsync(User.Identity.GetUserId(), true);
-            var user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
+            string userId = null;
+
+            foreach (var u in db.Users.ToList())
+            {
+                if (u.Email.Equals(User.Identity.GetUserName()))
+                {
+                    userId = u.Id;
+                }
+            }
+
+            await UserManager.SetTwoFactorEnabledAsync(userId, true);
+            var user = await UserManager.FindByIdAsync(userId);
             if (user != null)
             {
                 await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
             }
-            return RedirectToAction("Index", "Manage");
+            return RedirectToAction("Manage", "Account");
         }
 
         //
@@ -151,20 +173,40 @@ namespace ParkEasyV1.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DisableTwoFactorAuthentication()
         {
-            await UserManager.SetTwoFactorEnabledAsync(User.Identity.GetUserId(), false);
-            var user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
+            string userId = null;
+
+            foreach (var u in db.Users.ToList())
+            {
+                if (u.Email.Equals(User.Identity.GetUserName()))
+                {
+                    userId = u.Id;
+                }
+            }
+
+            await UserManager.SetTwoFactorEnabledAsync(userId, false);
+            var user = await UserManager.FindByIdAsync(userId);
             if (user != null)
             {
                 await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
             }
-            return RedirectToAction("Index", "Manage");
+            return RedirectToAction("Manage", "Account");
         }
 
         //
         // GET: /Manage/VerifyPhoneNumber
         public async Task<ActionResult> VerifyPhoneNumber(string phoneNumber)
         {
-            var code = await UserManager.GenerateChangePhoneNumberTokenAsync(User.Identity.GetUserId(), phoneNumber);
+            string userId = null;
+
+            foreach (var user in db.Users.ToList())
+            {
+                if (user.Email.Equals(User.Identity.GetUserName()))
+                {
+                    userId = user.Id;
+                }
+            }
+
+            var code = await UserManager.GenerateChangePhoneNumberTokenAsync(userId, phoneNumber);
             // Send an SMS through the SMS provider to verify the phone number
             return phoneNumber == null ? View("Error") : View(new VerifyPhoneNumberViewModel { PhoneNumber = phoneNumber });
         }
@@ -175,19 +217,29 @@ namespace ParkEasyV1.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> VerifyPhoneNumber(VerifyPhoneNumberViewModel model)
         {
+            string userId = null;
+
+            foreach (var user in db.Users.ToList())
+            {
+                if (user.Email.Equals(User.Identity.GetUserName()))
+                {
+                    userId = user.Id;
+                }
+            }
+
             if (!ModelState.IsValid)
             {
                 return View(model);
             }
-            var result = await UserManager.ChangePhoneNumberAsync(User.Identity.GetUserId(), model.PhoneNumber, model.Code);
+            var result = await UserManager.ChangePhoneNumberAsync(userId, model.PhoneNumber, model.Code);
             if (result.Succeeded)
             {
-                var user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
+                var user = await UserManager.FindByIdAsync(userId);
                 if (user != null)
                 {
                     await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
                 }
-                return RedirectToAction("Index", new { Message = ManageMessageId.AddPhoneSuccess });
+                return RedirectToAction("Manage", "Account", new { Message = ManageMessageId.AddPhoneSuccess });
             }
             // If we got this far, something failed, redisplay form
             ModelState.AddModelError("", "Failed to verify phone");
@@ -200,12 +252,22 @@ namespace ParkEasyV1.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> RemovePhoneNumber()
         {
-            var result = await UserManager.SetPhoneNumberAsync(User.Identity.GetUserId(), null);
+            string userId = null;
+
+            foreach (var u in db.Users.ToList())
+            {
+                if (u.Email.Equals(User.Identity.GetUserName()))
+                {
+                    userId = u.Id;
+                }
+            }
+
+            var result = await UserManager.SetPhoneNumberAsync(userId, null);
             if (!result.Succeeded)
             {
                 return RedirectToAction("Index", new { Message = ManageMessageId.Error });
             }
-            var user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
+            var user = await UserManager.FindByIdAsync(userId);
             if (user != null)
             {
                 await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
@@ -230,10 +292,21 @@ namespace ParkEasyV1.Controllers
             {
                 return View(model);
             }
-            var result = await UserManager.ChangePasswordAsync(User.Identity.GetUserId(), model.OldPassword, model.NewPassword);
+
+            string userId = null;
+
+            foreach (var user in db.Users.ToList())
+            {
+                if (user.Email.Equals(User.Identity.GetUserName()))
+                {
+                    userId = user.Id;
+                }
+            }
+
+            var result = await UserManager.ChangePasswordAsync(userId, model.OldPassword, model.NewPassword);
             if (result.Succeeded)
             {
-                var user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
+                var user = await UserManager.FindByIdAsync(userId);
                 if (user != null)
                 {
                     await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
@@ -260,10 +333,20 @@ namespace ParkEasyV1.Controllers
         {
             if (ModelState.IsValid)
             {
-                var result = await UserManager.AddPasswordAsync(User.Identity.GetUserId(), model.NewPassword);
+                string userId = null;
+
+                foreach (var user in db.Users.ToList())
+                {
+                    if (user.Email.Equals(User.Identity.GetUserName()))
+                    {
+                        userId = user.Id;
+                    }
+                }
+
+                var result = await UserManager.AddPasswordAsync(userId, model.NewPassword);
                 if (result.Succeeded)
                 {
-                    var user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
+                    var user = await UserManager.FindByIdAsync(userId);
                     if (user != null)
                     {
                         await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
