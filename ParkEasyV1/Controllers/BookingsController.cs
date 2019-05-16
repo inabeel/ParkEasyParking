@@ -76,12 +76,7 @@ namespace ParkEasyV1.Controllers
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
-
-            ViewBag.FlightID = new SelectList(db.Flights, "ID", "DepartureFlightNo", booking.FlightID);
-            ViewBag.ID = new SelectList(db.Invoices, "ID", "CustomerID", booking.ID);
-            ViewBag.ParkingSlotID = new SelectList(db.ParkingSlots, "ID", "ID", booking.ParkingSlotID);
-            ViewBag.TariffID = new SelectList(db.Tariffs, "ID", "Type", booking.TariffID);
-            ViewBag.UserID = new SelectList(db.Users, "Id", "FirstName", booking.UserID);
+           
             return View(booking);
         }
 
