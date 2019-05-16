@@ -166,7 +166,8 @@ namespace ParkEasyV1.Controllers
                     await UserManager.AddToRoleAsync(user.Id, "Customer");
                     await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
                     
-                    // For more information on how to enable account confirmation and password reset please visit https://go.microsoft.com/fwlink/?LinkID=320771
+                    // UNCOMMENT TO ENABLE EMAIL ACCOUNT CONFIRMATION
+
                     // Send an email with this link
                      string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
                      var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
@@ -222,7 +223,10 @@ namespace ParkEasyV1.Controllers
                 // Send an email with this link
                  string code = await UserManager.GeneratePasswordResetTokenAsync(user.Id);
                  var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);		
-                 await UserManager.SendEmailAsync(user.Id, "Reset Password", "Please reset your password by clicking <a href=\"" + callbackUrl + "\">here</a>");
+                 await UserManager.SendEmailAsync(user.Id, "Reset Password", 
+                     "Hello, " + model.Email + "<br>We recieved a request to reset your password from ParkEasy Airport Parking. " +
+                     "<br>Please reset your password by clicking <a href=\"" + callbackUrl + "\">here</a>" +
+                     "<br>If you did not request a new password, please let us know.");
                  return RedirectToAction("ForgotPasswordConfirmation", "Account");
             }
 
@@ -376,9 +380,8 @@ namespace ParkEasyV1.Controllers
                 {
                     return View("ExternalLoginFailure");
                 }
-                var user = new Customer { UserName = model.Email, Email = model.Email, RegistrationDate = DateTime.Now, Corporate = false, FirstName = model.FirstName, LastName = model.Surname, AddressLine1 = model.AddressLine1, AddressLine2 = model.AddressLine2, City = model.City, Postcode = model.Postcode };
+                var user = new Customer { UserName = model.Email, Email = model.Email, RegistrationDate = DateTime.Now, Corporate = false, FirstName = model.FirstName, LastName = model.Surname, AddressLine1 = model.AddressLine1, AddressLine2 = model.AddressLine2, City = model.City, Postcode = model.Postcode, EmailConfirmed = true };
                 //CREATE NEW CUSTOMER - ALL USERS REGISTERING WILL BE CUSTOMERS
-                //var user = new Customer { UserName = model.Email, Email = model.Email, RegistrationDate = DateTime.Now, Corporate = false, FirstName = model.FirstName, LastName = model.Surname, AddressLine1 = model.AddressLine1, AddressLine2 = model.AddressLine2, City = model.City, Postcode = model.Postcode };
                 var result = await UserManager.CreateAsync(user);
                 if (result.Succeeded)
                 {

@@ -238,7 +238,8 @@ namespace ParkEasyV1.Controllers
                 {
                     await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
                 }
-                return RedirectToAction("Index", new { Message = ManageMessageId.ChangePasswordSuccess });
+                TempData["Success"] = "Password Successfully Changed";
+                return RedirectToAction("Index", "Users", new { Message = ManageMessageId.ChangePasswordSuccess });
             }
             AddErrors(result);
             return View(model);
