@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -52,5 +53,24 @@ namespace ParkEasyV1.Models
     public enum BookingStatus
     {
         Confirmed, UnPaid, Cancelled, NoShow, Void
+    }
+
+    /// <summary>
+    /// Class for validating the Google reCaptcha API Response in Create Booking
+    /// </summary>
+    public class CaptchaResponse
+    {
+        [JsonProperty("success")]
+        public bool Success
+        {
+            get;
+            set;
+        }
+        [JsonProperty("error-codes")]
+        public List<string> ErrorMessage
+        {
+            get;
+            set;
+        }
     }
 }

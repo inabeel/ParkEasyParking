@@ -10,6 +10,7 @@ using System.Web;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
+using Newtonsoft.Json;
 using ParkEasyV1.Models;
 using ParkEasyV1.Models.ViewModels;
 
@@ -89,7 +90,9 @@ namespace ParkEasyV1.Controllers
         {
             UserManager<User> userManager = new UserManager<User>(new UserStore<User>(db));
 
-            if (ModelState.IsValid)
+            CaptchaResponse response = ValidateCaptcha(Request["g-recaptcha-response"]);
+
+            if (response.Success && ModelState.IsValid)
             {
                 //create customer vehicle
                 db.Vehicles.Add(new Vehicle()
@@ -156,9 +159,26 @@ namespace ParkEasyV1.Controllers
                 return RedirectToAction("Valet");
 
             }
+            else if(response.Success==false)
+            {
+                return Content("Error From Google ReCaptcha : " + response.ErrorMessage[0].ToString());
+            }
 
             // If we got this far, something failed, redisplay form
             return View("Create");
+        }
+
+        /// <summary>  
+        /// Validate Captcha  
+        /// </summary>  
+        /// <param name="response"></param>  
+        /// <returns></returns>  
+        public static CaptchaResponse ValidateCaptcha(string response)
+        {
+            string secret = System.Web.Configuration.WebConfigurationManager.AppSettings["recaptchaPrivateKey"];
+            var client = new WebClient();
+            var jsonResult = client.DownloadString(string.Format("https://www.google.com/recaptcha/api/siteverify?secret={0}&response={1}", secret, response));
+            return JsonConvert.DeserializeObject<CaptchaResponse>(jsonResult.ToString());
         }
 
         public ActionResult Valet()
