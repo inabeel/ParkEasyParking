@@ -169,7 +169,7 @@ namespace ParkEasyV1.Controllers
         }
 
         /// <summary>  
-        /// Validate Captcha  
+        /// Validate Google Captcha  
         /// </summary>  
         /// <param name="response"></param>  
         /// <returns></returns>  
