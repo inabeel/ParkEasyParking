@@ -9,6 +9,7 @@ using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
+using Newtonsoft.Json;
 using ParkEasyV1.Models;
 
 namespace ParkEasyV1.Controllers
@@ -155,7 +156,9 @@ namespace ParkEasyV1.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Register(RegisterViewModel model)
         {
-            if (ModelState.IsValid)
+            CaptchaResponse response = ValidateCaptcha(Request["g-recaptcha-response"]);
+
+            if (response.Success && ModelState.IsValid)
             {
                 //CREATE NEW CUSTOMER - ALL USERS REGISTERING WILL BE CUSTOMERS
                 var user = new Customer { UserName = model.Email, Email = model.Email, RegistrationDate=DateTime.Now, Corporate = false, FirstName = model.FirstName, LastName = model.Surname, AddressLine1 = model.AddressLine1, AddressLine2 = model.AddressLine2, City = model.City, Postcode = model.Postcode };
@@ -177,9 +180,26 @@ namespace ParkEasyV1.Controllers
                 }
                 AddErrors(result);
             }
+            else if(response.Success==false)
+            {
+                return Content("Error From Google ReCaptcha : " + response.ErrorMessage[0].ToString());
+            }
 
             // If we got this far, something failed, redisplay form
             return View(model);
+        }
+
+        /// <summary>  
+        /// Validate Google Captcha  
+        /// </summary>  
+        /// <param name="response"></param>  
+        /// <returns></returns>  
+        public static CaptchaResponse ValidateCaptcha(string response)
+        {
+            string secret = System.Web.Configuration.WebConfigurationManager.AppSettings["recaptchaPrivateKey"];
+            var client = new WebClient();
+            var jsonResult = client.DownloadString(string.Format("https://www.google.com/recaptcha/api/siteverify?secret={0}&response={1}", secret, response));
+            return JsonConvert.DeserializeObject<CaptchaResponse>(jsonResult.ToString());
         }
 
         //

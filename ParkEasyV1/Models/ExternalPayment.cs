@@ -5,7 +5,7 @@ using System.Web;
 
 namespace ParkEasyV1.Models
 {
-    public class StripePayment : Payment
+    public class ExternalPayment : Payment
     {
         public string TransactionID { get; set; }
     }

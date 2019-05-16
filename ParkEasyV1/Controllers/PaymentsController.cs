@@ -12,6 +12,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using ParkEasyV1.Models;
 using ParkEasyV1.Models.ViewModels;
+using PayPal.Api;
 using Stripe;
 
 namespace ParkEasyV1.Controllers
@@ -27,6 +28,10 @@ namespace ParkEasyV1.Controllers
             return View(payments.ToList());
         }
 
+        /// <summary>
+        /// HTTP GET ActionResult for processing booking payments
+        /// </summary>
+        /// <returns>Payment view</returns>
         // GET: Payments/Charge
         public ActionResult Charge()
         {
@@ -41,6 +46,12 @@ namespace ParkEasyV1.Controllers
             return View();
         }
 
+        /// <summary>
+        /// HttpPost ActionResult for processing a Stripe API card payment
+        /// </summary>
+        /// <param name="stripeEmail"></param>
+        /// <param name="stripeToken"></param>
+        /// <returns>Redirect MyBookings</returns>
         // POST: Payments/Charge
         [HttpPost]
         public ActionResult Charge(string stripeEmail, string stripeToken)
@@ -67,7 +78,7 @@ namespace ParkEasyV1.Controllers
 
             booking.BookingStatus = BookingStatus.Confirmed;
 
-            db.Payments.Add(new StripePayment()
+            db.Payments.Add(new ExternalPayment()
             {
                 PaymentDate = DateTime.Now,
                 Amount = charge.Amount,
@@ -87,7 +98,7 @@ namespace ParkEasyV1.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Payment payment = db.Payments.Find(id);
+            Models.Payment payment = db.Payments.Find(id);
             if (payment == null)
             {
                 return HttpNotFound();
@@ -101,7 +112,7 @@ namespace ParkEasyV1.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "ID, PaymentDate, Amount")] Payment payment)  //remember date, amount, user
+        public ActionResult Create([Bind(Include = "ID, PaymentDate, Amount")] Models.Payment payment)  //remember date, amount, user
         {
             UserManager<User> userManager = new UserManager<User>(new UserStore<User>(db));
 
@@ -132,7 +143,7 @@ namespace ParkEasyV1.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Payment payment = db.Payments.Find(id);
+            Models.Payment payment = db.Payments.Find(id);
             if (payment == null)
             {
                 return HttpNotFound();
@@ -146,7 +157,7 @@ namespace ParkEasyV1.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "ID,PaymentDate,Amount,UserID")] Payment payment)
+        public ActionResult Edit([Bind(Include = "ID,PaymentDate,Amount,UserID")] Models.Payment payment)
         {
             if (ModelState.IsValid)
             {
@@ -165,7 +176,7 @@ namespace ParkEasyV1.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Payment payment = db.Payments.Find(id);
+            Models.Payment payment = db.Payments.Find(id);
             if (payment == null)
             {
                 return HttpNotFound();
@@ -178,10 +189,171 @@ namespace ParkEasyV1.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            Payment payment = db.Payments.Find(id);
+            Models.Payment payment = db.Payments.Find(id);
             db.Payments.Remove(payment);
             db.SaveChanges();
             return RedirectToAction("Index");
+        }
+
+        /// <summary>
+        /// ActionResult for making a payment using PayPal API
+        /// </summary>
+        /// <param name="Cancel"></param>
+        /// <returns></returns>
+        public ActionResult PaymentWithPaypal(string Cancel = null)
+        {
+            Booking booking = db.Bookings.Find(TempData["bID"]);
+
+            //getting the apiContext  
+            APIContext apiContext = PayPalConfiguration.GetAPIContext();
+            try
+            {
+                //A resource representing a Payer that funds a payment Payment Method as paypal  
+                //Payer Id will be returned when payment proceeds or click to pay  
+                string payerId = Request.Params["PayerID"];
+                if (string.IsNullOrEmpty(payerId))
+                {
+                    //this section will be executed first because PayerID doesn't exist  
+                    //it is returned by the create function call of the payment class  
+                    // Creating a payment  
+                    // baseURL is the url on which paypal sendsback the data.  
+                    string baseURI = Request.Url.Scheme + "://" + Request.Url.Authority + "/Payments/PaymentWithPayPal?";
+                    //here we are generating guid for storing the paymentID received in session  
+                    //which will be used in the payment execution  
+                    var guid = Convert.ToString((new Random()).Next(100000));
+                    //CreatePayment function gives us the payment approval url  
+                    //on which payer is redirected for paypal account payment  
+                    var createdPayment = this.CreatePayment(apiContext, baseURI + "guid=" + guid);
+                    //get links returned from paypal in response to Create function call  
+                    var links = createdPayment.links.GetEnumerator();
+                    string paypalRedirectUrl = null;
+                    while (links.MoveNext())
+                    {
+                        Links lnk = links.Current;
+                        if (lnk.rel.ToLower().Trim().Equals("approval_url"))
+                        {
+                            //saving the payapalredirect URL to which user will be redirected for payment  
+                            paypalRedirectUrl = lnk.href;
+                        }
+                    }
+                    // saving the paymentID in the key guid  
+                    Session.Add(guid, createdPayment.id);
+                    return Redirect(paypalRedirectUrl);
+                }
+                else
+                {
+                    // This function exectues after receving all parameters for the payment  
+                    var guid = Request.Params["guid"];
+                    var executedPayment = ExecutePayment(apiContext, payerId, Session[guid] as string);
+                    //If executed payment failed then we will show payment failure message to user  
+                    if (executedPayment.state.ToLower() != "approved")
+                    {
+                        TempData["Error"] = "We were unable to process your payment. Please try again.";
+                        ViewBag.Total = booking.Total;
+                        return View("Charge");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "We were unable to process your payment. Please try again.";
+                ViewBag.Total = booking.Total;
+                return View("Charge");
+            }
+            booking.BookingStatus = BookingStatus.Confirmed;
+            db.SaveChanges();
+            //on successful payment, show success page to user.  
+            return RedirectToAction("MyBookings", "Users");
+        }
+        private PayPal.Api.Payment payment;
+        private PayPal.Api.Payment ExecutePayment(APIContext apiContext, string payerId, string paymentId)
+        {
+            var paymentExecution = new PaymentExecution()
+            {
+                payer_id = payerId
+            };
+            this.payment = new PayPal.Api.Payment()
+            {
+                id = paymentId
+            };
+            return this.payment.Execute(apiContext, paymentExecution);
+        }
+        private PayPal.Api.Payment CreatePayment(APIContext apiContext, string redirectUrl)
+        {
+            Booking booking = db.Bookings.Find(TempData["bID"]);
+
+            //create itemlist and add item objects to it  
+            var itemList = new ItemList()
+            {
+                items = new List<Item>()
+            };
+            //Adding Item Details like name, currency, price etc  
+            itemList.items.Add(new Item()
+            {
+                name = "ParkEasy Airport Parking Booking",
+                currency = "GBP",
+                price = booking.Total.ToString(),
+                quantity = "1",
+                sku = booking.ParkingSlot.ID.ToString()
+            });
+            var payer = new Payer()
+            {
+                payment_method = "paypal"
+            };
+            // Configure Redirect Urls here with RedirectUrls object  
+            var redirUrls = new RedirectUrls()
+            {
+                cancel_url = redirectUrl + "&Cancel=true",
+                return_url = redirectUrl
+            };
+            // Adding Tax, shipping and Subtotal details  
+            var details = new Details()
+            {
+                tax = "0",
+                shipping = "0",
+                subtotal = booking.Total.ToString(),
+            };
+            //Final amount with details  
+            var amount = new Amount()
+            {
+                currency = "GBP",
+                total = booking.Total.ToString(), // Total must be equal to sum of tax, shipping and subtotal.  
+                details = details
+            };
+            var transactionList = new List<Transaction>();
+            // Adding description about the transaction  
+            transactionList.Add(new Transaction()
+            {
+                description = "ParkEasy Airport Parking Booking",
+                //invoice_number = "your generated invoice number", //Generate an Invoice No  
+                amount = amount,
+                item_list = itemList
+            });
+            this.payment = new PayPal.Api.Payment()
+            {
+                intent = "sale",
+                payer = payer,
+                transactions = transactionList,
+                redirect_urls = redirUrls
+            };
+
+            SavePayment(booking.Total, booking.User, payment.id);
+
+            // Create a payment using a APIContext  
+            return this.payment.Create(apiContext);
+        }
+
+        private void SavePayment(double amount, User user, string transactionId)
+        {
+           db.Payments.Add(new ExternalPayment()
+            {
+                PaymentDate = DateTime.Now,
+                Amount = amount,
+                User = user,
+                TransactionID = transactionId
+            });
+
+            db.SaveChanges();
         }
 
         protected override void Dispose(bool disposing)

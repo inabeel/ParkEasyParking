@@ -65,6 +65,9 @@
     <Reference Include="Microsoft.IdentityModel.Tokens, Version=5.1.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.IdentityModel.Tokens.5.1.2\lib\net451\Microsoft.IdentityModel.Tokens.dll</HintPath>
     </Reference>
+    <Reference Include="PayPal, Version=1.9.1.0, Culture=neutral, PublicKeyToken=5b4afc1ccaef40fb, processorArchitecture=MSIL">
+      <HintPath>..\packages\PayPal.1.9.1\lib\net451\PayPal.dll</HintPath>
+    </Reference>
     <Reference Include="SendGrid, Version=9.11.0.0, Culture=neutral, PublicKeyToken=4f047e93159395ca, processorArchitecture=MSIL">
       <HintPath>..\packages\Sendgrid.9.11.0\lib\net452\SendGrid.dll</HintPath>
     </Reference>
@@ -254,7 +257,8 @@
     <Compile Include="Models\Invoice.cs" />
     <Compile Include="Models\ParkingSlot.cs" />
     <Compile Include="Models\Payment.cs" />
-    <Compile Include="Models\StripePayment.cs" />
+    <Compile Include="Models\PayPalConfiguration.cs" />
+    <Compile Include="Models\ExternalPayment.cs" />
     <Compile Include="Models\Tariff.cs" />
     <Compile Include="Models\Vehicle.cs" />
     <Compile Include="Models\ViewModels\AccountViewModels.cs" />
@@ -568,7 +572,9 @@
     <Content Include="Scripts\umd\popper-utils.min.js" />
     <Content Include="Scripts\umd\popper.js" />
     <Content Include="Scripts\umd\popper.min.js" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
