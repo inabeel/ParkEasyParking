@@ -686,6 +686,7 @@
     <Content Include="Views\Users\MyBookings.cshtml" />
     <Content Include="Views\Payments\Charge.cshtml" />
     <Content Include="Views\Bookings\Cancel.cshtml" />
+    <Content Include="Views\Bookings\Confirmation.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

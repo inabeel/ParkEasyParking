@@ -297,6 +297,61 @@ namespace ParkEasyV1.Controllers
             return View(model);
         }
 
+        /// <summary>
+        /// HttpGet User Booking Confirmation
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public ActionResult Confirmation(int id)
+        {
+            Booking booking = db.Bookings.Find(id);
+            if (booking == null)
+            {
+                return HttpNotFound();
+            }
+
+            int vehicleID = 0;
+
+            //get bookingline vehicle id
+            foreach (var line in db.BookingLines.ToList())
+            {
+                if (line.BookingID == id)
+                {
+                    vehicleID = line.VehicleID;
+                }
+            }
+
+            Vehicle vehicle = db.Vehicles.Find(vehicleID);
+
+            ViewBookingViewModel model = new ViewBookingViewModel
+            {
+                BookingID = booking.ID,
+                DepartureDate = booking.Flight.DepartureDate,
+                DepartureTime = booking.Flight.DepartureTime,
+                ReturnDate = booking.Flight.ReturnDate,
+                ReturnTime = booking.Flight.ReturnFlightTime,
+                Duration = booking.Duration,
+                Total = booking.Total,
+                Valet = booking.ValetService,
+                FirstName = booking.User.FirstName,
+                Surname = booking.User.LastName,
+                AddressLine1 = booking.User.AddressLine1,
+                AddressLine2 = booking.User.AddressLine2,
+                City = booking.User.City,
+                Postcode = booking.User.Postcode,
+                Email = booking.User.Email,
+                PhoneNo = booking.User.PhoneNumber,
+                VehicleMake = vehicle.Make,
+                VehicleModel = vehicle.Model,
+                VehicleColour = vehicle.Colour,
+                VehicleRegistration = vehicle.RegistrationNumber,
+                NoOfPassengers = vehicle.NoOfPassengers
+            };
+
+
+            return View(model);
+        }
+
         // GET: Bookings/Delete/5
         public ActionResult Delete(int? id)
         {

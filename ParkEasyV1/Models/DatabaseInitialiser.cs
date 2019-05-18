@@ -431,7 +431,7 @@ namespace ParkEasyV1.Models
                 ReturnFlightNo = "FID98",
                 ReturnFlightTime = new TimeSpan(10, 00, 00),
                 DepartureDate = new DateTime(DateTime.Today.Year, DateTime.Today.Month, DateTime.Today.Day),
-                ReturnDate = new DateTime(DateTime.Today.Year, DateTime.Today.Month, DateTime.Today.Day+14),
+                ReturnDate = new DateTime(DateTime.Today.Year, DateTime.Today.Month, DateTime.Today.Day+3),
                 DestinationAirport = "Portugal"
             });
 

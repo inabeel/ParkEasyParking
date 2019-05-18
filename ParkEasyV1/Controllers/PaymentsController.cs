@@ -88,7 +88,7 @@ namespace ParkEasyV1.Controllers
 
             db.SaveChanges();
 
-            return RedirectToAction("MyBookings", "Users");
+            return RedirectToAction("Confirmation", "Bookings", new { id=booking.ID});
         }
 
         // GET: Payments/Details/5
@@ -263,7 +263,7 @@ namespace ParkEasyV1.Controllers
             booking.BookingStatus = BookingStatus.Confirmed;
             db.SaveChanges();
             //on successful payment, show success page to user.  
-            return RedirectToAction("MyBookings", "Users");
+            return RedirectToAction("Confirmation", "Bookings", new { id=booking.ID});
         }
         private PayPal.Api.Payment payment;
         private PayPal.Api.Payment ExecutePayment(APIContext apiContext, string payerId, string paymentId)

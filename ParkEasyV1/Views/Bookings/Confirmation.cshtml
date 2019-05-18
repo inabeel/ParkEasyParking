@@ -1,0 +1,105 @@
+﻿@model ParkEasyV1.Models.ViewModels.ViewBookingViewModel
+
+
+@{
+    ViewBag.Title = "Booking Confirmation";
+}
+
+<div class="container body-content" id="bookingConfirmation">
+    <h2 class="text-center my-4">Your booking has been confirmed.</h2>
+    <p class="text-center">Thank you for booking with ParkEasy Airport Parking. A copy of your booking confirmation will be emailed to you shortly.</p>
+    <h6 class="text-center font-weight-bold my-3">Booking Reference Number: #@Model.BookingID</h6>
+
+    <center>
+        <div class="jumbotron col-md-12">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5>Customer Details</h5>
+                    <hr />
+                    <dl>
+                        <dt>Email</dt>
+                        <dd>@Model.Email</dd>
+
+                        <dt>Name</dt>
+                        <dd>@Model.FirstName @Model.Surname</dd>
+
+                        <dt>Contact Number</dt>
+                        <dd>@Model.PhoneNo</dd>
+
+                        <dt>Number of People Travelling</dt>
+                        <dd>@Model.NoOfPassengers</dd>
+                    </dl>
+                </div>
+
+                <div class="col-md-4">
+                    <h5>Booking Details</h5>
+                    <hr />
+                    <dl>
+                        <dt>Duration</dt>
+                        <dd>@Model.Duration days</dd>
+
+                        <dt>Departure Date</dt>
+                        <dd>@Model.DepartureDate.ToShortDateString()</dd>
+
+                        <dt>Return Date</dt>
+                        <dd>@Model.ReturnDate.ToShortDateString()</dd>
+
+                        <dt>Valet Service</dt>
+                        <dd>
+                            @if (Model.Valet)
+                            {
+                                <i class="fas fa-check text-success"></i>
+                            }
+                            else
+                            {
+                                <i class="fas fa-check text-danger"></i>
+                            }
+                        </dd>
+
+                        <dt>Total</dt>
+                        <dd>@Model.Total</dd>
+
+                        <dt>Status</dt>
+                        <dd>@Model.Status</dd>
+                    </dl>
+                </div>
+
+                <div class="col-md-4">
+                    <h5>Vehicle Details</h5>
+                    <hr />
+                    <dl>
+                        <dt>Make</dt>
+                        <dd>@Model.VehicleMake</dd>
+
+                        <dt>Model</dt>
+                        <dd>@Model.VehicleModel</dd>
+
+                        <dt>Colour</dt>
+                        <dd>@Model.VehicleColour</dd>
+
+                        <dt>Registration</dt>
+                        <dd>@Model.VehicleRegistration</dd>
+                    </dl>
+                </div>
+            </div>
+
+        </div>
+    </center>
+    <div class="row">
+        <button class="btn btn-darkblue font-weight-bold m-3" type="button" onclick="location.href='@Url.Action("MyBookings", "Users")'">Manage Booking</button>
+        <button class="btn btn-darkblue font-weight-bold m-3" type="button" onclick="printDiv('bookingConfirmation')">Print Confirmation</button>
+    </div>
+</div>
+
+<script>
+    function printDiv(divName) {
+        var printContents = document.getElementById(divName).innerHTML;
+        var originalContents = document.body.innerHTML;
+
+        document.body.innerHTML = printContents;
+
+        window.print();
+
+        document.body.innerHTML = originalContents;
+    }
+</script>
