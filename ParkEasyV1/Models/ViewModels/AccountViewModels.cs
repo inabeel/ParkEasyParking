@@ -141,6 +141,9 @@ namespace ParkEasyV1.Models
         [Required]
         [MustBeTrue(ErrorMessage = "You must agree to the ParkEasy Terms & Conditions")]
         public bool TermsConditions { get; set; }
+
+        [Display(Name ="I am a corporate client wishing to open an account")]
+        public bool Corporate { get; set; }
     }
 
     public class ResetPasswordViewModel

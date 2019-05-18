@@ -6,6 +6,8 @@ using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
 using ParkEasyV1.Models;
 
 namespace ParkEasyV1.Controllers
@@ -17,8 +19,31 @@ namespace ParkEasyV1.Controllers
         // GET: Invoices
         public ActionResult Index()
         {
-            var invoices = db.Invoices.Include(i => i.Booking);
-            return View(invoices.ToList());
+            UserManager<User> userManager = new UserManager<User>(new UserStore<User>(db));
+
+            User loggedInUser = userManager.FindByEmail(User.Identity.GetUserName());
+
+            ViewBag.UserID = loggedInUser.Id;
+
+            //var invoices = db.Invoices.Include(i => i.Booking);
+
+            return View();
+        }
+
+        // GET: Users/Departures
+        public ActionResult Departures()
+        {
+            foreach (var user in db.Users.ToList())
+            {
+                if (user.Email.Equals(User.Identity.Name))
+                {
+                    ViewBag.UserID = user.Id;
+                }
+            }
+            return View(db.Bookings.Where(b =>
+                b.Flight.DepartureDate.Day.Equals(DateTime.Today.Day)
+                && b.CheckedIn == false)
+                .ToList());
         }
 
         // GET: Invoices/Details/5

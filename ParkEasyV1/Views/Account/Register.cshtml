@@ -76,6 +76,12 @@
                 </div>
                 <div class="checkbox" style="padding-bottom: 10px;">
                     <div class="col-md-4" style="display: inline;">
+                        @Html.CheckBoxFor(m => m.Corporate)
+                        <p style="display: inline;">I am a corporate client wishing to open an account with ParkEasy Airport Parking</p>
+                    </div>
+                </div>
+                <div class="checkbox" style="padding-bottom: 10px;">
+                    <div class="col-md-4" style="display: inline;">
                         @Html.CheckBoxFor(m => m.TermsConditions)
                         <p style="display: inline;">I agree to the ParkEasy @Html.ActionLink("Terms & Conditions", "", "", new { @class = "font-weight-bold text-darkblue" })</p>
                         <br>@Html.ValidationMessageFor(m => m.TermsConditions, "", new { @class = "text-danger" })

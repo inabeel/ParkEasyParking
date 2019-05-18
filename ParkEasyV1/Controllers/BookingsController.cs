@@ -19,7 +19,6 @@ namespace ParkEasyV1.Controllers
     public class BookingsController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
-        private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
 
         // GET: Bookings
@@ -231,10 +230,11 @@ namespace ParkEasyV1.Controllers
                 Email = booking.User.Email,
                 PhoneNo = booking.User.PhoneNumber,
                 VehicleMake = vehicle.Make,
-                VehicleModel  = vehicle.Model,
+                VehicleModel = vehicle.Model,
                 VehicleColour = vehicle.Colour,
                 VehicleRegistration = vehicle.RegistrationNumber,
-                NoOfPassengers = vehicle.NoOfPassengers
+                NoOfPassengers = vehicle.NoOfPassengers,
+                Status = booking.BookingStatus
             };
 
             return View(model);

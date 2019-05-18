@@ -71,10 +71,10 @@
                                     @Html.DisplayFor(modelItem => item.DateBooked)
                                 </td>
                                 <td>
-                                    @Html.DisplayFor(modelItem => item.Flight.DepartureDate)
+                                    @Html.DisplayFor(modelItem => item.Flight.DepartureDate.ToShortDateString())
                                 </td>
                                 <td>
-                                    @Html.DisplayFor(modelItem => item.Flight.ReturnDate)
+                                    @Html.DisplayFor(modelItem => item.Flight.ReturnDate.ToShortDateString())
                                 </td>
                                 <td>
                                     @if (item.ValetService == true)

@@ -5,6 +5,11 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Web;
+using System.Net.Http;
+using System.Net.Mail;
+using SendGrid.Helpers.Mail;
+using SendGrid;
+using System.Configuration;
 
 namespace ParkEasyV1.Models
 {
@@ -48,6 +53,25 @@ namespace ParkEasyV1.Models
         [Display(Name = "Tariff")]
         public int TariffID { get; set; }
         public virtual Tariff Tariff { get; set; }
+
+        public void EmailConfirmation()
+        {
+            var apiKey = ConfigurationManager.AppSettings["SendGridKey"];
+            var client = new SendGridClient(apiKey);
+            var msg = new SendGridMessage()
+            {
+                From = new EmailAddress("confirmation@parkeasy.co.uk", "ParkEasy Airport Parking"),
+                Subject = "Booking Reference #" + this.ID + " Confirmation",
+                PlainTextContent = 
+                "Hello, " + this.User.FirstName +
+                "Your booking has been confirmed.",
+                HtmlContent = "Hello, " + User.FirstName + "<br>" +
+                "Your booking with ParkEasy Airport Parking has been confirmed." + "<br>" +
+                "You can view a copy of your booking confirmation by clicking the link <a href=localhost:44350/Bookings/Confirmation/" + ID + ">here</a>"
+            };
+            msg.AddTo(new EmailAddress(User.Email));
+            var response = client.SendEmailAsync(msg);
+        }
     }
 
     public enum BookingStatus

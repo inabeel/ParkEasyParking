@@ -19,7 +19,7 @@ namespace ParkEasyV1.Controllers
 {
     public class PaymentsController : Controller
     {
-        private ApplicationDbContext db = new ApplicationDbContext();
+        private ApplicationDbContext db = new ApplicationDbContext();        
 
         // GET: Payments
         public ActionResult Index()
@@ -35,9 +35,14 @@ namespace ParkEasyV1.Controllers
         // GET: Payments/Charge
         public ActionResult Charge()
         {
+            UserManager<User> userManager = new UserManager<User>(new UserStore<User>(db));
+
             ViewBag.StripePublishableKey = ConfigurationManager.AppSettings["StripePublishableKey"];
 
             Booking booking = db.Bookings.Find(TempData["bookingID"]);
+
+            Models.Customer customer = userManager.FindByEmail(User.Identity.GetUserName()) as Models.Customer;
+            ViewBag.Corporate = customer.Corporate;
 
             ViewBag.Total = booking.Total;
             ViewBag.StripeTotal = (int)booking.Total*100;
@@ -87,6 +92,8 @@ namespace ParkEasyV1.Controllers
             });
 
             db.SaveChanges();
+
+            booking.EmailConfirmation();
 
             return RedirectToAction("Confirmation", "Bookings", new { id=booking.ID});
         }
@@ -262,6 +269,7 @@ namespace ParkEasyV1.Controllers
             }
             booking.BookingStatus = BookingStatus.Confirmed;
             db.SaveChanges();
+            booking.EmailConfirmation();
             //on successful payment, show success page to user.  
             return RedirectToAction("Confirmation", "Bookings", new { id=booking.ID});
         }
