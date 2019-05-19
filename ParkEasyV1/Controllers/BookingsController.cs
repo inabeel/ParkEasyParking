@@ -13,6 +13,7 @@ using Microsoft.AspNet.Identity.EntityFramework;
 using Newtonsoft.Json;
 using ParkEasyV1.Models;
 using ParkEasyV1.Models.ViewModels;
+using Rotativa;
 
 namespace ParkEasyV1.Controllers
 {
@@ -349,6 +350,17 @@ namespace ParkEasyV1.Controllers
 
 
             return View(model);
+        }
+
+        /// <summary>
+        /// ActionResult to convert Booking Confirmation to PDF
+        /// </summary>
+        /// <param name="bookingId"></param>
+        /// <returns></returns>
+        public ActionResult PrintConfirmationPdf(int? bookingId)
+        {
+            var report = new ActionAsPdf("Confirmation", new { id = bookingId });
+            return report;
         }
 
         // GET: Bookings/Delete/5

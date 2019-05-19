@@ -116,6 +116,8 @@
             <div class="row">
                 <button class="btn btn-darkblue font-weight-bold m-3" type="button" onclick="location.href='@Url.Action("Charge", "Payments", new { id=Model.ID})'">Pay Invoice</button>
                 <button class="btn btn-darkblue font-weight-bold m-3" type="button" onclick="printDiv('invoice')">Print Invoice</button>
+                <button class="btn btn-darkblue font-weight-bold m-3" type="button" onclick="location.href='@Url.Action("PrintViewToPdf", "Invoice", new { bookingId=Model.ID})'">View As PDF</button>
+
             </div>
         </div>
     </div>

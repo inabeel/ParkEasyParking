@@ -10,6 +10,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using ParkEasyV1.Models;
 using ParkEasyV1.Models.ViewModels;
+using Rotativa;
 
 namespace ParkEasyV1.Controllers
 {
@@ -58,6 +59,18 @@ namespace ParkEasyV1.Controllers
 
             return View(booking);
         }
+
+        /// <summary>
+        /// ActionResult to convert Invoice View to PDF
+        /// </summary>
+        /// <param name="bookingId"></param>
+        /// <returns></returns>
+        public ActionResult PrintViewToPdf(int? bookingId)
+        {
+            var report = new ActionAsPdf("View", new {id=bookingId});
+            return report;
+        }
+        
 
         /// <summary>
         /// HttpGet User Invoice Payment Confirmation
@@ -112,6 +125,17 @@ namespace ParkEasyV1.Controllers
 
 
             return View(model);
+        }
+
+        /// <summary>
+        /// ActionResult to convert Invoice Payment Confirmation to PDF
+        /// </summary>
+        /// <param name="bookingId"></param>
+        /// <returns></returns>
+        public ActionResult PrintConfirmationToPdf(int? bookingId)
+        {
+            var report = new ActionAsPdf("Confirmation", new { id = bookingId });
+            return report;
         }
 
         // GET: Invoice/Details/5
