@@ -30,7 +30,7 @@
                     @Html.ActionLink("Customer Returns", "Returns", "Users", new { area = "" }, new { @class = "list-group-item" })
                     @if (User.IsInRole("Invoice Clerk") || User.IsInRole("Admin"))
                     {
-                        @Html.ActionLink("Manage Invoices", "Index", "Users", new { area = "" }, new { @class = "list-group-item" })
+                        @Html.ActionLink("Manage Invoices", "Index", "Invoice", new { area = "" }, new { @class = "list-group-item" })
                     }
                     @if (User.IsInRole("Manager") || User.IsInRole("Admin"))
                     {
@@ -71,10 +71,10 @@
                                     @Html.DisplayFor(modelItem => item.DateBooked)
                                 </td>
                                 <td>
-                                    @Html.DisplayFor(modelItem => item.Flight.DepartureDate.ToShortDateString())
+                                    @Html.DisplayFor(modelItem => item.Flight.DepartureDate)
                                 </td>
                                 <td>
-                                    @Html.DisplayFor(modelItem => item.Flight.ReturnDate.ToShortDateString())
+                                    @Html.DisplayFor(modelItem => item.Flight.ReturnDate)
                                 </td>
                                 <td>
                                     @if (item.ValetService == true)

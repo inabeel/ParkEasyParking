@@ -28,7 +28,7 @@
                     @Html.ActionLink("Customer Returns", "Index", "Users", new { area = "" }, new { @class = "list-group-item active" })
                     @if (User.IsInRole("Invoice Clerk") || User.IsInRole("Admin"))
                     {
-                        @Html.ActionLink("Manage Invoices", "Index", "Users", new { area = "" }, new { @class = "list-group-item" })
+                        @Html.ActionLink("Manage Invoices", "Index", "Invoice", new { area = "" }, new { @class = "list-group-item" })
                     }
                     @if (User.IsInRole("Manager") || User.IsInRole("Admin"))
                     {

@@ -176,23 +176,23 @@ namespace ParkEasyV1.Models
                 }
 
                 //Create Corporate Customer
-                if (userManager.FindByName("graham.cadger@cityofglacol.ac.uk") == null)
+                if (userManager.FindByName("samirzarrug@college.co.uk") == null)
                 {
                     var customer = new Customer
                     {
-                        UserName = "graham.cadger@cityofglacol.ac.uk",
-                        Email = "graham.cadger@cityofglacol.ac.uk",
+                        UserName = "samirzarrug@college.co.uk",
+                        Email = "samirzarrug@college.co.uk",
                         RegistrationDate = DateTime.Now,
                         EmailConfirmed = true,
-                        FirstName = "Graham",
-                        LastName = "Cadger",
+                        FirstName = "Samir",
+                        LastName = "Zarrug",
                         AddressLine1 = "190 Cathedral Street",
                         AddressLine2 = "Glasgow",
                         City = "Glasgow",
                         Postcode = "G4 0RF",
                         Corporate = true
                     };
-                    userManager.Create(customer, "grahamcadger");
+                    userManager.Create(customer, "samir");
                     userManager.AddToRoles(customer.Id, "Customer");
                 }
 
@@ -363,7 +363,7 @@ namespace ParkEasyV1.Models
             });
 
             Flight flight = context.Flights.Find(2);
-            Tariff tariff = context.Tariffs.Find(2);
+            Tariff tariff = context.Tariffs.Find(1);
             TimeSpan duration = flight.ReturnDate - flight.DepartureDate;
             double price = tariff.Amount * Convert.ToInt32(duration.TotalDays) + 10;
 
@@ -373,7 +373,7 @@ namespace ParkEasyV1.Models
                 User = userManager.FindByEmail("john@gmail.com"),
                 Flight = context.Flights.Find(2),
                 ParkingSlot = context.ParkingSlots.Find(100),
-                Tariff = context.Tariffs.Find(2),
+                Tariff = context.Tariffs.Find(1),
 
                 DateBooked = DateTime.Now,
                 Duration = Convert.ToInt32(duration.TotalDays),
@@ -436,7 +436,7 @@ namespace ParkEasyV1.Models
             });
 
             Flight flight = context.Flights.Find(3);
-            Tariff tariff = context.Tariffs.Find(3);
+            Tariff tariff = context.Tariffs.Find(1);
             TimeSpan duration = flight.ReturnDate - flight.DepartureDate;
             double price = tariff.Amount * Convert.ToInt32(duration.TotalDays) + 20;
 
@@ -446,7 +446,7 @@ namespace ParkEasyV1.Models
                 User = userManager.FindByEmail("john@gmail.com"),
                 Flight = context.Flights.Find(3),
                 ParkingSlot = context.ParkingSlots.Find(101),
-                Tariff = context.Tariffs.Find(3),
+                Tariff = context.Tariffs.Find(1),
 
                 DateBooked = DateTime.Now,
                 Duration = Convert.ToInt32(duration.TotalDays),
@@ -475,8 +475,74 @@ namespace ParkEasyV1.Models
             });
 
             context.SaveChanges();
+            CreateCorporateBooking(context);
         }
 
-        
+        private void CreateCorporateBooking(ApplicationDbContext context)
+        {
+            UserManager<User> userManager = new UserManager<User>(new UserStore<User>(context));
+
+            //CREATE CORPORATE BOOKING
+
+            //create customer vehicle
+            context.Vehicles.Add(new Vehicle()
+            {
+                ID = 4,
+                RegistrationNumber = "ZARRUG1",
+                Make = "Jaguar",
+                Model = "XF",
+                Colour = "Silver",
+                NoOfPassengers = 2
+            });
+
+            //create customer flight
+            context.Flights.Add(new Flight()
+            {
+                ID = 4,
+                DepartureFlightNo = "BA771",
+                DepartureTime = new TimeSpan(09, 00, 00),
+                ReturnFlightNo = "BA772",
+                ReturnFlightTime = new TimeSpan(10, 00, 00),
+                DepartureDate = new DateTime(2019, 6, 24),
+                ReturnDate = new DateTime(2019, 7, 01),
+                DestinationAirport = "Dubai"
+            });
+
+            Flight flight = context.Flights.Find(4);
+            Tariff tariff = context.Tariffs.Find(1);
+            TimeSpan duration = flight.ReturnDate - flight.DepartureDate;
+            double price = tariff.Amount * Convert.ToInt32(duration.TotalDays) + 20;
+
+            //create customer booking
+            context.Bookings.Add(new Booking()
+            {
+                User = userManager.FindByEmail("samirzarrug@college.co.uk"),
+                Flight = context.Flights.Find(4),
+                ParkingSlot = context.ParkingSlots.Find(102),
+                Tariff = context.Tariffs.Find(1),
+
+                DateBooked = DateTime.Now,
+                Duration = Convert.ToInt32(duration.TotalDays),
+                Total = price,
+                BookingStatus = BookingStatus.Confirmed,
+                ValetService = true,
+                CheckedIn = false,
+                CheckedOut = false,
+
+                //add booking lines
+                BookingLines = new List<BookingLine>()
+                {
+                    new BookingLine() {Booking = context.Bookings.Find(4), Vehicle = context.Vehicles.Find(4)},
+                },
+            });
+
+            ParkingSlot slot = context.ParkingSlots.Find(102);
+            slot.Status = Status.Reserved;
+            
+
+            context.SaveChanges();
+        }
+
+
     }
 }

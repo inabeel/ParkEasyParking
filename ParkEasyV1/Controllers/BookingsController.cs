@@ -19,7 +19,6 @@ namespace ParkEasyV1.Controllers
     public class BookingsController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
-        private ApplicationUserManager _userManager;
 
         // GET: Bookings
         public ActionResult Index()

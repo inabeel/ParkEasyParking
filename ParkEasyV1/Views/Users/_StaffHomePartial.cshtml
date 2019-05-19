@@ -25,7 +25,7 @@
 
                 @if (User.IsInRole("Invoice Clerk"))
                 {
-                    @Html.ActionLink("Manage Invoices", "Manage", "Invoices", new { area = "" }, new { @class = "list-group-item" })
+                    @Html.ActionLink("Manage Invoices", "Index", "Invoice", new { area = "" }, new { @class = "list-group-item" })
                 }
 
                 @if (User.IsInRole("Manager"))

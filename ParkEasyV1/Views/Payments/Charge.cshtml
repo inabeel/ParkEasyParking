@@ -42,14 +42,14 @@
         </div>
     </center>
 
-    @if (ViewBag.Corporate)
+    @if (ViewBag.Corporate && ViewBag.Invoice==null)
     {
         <center class="my-4">
             <div class="col-md-10">
                 <hr />
                 <p>Corporate Clients</p>
                 <p><strong>Note:</strong> This booking payment option is available for our corporate clients ONLY.</p>
-                <center class="my-5"><button class="btn btn-darkblue font-weight-bold" onclick="location.href='@Url.Action("MyBookings", "Users")'">Invoice Booking Charge</button></center>
+                <center class="my-5"><button class="btn btn-darkblue font-weight-bold" onclick="location.href='@Url.Action("InvoiceCharge", "Payments")'">Invoice Booking Charge</button></center>
             </div>
         </center>
     }

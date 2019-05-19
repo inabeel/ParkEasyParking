@@ -1,0 +1,257 @@
+﻿@model IEnumerable<ParkEasyV1.Models.Booking>
+    @using ParkEasyV1.Models
+
+@{
+    ViewBag.Title = "Manage Invoices";
+}
+
+<div class="container-fluid">
+    <!-- Page Content -->
+    <div class="container-fluid" style="padding: 0 0 0 0;">
+        <div class="row">
+            <div class="col-lg-2 bg-dark-blue d-none d-sm-block" style="padding-top: 10px; padding-bottom: 20px;">
+                <center><i class="fas fa-user fa-5x text-white" style="padding-bottom: 20px;"></i></center>
+
+                <center>
+                    <button type="button" id="sidebarDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="btn btn-darkblue-sidebar dropdown-toggle btn-sm my-2 my-sm-0 mr-sm-2 text-white font-weight-bold">@User.Identity.Name</button>
+                    <div class="dropdown-menu" aria-labelledby="sidebarDropdown">
+                        <a class="dropdown-item" href="#">My Details</a>
+                        <a class="dropdown-item" href="#" onclick="javascript:document.getElementById('logoutForm').submit()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                    <p class="text-white" style="font-size: small;">Staff ID: @ViewBag.UserID</p>
+                </center>
+
+                <div class="list-group text-left font-weight-bold" style="padding-top: 30px;">
+                    @Html.ActionLink("Dashboard", "Index", "Users", new { area = "" }, new { @class = "list-group-item" })
+                    @Html.ActionLink("Manage Users", "Manage", "Users", new { area = "" }, new { @class = "list-group-item" })
+                    @Html.ActionLink("Manage Bookings", "Manage", "Bookings", new { area = "" }, new { @class = "list-group-item" })
+                    @Html.ActionLink("Customer Departures", "Departures", "Users", new { area = "" }, new { @class = "list-group-item" })
+                    @Html.ActionLink("Customer Returns", "Returns", "Users", new { area = "" }, new { @class = "list-group-item" })
+                    @if (User.IsInRole("Invoice Clerk") || User.IsInRole("Admin"))
+                    {
+                        @Html.ActionLink("Manage Invoices", "Index", "Invoice", new { area = "" }, new { @class = "list-group-item active" })
+                    }
+                    @if (User.IsInRole("Manager") || User.IsInRole("Admin"))
+                    {
+                        @Html.ActionLink("Manage Tariffs", "Manage", "Tariffs", new { area = "" }, new { @class = "list-group-item" })
+                    }
+
+                    @Html.ActionLink("Analytic Reports", "Index", "Users", new { area = "" }, new { @class = "list-group-item" })
+                </div>
+            </div>
+            <!-- /.col-lg-3 -->
+            <div class="col-lg-9" style="padding-bottom: 50px;">
+                <h3 class="font-weight-bold" style="padding-top: 50px; padding-bottom: 30px;">Manage Corporate Customer Invoices</h3>
+                <h4 class="font-weight-bold text-center" style="padding-top: 20px; padding-bottom: 30px;">All Corporate Bookings</h4>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped table-hover text-center">
+                        <tr>
+
+                            <th>Customer</th>
+                            <th>Booking Placed</th>
+                            <th>Departure Date</th>
+                            <th>Return Date</th>
+                            <th>Booking Total</th>
+                            <th>Booking Status</th>
+                            <th>Invoice Status</th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@Html.DisplayFor(modelItem => item.User.Email)</td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.DateBooked)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Flight.DepartureDate)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Flight.ReturnDate)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Total)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.BookingStatus)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Invoice.Status)
+                                </td>
+                                <td>
+                                    @if (item.Invoice == null)
+                                    {
+                                        <center><button class="btn btn-darkblue font-weight-bold" type="button" onclick="location.href='@Url.Action("Generate", "Invoice", new { id = item.ID})'">Generate Invoice</button></center>
+                                    }
+                                    else if (item.Invoice.Status != null)
+                                    {
+                                        <center><button class="btn btn-darkblue font-weight-bold" type="button" onclick="location.href='@Url.Action("View", "Invoice", new { id = item.ID})'">View Invoice</button></center>
+                                    }
+                                </td>
+                                <td>
+                                    <center><button class="btn btn-darkblue font-weight-bold" type="button" onclick="location.href='@Url.Action("Edit", "Bookings", new { id = item.ID})'">View</button></center>
+                                </td>
+                                <td>
+                                    <center><button class="btn btn-danger font-weight-bold" type="button" onclick="location.href='@Url.Action("Cancel", "Bookings", new { id = item.ID})'">Cancel</button></center>
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                </div>
+                <button class="btn btn-darkblue font-weight-bold" type="button" onclick="location.href='@Url.Action("Manage", "Bookings")'">View All Bookings</button>
+
+                <h4 class="font-weight-bold text-center" style="padding-top: 50px; padding-bottom: 30px;">Awaiting Invoice</h4>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped table-hover text-center">
+                        <tr>
+
+                            <th>Customer</th>
+                            <th>Booking Placed</th>
+                            <th>Departure Date</th>
+                            <th>Return Date</th>
+                            <th>Booking Total</th>
+                            <th>Booking Status</th>
+                            <th></th>
+                        </tr>
+
+                        @foreach (var item in Model)
+                        {
+                            if (item.Invoice == null)
+                            {
+
+
+                                <tr>
+                                    <td>@Html.DisplayFor(modelItem => item.User.Email)</td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.DateBooked)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Flight.DepartureDate)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Flight.ReturnDate)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Total)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.BookingStatus)
+                                    </td>
+                                    <td>
+                                        <center><button class="btn btn-darkblue font-weight-bold" type="button" onclick="location.href='@Url.Action("Generate", "Invoice", new { id = item.ID })'">Generate Invoice</button></center>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </table>
+                </div>
+
+                <h4 class="font-weight-bold text-center" style="padding-top: 50px; padding-bottom: 30px;">Sent Invoices</h4>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped table-hover text-center">
+                        <tr>
+
+                            <th>Customer</th>
+                            <th>Booking Placed</th>
+                            <th>Departure Date</th>
+                            <th>Return Date</th>
+                            <th>Booking Total</th>
+                            <th>Booking Status</th>
+                            <th>Invoice Expiry Date</th>
+                            <th></th>
+                        </tr>
+
+                        @foreach (var item in Model)
+                        {
+                            if (item.Invoice!=null && item.Invoice.Status == InvoiceStatus.Sent)
+                            {
+                                <tr>
+                                    <td>@Html.DisplayFor(modelItem => item.User.Email)</td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.DateBooked)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Flight.DepartureDate)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Flight.ReturnDate)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Total)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.BookingStatus)
+                                    </td>
+                                    <td>@Html.DisplayFor(modelItem => item.Invoice.ExpiryDate)</td>
+                                    <td>
+                                        <center><button class="btn btn-darkblue font-weight-bold" type="button" onclick="location.href='@Url.Action("View", "Invoice", new { id = item.ID })'">View Invoice</button></center>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </table>
+                </div>
+
+                <h4 class="font-weight-bold text-center" style="padding-top: 50px; padding-bottom: 30px;">Overdue Invoices</h4>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped table-hover text-center">
+                        <tr>
+                            <th>Customer</th>
+                            <th>Booking Placed</th>
+                            <th>Departure Date</th>
+                            <th>Return Date</th>
+                            <th>Booking Total</th>
+                            <th>Booking Status</th>
+                            <th>Invoice Expiry Date</th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+
+                        @foreach (var item in Model)
+                        {
+                            if (item.Invoice!=null && item.Invoice.Status == InvoiceStatus.Overdue)
+                            {
+                        <tr>
+                            <td>@Html.DisplayFor(modelItem => item.User.Email)</td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.DateBooked)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Flight.DepartureDate)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Flight.ReturnDate)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Total)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.BookingStatus)
+                            </td>
+                            <td>@Html.DisplayFor(modelItem => item.Invoice.ExpiryDate)</td>
+                            <td>
+                                <center><button class="btn btn-darkblue font-weight-bold" type="button" onclick="location.href='@Url.Action("View", "Invoice", new { id = item.ID })'">View Invoice</button></center>
+                            </td>
+                            <td>
+                                <center><button class="btn btn-danger font-weight-bold" type="button" onclick="location.href='@Url.Action("Cancel", "Bookings", new { id = item.ID })'">Cancel Booking</button></center>
+                            </td>
+                            <td>
+                                <center><button class="btn btn-danger font-weight-bold" type="button" onclick="location.href='@Url.Action("WriteOff", "Invoice", new { id = item.ID })'">Write Off Invoice</button></center>
+                            </td>
+                        </tr>
+                            }
+                        }
+                    </table>
+                </div>
+            </div>
+            <!-- /.col-lg-9 -->
+        </div>
+        <!-- /.container -->
+    </div>
+</div>
+
+<script src="~/Scripts/umd/popper.min.js"></script> 

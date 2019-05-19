@@ -1,0 +1,136 @@
+﻿@model ParkEasyV1.Models.Booking
+
+@{
+    ViewBag.Title = "Invoice";
+}
+<div class="container">
+    @if (Model.Invoice.Status == ParkEasyV1.Models.InvoiceStatus.Paid)
+    {
+        <div class="alert alert-success" role="alert">
+            This invoice has been paid and the booking has been confirmed.
+        </div>
+    }
+    else if (Model.Invoice.Status == ParkEasyV1.Models.InvoiceStatus.Overdue)
+    {
+        <div class="alert alert-danger" role="alert">
+            This invoice is overdue. Please contact us immediately to prevent incurring further charges.
+        </div>
+    }
+    <div class="card my-4" id="invoice">
+        <div class="card-header">
+            <strong>Customer Invoice</strong> <span class="float-right"> <strong>Booking Reference:</strong> #@Model.ID</span><br>
+            <strong>Date:</strong> @Model.Invoice.InvoiceDate.ToShortDateString() <span class="float-right"> <strong>Status:</strong> @Model.BookingStatus</span>
+        </div>
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-sm-6">
+                    <h6 class="mb-3">From:</h6>
+                    <div>
+                        <strong>ParkEasy Airport Parking</strong>
+                    </div>
+                    <div>190 Airport Road,</div>
+                    <div>Glasgow, G73 3QA</div>
+                    <div>Email: contact@parkeasy.co.uk</div>
+                    <div>Phone: 0141 555 0204</div>
+                </div>
+
+                <div class="col-sm-6">
+                    <h6 class="mb-3">To:</h6>
+                    <div>
+                        <strong>@Model.User.FirstName @Model.User.LastName</strong>
+                    </div>
+                    <div>Attn: @Model.User.FirstName @Model.User.LastName</div>
+                    <div>@Model.User.AddressLine1, @Model.User.City, @Model.User.Postcode</div>
+                    <div>Email: @Model.User.Email</div>
+                    <div>Phone: @Model.User.PhoneNumber</div>
+                </div>
+            </div>
+
+            <div class="table-responsive-sm">
+                <table class="table table-striped text-center">
+                    <thead>
+                        <tr>
+                            <th>Booking Date</th>
+                            <th>Departure Date</th>
+                            <th>Return Date</th>
+
+                            <th class="right">Duration (days)</th>
+                            <th class="center">Valet</th>
+                            <th class="right">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="left strong">@Model.DateBooked.ToShortDateString()</td>
+                            <td class="left">@Model.Flight.DepartureDate.ToShortDateString()</td>
+                            <td class="left">@Model.Flight.ReturnDate.ToShortDateString()</td>
+
+                            <td class="right">@Model.Duration</td>
+                            <td class="center">
+                                @if (Model.ValetService)
+                                {
+                                    <i class="fas fa-check text-success"></i>
+                                }
+                                else
+                                {
+                                    <i class="fas fa-times text-danger"></i>
+                                }
+                            </td>
+                            <td class="right">£@ViewBag.Subtotal</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="row">
+                <div class="col-lg-4 col-sm-5">
+
+                </div>
+
+                <div class="col-lg-4 col-sm-5 ml-auto">
+                    <table class="table table-clear">
+                        <tbody>
+                            <tr>
+                                <td class="left">
+                                    <strong>Subtotal</strong>
+                                </td>
+                                <td class="right">£@ViewBag.Subtotal</td>
+                            </tr>
+                            <tr>
+                                <td class="left">
+                                    <strong>VAT (20%)</strong>
+                                </td>
+                                <td class="right">£@ViewBag.Vat</td>
+                            </tr>
+                            <tr>
+                                <td class="left">
+                                    <strong>Total</strong>
+                                </td>
+                                <td class="right">
+                                    <strong>£@Model.Total</strong>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="row">
+                <button class="btn btn-darkblue font-weight-bold m-3" type="button" onclick="location.href='@Url.Action("Charge", "Payments", new { id=Model.ID})'">Pay Invoice</button>
+                <button class="btn btn-darkblue font-weight-bold m-3" type="button" onclick="printDiv('invoice')">Print Invoice</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function printDiv(divName) {
+        var printContents = document.getElementById(divName).innerHTML;
+        var originalContents = document.body.innerHTML;
+
+        document.body.innerHTML = printContents;
+
+        window.print();
+
+        document.body.innerHTML = originalContents;
+    }
+</script>
+

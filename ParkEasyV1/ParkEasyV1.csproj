@@ -237,7 +237,7 @@
     <Compile Include="Controllers\BookingsController.cs" />
     <Compile Include="Controllers\FlightsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Controllers\InvoicesController.cs" />
+    <Compile Include="Controllers\InvoiceController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\ParkingSlotsController.cs" />
     <Compile Include="Controllers\PaymentsController.cs" />
@@ -644,11 +644,6 @@
     <Content Include="Views\ParkingSlots\Details.cshtml" />
     <Content Include="Views\ParkingSlots\Edit.cshtml" />
     <Content Include="Views\ParkingSlots\Index.cshtml" />
-    <Content Include="Views\Invoices\Create.cshtml" />
-    <Content Include="Views\Invoices\Delete.cshtml" />
-    <Content Include="Views\Invoices\Details.cshtml" />
-    <Content Include="Views\Invoices\Edit.cshtml" />
-    <Content Include="Views\Invoices\Index.cshtml" />
     <Content Include="Views\Flights\Create.cshtml" />
     <Content Include="Views\Flights\Delete.cshtml" />
     <Content Include="Views\Flights\Details.cshtml" />
@@ -687,6 +682,13 @@
     <Content Include="Views\Payments\Charge.cshtml" />
     <Content Include="Views\Bookings\Cancel.cshtml" />
     <Content Include="Views\Bookings\Confirmation.cshtml" />
+    <Content Include="Views\Invoice\Create.cshtml" />
+    <Content Include="Views\Invoice\Delete.cshtml" />
+    <Content Include="Views\Invoice\Details.cshtml" />
+    <Content Include="Views\Invoice\Edit.cshtml" />
+    <Content Include="Views\Invoice\Index.cshtml" />
+    <Content Include="Views\Invoice\View.cshtml" />
+    <Content Include="Views\Invoice\Confirmation.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

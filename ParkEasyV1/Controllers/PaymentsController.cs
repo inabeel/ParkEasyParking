@@ -33,13 +33,29 @@ namespace ParkEasyV1.Controllers
         /// </summary>
         /// <returns>Payment view</returns>
         // GET: Payments/Charge
-        public ActionResult Charge()
+        [Authorize]
+        public ActionResult Charge(int? id)
         {
             UserManager<User> userManager = new UserManager<User>(new UserStore<User>(db));
 
             ViewBag.StripePublishableKey = ConfigurationManager.AppSettings["StripePublishableKey"];
 
-            Booking booking = db.Bookings.Find(TempData["bookingID"]);
+            Booking booking=null;
+
+            if (id==null)
+            {
+                booking = db.Bookings.Find(TempData["bookingID"]);
+            }
+            else
+            {
+                booking = db.Bookings.Find(id);
+            }
+
+            if (booking.Invoice!=null)
+            {
+                ViewBag.Invoice = true;
+                TempData["InvoicePayment"] = true;
+            }
 
             Models.Customer customer = userManager.FindByEmail(User.Identity.GetUserName()) as Models.Customer;
             ViewBag.Corporate = customer.Corporate;
@@ -62,7 +78,7 @@ namespace ParkEasyV1.Controllers
         public ActionResult Charge(string stripeEmail, string stripeToken)
         {
             Booking booking = db.Bookings.Find(TempData["bID"]);
-
+            
             var customers = new CustomerService();
             var charges = new ChargeService();
 
@@ -81,7 +97,7 @@ namespace ParkEasyV1.Controllers
                 ReceiptEmail = customer.Email,
             });
 
-            booking.BookingStatus = BookingStatus.Confirmed;
+            booking.BookingStatus = BookingStatus.Confirmed;            
 
             db.Payments.Add(new ExternalPayment()
             {
@@ -90,8 +106,16 @@ namespace ParkEasyV1.Controllers
                 User = booking.User,
                 TransactionID = charge.ReceiptNumber
             });
-
             db.SaveChanges();
+
+            if ((bool)TempData["InvoicePayment"])
+            {
+                booking.Invoice.Status = InvoiceStatus.Paid;
+                db.SaveChanges();
+                return RedirectToAction("Confirmation", "Invoice", new { id=booking.ID});
+            }
+
+            
 
             booking.EmailConfirmation();
 
@@ -267,6 +291,13 @@ namespace ParkEasyV1.Controllers
                 ViewBag.Total = booking.Total;
                 return View("Charge");
             }
+
+            if ((bool)TempData["InvoicePayment"])
+            {
+                booking.Invoice.Status = InvoiceStatus.Paid;
+                return RedirectToAction("Confirmation", "Invoice", new { id = booking.ID });
+            }
+
             booking.BookingStatus = BookingStatus.Confirmed;
             db.SaveChanges();
             booking.EmailConfirmation();
@@ -349,6 +380,20 @@ namespace ParkEasyV1.Controllers
 
             // Create a payment using a APIContext  
             return this.payment.Create(apiContext);
+        }
+
+        /// <summary>
+        /// ActionResult to Confirm a booking for corporate customers who will be invoiced for payment
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult InvoiceCharge()
+        {
+            Booking booking = db.Bookings.Find(TempData["bID"]);
+
+            booking.BookingStatus = BookingStatus.Confirmed;
+            db.SaveChanges();
+
+            return RedirectToAction("Confirmation", "Bookings", new { id = booking.ID });
         }
 
         private void SavePayment(double amount, User user, string transactionId)
