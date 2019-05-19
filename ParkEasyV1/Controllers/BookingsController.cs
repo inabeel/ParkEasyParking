@@ -133,7 +133,7 @@ namespace ParkEasyV1.Controllers
                     DateBooked = DateTime.Now,
                     Duration = CalculateBookingDuration(model.DepartureDate, model.ReturnDate),
                     Total = db.Tariffs.Find(1).Amount * Convert.ToInt32(CalculateBookingDuration(model.DepartureDate, model.ReturnDate)),
-                    BookingStatus = BookingStatus.UnPaid,
+                    BookingStatus = BookingStatus.Unpaid,
                     ValetService = false,
                     CheckedIn = false,
                     CheckedOut = false,
@@ -444,6 +444,58 @@ namespace ParkEasyV1.Controllers
             else
             {
                 return RedirectToAction("Index");
+            }
+        }
+
+        /// <summary>
+        /// ActionResult for handling the event of a Customer not showing up for a booking
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult NoShow(int id)
+        {
+            try
+            {
+                Booking booking = db.Bookings.Find(id);
+
+                booking.BookingStatus = BookingStatus.NoShow;
+
+                db.SaveChanges();
+
+                TempData["Success"] = "Booking Successfully Marked As No Show";
+                return RedirectToAction("Manage");
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Booking Could Not Be Marked As No Show";
+                return RedirectToAction("Manage");
+            }
+        }
+
+        /// <summary>
+        /// ActionResult for handling the event a Customer is delayed returning from their trip by increasing the booking stay by 1 day
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public ActionResult Delay(int id)
+        {
+            try
+            {
+                Booking booking = db.Bookings.Find(id);
+
+                booking.Flight.ReturnDate.AddDays(1);
+                booking.Duration++;
+                booking.BookingStatus = BookingStatus.Delayed;
+                booking.Total = booking.Total + booking.Tariff.Amount;
+
+                db.SaveChanges();
+
+                TempData["Success"] = "Booking Delay Successfully Updated";
+                return RedirectToAction("Manage");
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Booking Delay Could Not Be Updated";
+                return RedirectToAction("Manage");
             }
         }
 

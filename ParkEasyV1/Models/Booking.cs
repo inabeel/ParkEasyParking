@@ -76,7 +76,7 @@ namespace ParkEasyV1.Models
 
     public enum BookingStatus
     {
-        Confirmed, UnPaid, Cancelled, NoShow, Void
+        Confirmed, Unpaid, Cancelled, NoShow, Void, Delayed
     }
 
     /// <summary>

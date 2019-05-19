@@ -42,26 +42,32 @@ namespace ParkEasyV1.Controllers
 
             Booking booking=null;
 
+            //check if the payment is linked to a specific booking id parameter
+            //new bookings will not have an id parameter - but invoice booking payments will
             if (id==null)
             {
+                //find booking from tempdata
                 booking = db.Bookings.Find(TempData["bookingID"]);
             }
             else
             {
+                //find booking from id parameter
                 booking = db.Bookings.Find(id);
             }
 
+            //if booking has an invoice - then the payment is being paid from a previous invoice
             if (booking.Invoice!=null)
             {
+                //update viewbag invoice attribute and store the invoice in tempdata
                 ViewBag.Invoice = true;
-                TempData["InvoicePayment"] = true;
+                TempData["Invoice"] = booking.Invoice;
             }
 
             Models.Customer customer = userManager.FindByEmail(User.Identity.GetUserName()) as Models.Customer;
             ViewBag.Corporate = customer.Corporate;
 
             ViewBag.Total = booking.Total;
-            ViewBag.StripeTotal = (int)booking.Total*100;
+            ViewBag.StripeTotal = (int)Math.Ceiling(booking.Total*100);
 
             TempData["bID"] = booking.ID;
             return View();
@@ -90,7 +96,7 @@ namespace ParkEasyV1.Controllers
 
             var charge = charges.Create(new ChargeCreateOptions
             {
-                Amount = (int)booking.Total * 100,
+                Amount = (int)Math.Ceiling(booking.Total * 100),
                 Description = "ParkEasy Airport Parking Charge",
                 Currency = "gbp",
                 CustomerId = customer.Id,
@@ -108,7 +114,7 @@ namespace ParkEasyV1.Controllers
             });
             db.SaveChanges();
 
-            if ((bool)TempData["InvoicePayment"])
+            if (TempData["Invoice"]!=null)
             {
                 booking.Invoice.Status = InvoiceStatus.Paid;
                 db.SaveChanges();

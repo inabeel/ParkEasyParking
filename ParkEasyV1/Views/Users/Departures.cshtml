@@ -53,6 +53,7 @@
                             <th></th>
                             <th></th>
                             <th></th>
+                            <th></th>
                         </tr>
 
                         @foreach (var item in Model)
@@ -77,6 +78,9 @@
                                 </td>
                                 <td>
                                     <center><button class="btn btn-danger font-weight-bold" type="button" onclick="location.href='@Url.Action("Cancel", "Bookings", new { id = item.ID})'">Cancel</button></center>
+                                </td>
+                                <td>
+                                    <center><button class="btn btn-darkblue font-weight-bold" type="button" onclick="location.href='@Url.Action("NoShow", "Bookings", new { id = item.ID})'">No Show</button></center>
                                 </td>
                             </tr>
                         }
