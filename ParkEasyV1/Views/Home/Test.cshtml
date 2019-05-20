@@ -9,19 +9,7 @@
 <div class="container body-content">
     <h1>Scheduler</h1>
 
-    <script src="~/Scripts/DayPilot/daypilot-all.min.js"></script>
-
-    @Html.DayPilotScheduler("dp", new DayPilotSchedulerConfig()
-    {
-        BackendUrl = @Url.Action("Scheduler", "Backend"),
-        StartDate = new DateTime(2017, 1, 1),
-        Days = 31,
-        Scale = TimeScale.Day,
-        TimeHeaders = new TimeHeaderCollection()
-        {
-            new TimeHeader(GroupBy.Month, "MMMM yyyy"),
-            new TimeHeader(GroupBy.Day),
-        },
-        EventMoveHandling = EventMoveHandlingType.Notify
-    })
+    <script src="~/Scripts/dhtmlxScheduler/dhtmlxscheduler.js"></script>
+    <link href="~/Scripts/dhtmlxScheduler/dhtmlxscheduler_material.css" rel="stylesheet" />
+    <!--https://docs.dhtmlx.com/scheduler/howtostart_dotnet_core.html-->
 </div>
