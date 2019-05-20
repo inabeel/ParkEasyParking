@@ -1,7 +1,27 @@
-﻿
+﻿@using DayPilot.Web.Mvc
+@using DayPilot.Web.Mvc.Enums
+@using DayPilot.Web.Mvc.Events.Scheduler
+
 @{
     ViewBag.Title = "Test";
 }
 
-<h2>Test</h2>
+<div class="container body-content">
+    <h1>Scheduler</h1>
 
+    <script src="~/Scripts/DayPilot/daypilot-all.min.js"></script>
+
+    @Html.DayPilotScheduler("dp", new DayPilotSchedulerConfig()
+    {
+        BackendUrl = @Url.Action("Scheduler", "Backend"),
+        StartDate = new DateTime(2017, 1, 1),
+        Days = 31,
+        Scale = TimeScale.Day,
+        TimeHeaders = new TimeHeaderCollection()
+        {
+            new TimeHeader(GroupBy.Month, "MMMM yyyy"),
+            new TimeHeader(GroupBy.Day),
+        },
+        EventMoveHandling = EventMoveHandlingType.Notify
+    })
+</div>

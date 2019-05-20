@@ -16,7 +16,7 @@ namespace ParkEasyV1.Controllers
 {
     public class UsersController : AccountController
     {
-        private ApplicationDbContext db = new ApplicationDbContext();
+        private ApplicationDbContext db = new ApplicationDbContext();        
 
         /// <summary>
         /// default constructor
@@ -54,6 +54,13 @@ namespace ParkEasyV1.Controllers
                 if (user.Email.Equals(User.Identity.Name))
                 {
                     ViewBag.UserID = user.Id;
+
+                    if (User.IsInRole("Customer"))
+                    {
+                        Customer customer = user as Customer;
+                        ViewBag.Corporate = customer.Corporate;
+                    }
+                    
                 }
             }
 
@@ -127,10 +134,34 @@ namespace ParkEasyV1.Controllers
                 {
                     ViewBag.UserID = user.Id;
                     id = user.Id;
+                    Customer customer = user as Customer;
+                    ViewBag.Corporate = customer.Corporate;
                 }
             }
 
             return View(db.Bookings.Where(b=>b.UserID.Equals(id)).ToList());
+        }
+
+        public ActionResult MyInvoices()
+        {
+            UserManager<User> userManager = new UserManager<User>(new UserStore<User>(db));
+
+            User user = userManager.FindByEmail(User.Identity.GetUserName());
+            ViewBag.UserID = user.Id;
+            Customer customer = user as Customer;
+            ViewBag.Corporate = customer.Corporate;
+
+            List<Booking> invoiceBookings = new List<Booking>();
+
+            foreach (var booking in db.Bookings.ToList())
+            {
+                if (booking.Invoice!=null && booking.User.Email.Equals(user.Email))
+                {
+                    invoiceBookings.Add(booking);
+                }
+            }
+
+            return View(invoiceBookings);
         }
 
         // GET: Users/Details/5

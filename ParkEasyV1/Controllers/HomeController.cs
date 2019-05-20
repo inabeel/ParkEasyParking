@@ -7,10 +7,20 @@ using System.Web.Mvc;
 
 namespace ParkEasyV1.Controllers
 {
+    /// <summary>
+    /// Controller for handling home actions
+    /// </summary>
     public class HomeController : Controller
     {
+        /// <summary>
+        /// Instance of ApplicationDbContext
+        /// </summary>
         private ApplicationDbContext db = new ApplicationDbContext();
 
+        /// <summary>
+        /// ActionResult to return Index view
+        /// </summary>
+        /// <returns>Index view</returns>
         public ActionResult Index()
         {
             return View();
@@ -21,18 +31,30 @@ namespace ParkEasyV1.Controllers
             return View();
         }
 
+        /// <summary>
+        /// ActionResult to return About view
+        /// </summary>
+        /// <returns>About view</returns>
         public ActionResult About()
         {
 
             return View();
         }
 
+        /// <summary>
+        /// ActionResult to return Contact view
+        /// </summary>
+        /// <returns>Contact view</returns>
         public ActionResult Contact()
         {
 
             return View();
         }
 
+        /// <summary>
+        /// ActionResult to return Prices view
+        /// </summary>
+        /// <returns>Prices view</returns>
         public ActionResult Prices()
         {
             //get tarrifs from db
@@ -60,30 +82,50 @@ namespace ParkEasyV1.Controllers
             return View();
         }
 
+        /// <summary>
+        /// ActionResult to return Services view
+        /// </summary>
+        /// <returns>Services view</returns>
         public ActionResult Services()
         {
 
             return View();
         }
 
+        /// <summary>
+        /// ActionResult to return Terms of Service view
+        /// </summary>
+        /// <returns>Terms of service view</returns>
         public ActionResult ToS()
         {
 
             return View();
         }
 
+        /// <summary>
+        /// ActionResult to return Accessiblity view
+        /// </summary>
+        /// <returns>Accessiblity view</returns>
         public ActionResult Accessibility()
         {
 
             return View();
         }
 
+        /// <summary>
+        /// ActionResult to return Sitemap view
+        /// </summary>
+        /// <returns>Sitemap view</returns>
         public ActionResult Sitemap()
         {
 
             return View();
         }
 
+        /// <summary>
+        /// ActionResult to return FAQs view
+        /// </summary>
+        /// <returns>FAQs view</returns>
         public ActionResult FAQs()
         {
             //get tariffs from db
@@ -103,11 +145,6 @@ namespace ParkEasyV1.Controllers
                 }
             }
 
-            return View();
-        }
-
-        public ActionResult Test()
-        {
             return View();
         }
     }

@@ -155,14 +155,6 @@ namespace ParkEasyV1.Controllers
 
             if (ModelState.IsValid)
             {
-                //payment.PaymentDate = DateTime.Now;
-
-                //Booking booking = db.Bookings.Find(TempData["bookingID"]);
-
-                //payment.User = userManager.FindByName(User.Identity.Name);
-
-                //booking.BookingStatus = BookingStatus.Confirmed;
-
                 db.Payments.Add(payment);
                 db.SaveChanges();
                 return RedirectToAction("Index");

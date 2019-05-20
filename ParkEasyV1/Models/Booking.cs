@@ -10,6 +10,10 @@ using System.Net.Mail;
 using SendGrid.Helpers.Mail;
 using SendGrid;
 using System.Configuration;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
+using Twilio.Clients;
+using Twilio;
 
 namespace ParkEasyV1.Models
 {

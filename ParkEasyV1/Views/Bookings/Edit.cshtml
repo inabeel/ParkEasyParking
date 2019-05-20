@@ -5,6 +5,11 @@
 }
 
 <div class="container body-content">
+    <center>
+        <div class="alert alert-secondary col-md-8 text-center font-weight-bold my-3" role="alert">
+            @ViewBag.Message
+        </div>
+    </center>
     @if (User.IsInRole("Customer"))
     {
         <h2 class="text-center" style="margin-top: 20px; margin-bottom: 30px;">My Booking</h2>
@@ -194,15 +199,15 @@
             <div class="col-md-12">
                 @if (User.IsInRole("Customer"))
                 {
-                    <button class="btn btn-darkblue font-weight-bold m-3" onclick="location.href='@Url.Action("MyBookings", "Users")'">Back</button>
+                    <button class="btn btn-darkblue font-weight-bold m-3" type="button" onclick="location.href='@Url.Action("MyBookings", "Users")'">Back</button>
                 }
                 else
                 {
-                    <button class="btn btn-darkblue font-weight-bold m-3" onclick="location.href='@Url.Action("Manage", "Bookings")'">Back</button>
+                    <button class="btn btn-darkblue font-weight-bold m-3" type="button" onclick="location.href='@Url.Action("Manage", "Bookings")'">Back</button>
                 }
 
                 <input type="submit" class="btn btn-darkblue font-weight-bold m-3" value="Save" />
-                <button class="btn btn-danger font-weight-bold m-3" onclick="location.href='@Url.Action("Cancel", "Bookings", new { id = Model.BookingID })'">Cancel</button>
+                <button class="btn btn-danger font-weight-bold m-3" type="button" onclick="location.href='@Url.Action("Cancel", "Bookings", new { id = Model.BookingID })'">Cancel</button>
             </div>
         </div>
 

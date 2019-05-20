@@ -17,8 +17,12 @@ using Rotativa;
 
 namespace ParkEasyV1.Controllers
 {
+    /// <summary>
+    /// Controller for handling all booking events
+    /// </summary>
     public class BookingsController : Controller
     {
+        //instance of DBContext
         private ApplicationDbContext db = new ApplicationDbContext();
 
         // GET: Bookings
@@ -28,6 +32,10 @@ namespace ParkEasyV1.Controllers
             return View(bookings.ToList());
         }
 
+        /// <summary>
+        /// HttpGet ActionResult return the Manage view with a collection of bookings
+        /// </summary>
+        /// <returns>Manage view with collection of bookings</returns>
         // GET: Bookings/Manage
         public ActionResult Manage()
         {
@@ -57,15 +65,18 @@ namespace ParkEasyV1.Controllers
             return View(booking);
         }
 
+        /// <summary>
+        /// HttpGet ActionResult to return create booking view
+        /// </summary>
+        /// <returns>Create view</returns>
         // GET: Bookings/Create
         public ActionResult Create()
         {
             return View();
         }
 
-        // POST: Bookings/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
+        
+        // POST: Bookings/Create        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create([Bind(Include = "ID,DateBooked,Duration,Total,BookingStatus,ValetService,CheckedIn,CheckedOut,UserID,FlightID,ParkingSlotID,TariffID")] Booking booking)
@@ -80,7 +91,11 @@ namespace ParkEasyV1.Controllers
             return View(booking);
         }
 
-        //
+        /// <summary>
+        /// HttpPost ActionResult for creating a booking with details provided by a user
+        /// </summary>
+        /// <param name="model">CreateBookingViewModel with user booking data</param>
+        /// <returns>Valet option view</returns>
         // POST: /Bookings/CreateBooking
         [HttpPost]
         [Authorize]
@@ -168,10 +183,10 @@ namespace ParkEasyV1.Controllers
         }
 
         /// <summary>  
-        /// Validate Google Captcha  
+        /// Class for validating Google reCaptcha API response 
         /// </summary>  
-        /// <param name="response"></param>  
-        /// <returns></returns>  
+        /// <param name="response">reCaptcha reponse</param>  
+        /// <returns>Deserialized captcha response</returns>  
         public static CaptchaResponse ValidateCaptcha(string response)
         {
             string secret = System.Web.Configuration.WebConfigurationManager.AppSettings["recaptchaPrivateKey"];
@@ -180,11 +195,20 @@ namespace ParkEasyV1.Controllers
             return JsonConvert.DeserializeObject<CaptchaResponse>(jsonResult.ToString());
         }
 
+        /// <summary>
+        /// HttpGet ActionResult for returning the valet view
+        /// </summary>
+        /// <returns>Valet view</returns>
         public ActionResult Valet()
         {
             return View();
         }
 
+        /// <summary>
+        /// HttpGet ActionResult for amending a booking
+        /// </summary>
+        /// <param name="id">id of booking being edited</param>
+        /// <returns>Edit view with ViewBookingViewModel</returns>
         // GET: Bookings/Edit/5
         public ActionResult Edit(int? id)
         {
@@ -196,6 +220,17 @@ namespace ParkEasyV1.Controllers
             if (booking == null)
             {
                 return HttpNotFound();
+            }
+
+            int dateCompareResult = DateTime.Compare(booking.Flight.DepartureDate.AddHours(-24), DateTime.Now);
+
+            if (dateCompareResult > 0)
+            {
+                ViewBag.Message = "You will not be charged for any amendments to this booking.";
+            }
+            else if (dateCompareResult <= 0)
+            {
+                ViewBag.Message = "Any amendmends made to this booking will result in an admin charge to be paid on arrival.";
             }
 
             int vehicleID=0;
@@ -240,9 +275,12 @@ namespace ParkEasyV1.Controllers
             return View(model);
         }
 
-        // POST: Bookings/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
+        /// <summary>
+        /// HttpPost ActionResult for updating the booking with new edits
+        /// </summary>
+        /// <param name="model">ViewBookingViewModel with inputted data</param>
+        /// <returns>Booking Home View</returns>
+        // POST: Bookings/Edit/5        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit(ViewBookingViewModel model)
@@ -267,41 +305,46 @@ namespace ParkEasyV1.Controllers
                 //get the vehicle linked to booking
                 Vehicle vehicle = db.Vehicles.Find(vehicleID);
 
-                //update booking
-                booking.User.FirstName = model.FirstName;
-                booking.User.LastName = model.Surname;
-                booking.User.AddressLine1 = model.AddressLine1;
-                booking.User.AddressLine2 = model.AddressLine2;
-                booking.User.City = model.City;
-                booking.User.Email = model.Email;
-                booking.User.PhoneNumber = model.PhoneNo;
-                vehicle.Make = model.VehicleMake;
-                vehicle.Model = model.VehicleModel;
-                vehicle.Colour = model.VehicleColour;
-                vehicle.RegistrationNumber = model.VehicleRegistration;
-                vehicle.NoOfPassengers = model.NoOfPassengers;
-
-                db.SaveChanges();
-
-                TempData["Success"] = "Booking Successfully Updated";
-
-                if (User.IsInRole("Customer"))
+                if (booking.Flight.DepartureDate > DateTime.Now.AddHours(-24) && booking.Flight.DepartureDate <= DateTime.Now)
                 {
-                    return RedirectToAction("MyBookings", "Users");
+                    //update booking
+                    booking.User.FirstName = model.FirstName;
+                    booking.User.LastName = model.Surname;
+                    booking.User.AddressLine1 = model.AddressLine1;
+                    booking.User.AddressLine2 = model.AddressLine2;
+                    booking.User.City = model.City;
+                    booking.User.Email = model.Email;
+                    booking.User.PhoneNumber = model.PhoneNo;
+                    vehicle.Make = model.VehicleMake;
+                    vehicle.Model = model.VehicleModel;
+                    vehicle.Colour = model.VehicleColour;
+                    vehicle.RegistrationNumber = model.VehicleRegistration;
+                    vehicle.NoOfPassengers = model.NoOfPassengers;
+
+                    db.SaveChanges();
+
+                    TempData["Success"] = "Booking Successfully Updated";
+
+                    if (User.IsInRole("Customer"))
+                    {
+                        return RedirectToAction("MyBookings", "Users");
+                    }
+                    else
+                    {
+                        return RedirectToAction("Manage", "Bookings");
+                    }
                 }
-                else
-                {
-                    return RedirectToAction("Manage", "Bookings");
-                }
+
+                
             }
             return View(model);
         }
 
         /// <summary>
-        /// HttpGet User Booking Confirmation
+        /// HttpGet ActionResult for returning booking confirmation
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        /// <param name="id">id of booking</param>
+        /// <returns>Booking confirmation view</returns>
         public ActionResult Confirmation(int id)
         {
             Booking booking = db.Bookings.Find(id);
@@ -355,8 +398,8 @@ namespace ParkEasyV1.Controllers
         /// <summary>
         /// ActionResult to convert Booking Confirmation to PDF
         /// </summary>
-        /// <param name="bookingId"></param>
-        /// <returns></returns>
+        /// <param name="bookingId">id of booking</param>
+        /// <returns>booking confirmation view as PDF file</returns>
         public ActionResult PrintConfirmationPdf(int? bookingId)
         {
             var report = new ActionAsPdf("Confirmation", new { id = bookingId });
@@ -389,6 +432,11 @@ namespace ParkEasyV1.Controllers
             return RedirectToAction("Index");
         }
 
+        /// <summary>
+        /// HttpGet ActionResult to handle if a customer chooses to purchase the valet service and update booking
+        /// </summary>
+        /// <param name="valetID">the id of the valet service selected</param>
+        /// <returns>Payment Charge view</returns>
         public ActionResult PurchaseValet(int valetID)
         {
             Booking booking = db.Bookings.Find(TempData["bookingID"]);
@@ -402,6 +450,11 @@ namespace ParkEasyV1.Controllers
             return RedirectToAction("Charge", "Payments");
         }
 
+        /// <summary>
+        /// HttpGet ActionResult to return the cancel booking view
+        /// </summary>
+        /// <param name="id">booking id</param>
+        /// <returns>Cancel view with booking parameter</returns>
         // GET: Bookings/Cancel/5
         public ActionResult Cancel(int? id)
         {
@@ -414,25 +467,63 @@ namespace ParkEasyV1.Controllers
             {
                 return HttpNotFound();
             }
+
+            int dateCompareResult = DateTime.Compare(booking.Flight.DepartureDate.AddHours(-48), DateTime.Now);
+
+            if (dateCompareResult > 0)
+            {
+                ViewBag.Message = "If you cancel this booking now, you will not be charged.";
+            }
+            else if (dateCompareResult <= 0)
+            {
+                ViewBag.Message = "If you cancel this booking now, you will only recieve a partial refund of 70%.";
+            }            
+
             return View(booking);
         }
 
+        /// <summary>
+        /// HttpPost ActionResult for cancelling a booking
+        /// </summary>
+        /// <param name="id">booking id</param>
+        /// <returns>User home</returns>
         // POST: Bookings/Cancel/5
         [HttpPost, ActionName("Cancel")]
         [ValidateAntiForgeryToken]
         public ActionResult CancelConfirmed(int id)
         {
+            string message=null;
+
             Booking booking = db.Bookings.Find(id);
+
+            int dateCompareResult = DateTime.Compare(booking.Flight.DepartureDate.AddHours(-48), DateTime.Now);
+
+            if (booking.Flight.DepartureDate<=DateTime.Now)
+            {
+                if (dateCompareResult > 0 && User.IsInRole("Customer"))
+                {
+                    message = "Your full refund will be processed to your card or PayPal account.";
+                }
+                else if (dateCompareResult <= 0 && User.IsInRole("Customer"))
+                {
+                    message = "Your partial refund will be processed to your card or PayPal account.";
+                }
+            }            
+
             booking.BookingStatus = BookingStatus.Cancelled;
 
             booking.ParkingSlot.Status = Status.Available;
 
             db.SaveChanges();
-            TempData["Success"] = "Booking No: " + id + "has been successfully cancelled";
+            TempData["Success"] = "Booking No: " + id + " has been successfully cancelled." + message;
             return RedirectToAction("Index", "Users");
         }
 
-
+        /// <summary>
+        /// ActionResult for checking in a booking
+        /// </summary>
+        /// <param name="id">id of booking</param>
+        /// <returns>Booking Check In View</returns>
         public ActionResult CheckIn(int id)
         {
             if (CheckInBooking(id))
@@ -446,6 +537,11 @@ namespace ParkEasyV1.Controllers
             }            
         }
 
+        /// <summary>
+        /// ActionResult for checking out a booking
+        /// </summary>
+        /// <param name="id">id of booking</param>
+        /// <returns>Booking check out view</returns>
         public ActionResult CheckOut(int id)
         {
             if (CheckOutBooking(id))
@@ -460,9 +556,10 @@ namespace ParkEasyV1.Controllers
         }
 
         /// <summary>
-        /// ActionResult for handling the event of a Customer not showing up for a booking
+        /// ActionResult for handling the event a customer does not show up for a booking
         /// </summary>
-        /// <returns></returns>
+        /// <param name="id">booking id</param>
+        /// <returns>Manage bookings view</returns>
         public ActionResult NoShow(int id)
         {
             try
@@ -486,8 +583,8 @@ namespace ParkEasyV1.Controllers
         /// <summary>
         /// ActionResult for handling the event a Customer is delayed returning from their trip by increasing the booking stay by 1 day
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        /// <param name="id">booking id</param>
+        /// <returns>Manage booking view</returns>
         public ActionResult Delay(int id)
         {
             try
@@ -511,6 +608,11 @@ namespace ParkEasyV1.Controllers
             }
         }
 
+        /// <summary>
+        /// Function for checking in a booking using booking id
+        /// </summary>
+        /// <param name="id">id of booking</param>
+        /// <returns>true/false</returns>
         private bool CheckInBooking(int id)
         {
             foreach (var booking in db.Bookings.ToList())
@@ -527,6 +629,11 @@ namespace ParkEasyV1.Controllers
             return false;
         }
 
+        /// <summary>
+        /// Function for checking out a booking using booking id
+        /// </summary>
+        /// <param name="id">booking id</param>
+        /// <returns>true or false</returns>
         private bool CheckOutBooking(int id)
         {
             foreach (var booking in db.Bookings.ToList())
@@ -543,6 +650,10 @@ namespace ParkEasyV1.Controllers
             return false;
         }
 
+        /// <summary>
+        /// Function for getting the last booking id inserted into the database
+        /// </summary>
+        /// <returns>booking id</returns>
         private int GetLastBookingId()
         {
             Booking lastBookingEntry = db.Bookings
@@ -558,7 +669,10 @@ namespace ParkEasyV1.Controllers
             
         }
 
-
+        /// <summary>
+        /// Function for getting the id of the last flight inserted into the database
+        /// </summary>
+        /// <returns>flight id</returns>
         private int GetLastFlightId()
         {
             Flight lastFlightEntry = db.Flights
@@ -574,6 +688,10 @@ namespace ParkEasyV1.Controllers
             
         }
 
+        /// <summary>
+        /// Function for getting the id of the last vehicle inserted into the database
+        /// </summary>
+        /// <returns>vehicle id</returns>
         private int GetLastVehicleId()
         {
             Vehicle lastVehicleEntry = db.Vehicles
@@ -588,6 +706,10 @@ namespace ParkEasyV1.Controllers
             return 1;
         }
 
+        /// <summary>
+        /// Function to find the next available parking slot
+        /// </summary>
+        /// <returns>id of available parking slot</returns>
         private int FindAvailableParkingSlot()
         {
             foreach (var slot in db.ParkingSlots)
@@ -603,6 +725,12 @@ namespace ParkEasyV1.Controllers
             return 0;
         }
 
+        /// <summary>
+        /// Function to calculate the duration of a booking using the start and end date
+        /// </summary>
+        /// <param name="departureDate">date of flight departure</param>
+        /// <param name="returnDate">date of flight return</param>
+        /// <returns>duration of booking in days</returns>
         private int CalculateBookingDuration(DateTime departureDate, DateTime returnDate)
         {
             TimeSpan duration = returnDate.Subtract(departureDate);
@@ -610,6 +738,10 @@ namespace ParkEasyV1.Controllers
             return Convert.ToInt32(duration.TotalDays);
         }
 
+        /// <summary>
+        /// method to unload unused resources
+        /// </summary>
+        /// <param name="disposing">true/false to dispose</param>
         protected override void Dispose(bool disposing)
         {
             if (disposing)

@@ -56,18 +56,24 @@
         </div>
     }
     else
-    {
-            @RenderBody()
+    {       
+        @RenderBody()
     }
 
 
 
-    @if (ViewBag.Title.Equals("Forgot your password?") 
-        || ViewBag.Title.Equals("Forgot Password Confirmation") 
-        || ViewBag.Title.Equals("Reset password") 
+    @if (ViewBag.Title.Equals("Forgot your password?")
+        || ViewBag.Title.Equals("Forgot Password Confirmation")
+        || ViewBag.Title.Equals("Reset password")
         || ViewBag.Title.Equals("Reset password confirmation")
         || ViewBag.Title.Equals("Phone Number")
-        || ViewBag.Title.Equals("Verify Phone Number"))
+        || ViewBag.Title.Equals("Verify Phone Number")
+        || ViewBag.Title.Equals("Cancel Booking")
+        || ViewBag.Title.Equals("Change Password")
+        || ViewBag.Title.Equals("Test")
+        || ViewBag.Title.Equals("Create Tariff")
+        || ViewBag.Title.Equals("Edit Tariff")
+        || ViewBag.Title.Equals("Delete Tariff"))
     {
         <footer class="bg-dark-blue" style="position: absolute; bottom: 0; width: 100%;">
             <div class="container text-white" style="padding-top: 20px;">
@@ -111,10 +117,10 @@
                     </div>
                 </div>
             </div>
-            </footer>
+        </footer>
     }
     else
-    { 
+    {
         <footer class="bg-dark-blue">
             <div class="container text-white" style="padding-top: 20px;">
                 <div class="row">
@@ -162,13 +168,13 @@
         </footer>
     }
 
-            
 
 
-            <script src="~/Scripts/jquery-3.4.1.min.js"></script>
-            <script src="~/Scripts/bootstrap.min.js"></script>
-            <script src="~/Scripts/umd/popper.min.js"></script>
 
-            @RenderSection("scripts", required: false)
+    <script src="~/Scripts/jquery-3.4.1.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <script src="~/Scripts/umd/popper.min.js"></script>
+
+    @RenderSection("scripts", required: false)
 </body>
 </html>

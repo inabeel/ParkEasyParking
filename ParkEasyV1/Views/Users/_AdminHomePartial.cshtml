@@ -31,6 +31,20 @@
         <!-- /.col-lg-3 -->
         <div class="col-lg-9" style="padding-bottom: 50px;">
             <h3 class="font-weight-bold" style="padding-top: 50px; padding-bottom: 30px;">Staff Panel</h3>
+            @if (TempData["Success"] != null)
+            {
+                <div class="col-md-8 alert alert-success text-center my-2" role="alert">
+                    <strong>Success: </strong>@TempData["Success"]
+                </div>
+            }
+            @if (TempData["Error"] != null)
+            {
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-6 alert alert-danger text-center" role="alert" style="margin-top: 15px;"><strong>Error: </strong>@TempData["Error"]</div>
+                    <div class="col-md-2"></div>
+                </div>
+            }
             <div class="row">
                 <div class="col-md-3">
                     <div class="stats stats-primary ">

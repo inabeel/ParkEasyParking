@@ -14,6 +14,9 @@ using ParkEasyV1.Models;
 
 namespace ParkEasyV1.Controllers
 {
+    /// <summary>
+    /// Controller for handling User Account actions
+    /// </summary>
     [Authorize]
     public class AccountController : Controller
     {
@@ -21,16 +24,27 @@ namespace ParkEasyV1.Controllers
         private ApplicationUserManager _userManager;
         private ApplicationDbContext db = new ApplicationDbContext();
 
+        /// <summary>
+        /// Default constructor
+        /// </summary>
         public AccountController()
         {
         }
 
+        /// <summary>
+        /// Overloaded constructor
+        /// </summary>
+        /// <param name="userManager">instance of user manager</param>
+        /// <param name="signInManager">instance of sign in manager</param>
         public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager )
         {
             UserManager = userManager;
             SignInManager = signInManager;
         }
 
+        /// <summary>
+        /// ApplicationSignInManager 
+        /// </summary>
         public ApplicationSignInManager SignInManager
         {
             get
@@ -43,6 +57,9 @@ namespace ParkEasyV1.Controllers
             }
         }
 
+        /// <summary>
+        /// ApplicationUserManager
+        /// </summary>
         public ApplicationUserManager UserManager
         {
             get
@@ -55,7 +72,11 @@ namespace ParkEasyV1.Controllers
             }
         }
 
-        //
+        /// <summary>
+        /// HttpGet ActionResult for returning the login view
+        /// </summary>
+        /// <param name="returnUrl">Previous URL the user came from</param>
+        /// <returns>Login view</returns>
         // GET: /Account/Login
         [AllowAnonymous]
         public ActionResult Login(string returnUrl)
@@ -64,7 +85,12 @@ namespace ParkEasyV1.Controllers
             return View();
         }
 
-        //
+        /// <summary>
+        /// HttpPost ActionResult for validating the User login
+        /// </summary>
+        /// <param name="model">LoginViewModel with login details inputted</param>
+        /// <param name="returnUrl">Previous URL of the view user came from</param>
+        /// <returns>User Home View</returns>
         // POST: /Account/Login
         [HttpPost]
         [AllowAnonymous]
@@ -98,7 +124,13 @@ namespace ParkEasyV1.Controllers
             }
         }
 
-        //
+        /// <summary>
+        /// HttpGet ActionResult for returning the verify SMS code view
+        /// </summary>
+        /// <param name="provider">SMS provider</param>
+        /// <param name="returnUrl">URL of previous page user came from</param>
+        /// <param name="rememberMe">boolean for if user wants browser to be remembered</param>
+        /// <returns>View for verifying SMS code</returns>
         // GET: /Account/VerifyCode
         [AllowAnonymous]
         public async Task<ActionResult> VerifyCode(string provider, string returnUrl, bool rememberMe)
@@ -111,7 +143,11 @@ namespace ParkEasyV1.Controllers
             return View(new VerifyCodeViewModel { Provider = provider, ReturnUrl = returnUrl, RememberMe = rememberMe });
         }
 
-        //
+        /// <summary>
+        /// HttpPost ActionResult for validating the User SMS code
+        /// </summary>
+        /// <param name="model">VerifyCodeViewModel with code inputted</param>
+        /// <returns>Previous URL View</returns>
         // POST: /Account/VerifyCode
         [HttpPost]
         [AllowAnonymous]
@@ -141,7 +177,10 @@ namespace ParkEasyV1.Controllers
             }
         }
 
-        //
+        /// <summary>
+        /// HttpGet ActionResult for returning the Register view
+        /// </summary>
+        /// <returns>Register view</returns>
         // GET: /Account/Register
         [AllowAnonymous]
         public ActionResult Register()
@@ -149,7 +188,11 @@ namespace ParkEasyV1.Controllers
             return View();
         }
 
-        //
+        /// <summary>
+        /// HttpPost ActionResult for handling User registration
+        /// </summary>
+        /// <param name="model">RegisterViewModel with registration details inputted</param>
+        /// <returns>User home</returns>
         // POST: /Account/Register
         [HttpPost]
         [AllowAnonymous]
@@ -190,10 +233,10 @@ namespace ParkEasyV1.Controllers
         }
 
         /// <summary>  
-        /// Validate Google Captcha  
+        /// CaptchaResponse Class for verifying Google reCaptcha API response 
         /// </summary>  
-        /// <param name="response"></param>  
-        /// <returns></returns>  
+        /// <param name="response">Captcha Response</param>  
+        /// <returns>Deserialize Captcha Response</returns>  
         public static CaptchaResponse ValidateCaptcha(string response)
         {
             string secret = System.Web.Configuration.WebConfigurationManager.AppSettings["recaptchaPrivateKey"];
@@ -202,7 +245,12 @@ namespace ParkEasyV1.Controllers
             return JsonConvert.DeserializeObject<CaptchaResponse>(jsonResult.ToString());
         }
 
-        //
+        /// <summary>
+        /// Async ActionResult for confirming user email
+        /// </summary>
+        /// <param name="userId">ID of user</param>
+        /// <param name="code">Email code sent to user</param>
+        /// <returns>Email confirmed view</returns>
         // GET: /Account/ConfirmEmail
         [AllowAnonymous]
         public async Task<ActionResult> ConfirmEmail(string userId, string code)
@@ -215,7 +263,10 @@ namespace ParkEasyV1.Controllers
             return View(result.Succeeded ? "ConfirmEmail" : "Error");
         }
 
-        //
+        /// <summary>
+        /// HttpGet ActionResult for returning forgot password view
+        /// </summary>
+        /// <returns>ForgotPassword View</returns>
         // GET: /Account/ForgotPassword
         [AllowAnonymous]
         public ActionResult ForgotPassword()
@@ -223,7 +274,11 @@ namespace ParkEasyV1.Controllers
             return View();
         }
 
-        //
+        /// <summary>
+        /// HttpPost Async ActionResult for handling forgot password user output
+        /// </summary>
+        /// <param name="model">ForgotPasswordViewModel with inputted data</param>
+        /// <returns>ForgotPasswordConfirmation View</returns>
         // POST: /Account/ForgotPassword
         [HttpPost]
         [AllowAnonymous]
@@ -254,7 +309,10 @@ namespace ParkEasyV1.Controllers
             return View(model);
         }
 
-        //
+        /// <summary>
+        /// HttpGet ActionResult for returning forgot password confirmation
+        /// </summary>
+        /// <returns>ForgotPassword Confirmation View</returns>
         // GET: /Account/ForgotPasswordConfirmation
         [AllowAnonymous]
         public ActionResult ForgotPasswordConfirmation()
@@ -262,7 +320,11 @@ namespace ParkEasyV1.Controllers
             return View();
         }
 
-        //
+        /// <summary>
+        /// HttpGet ActionResult for returning reset password view
+        /// </summary>
+        /// <param name="code">Reset password code</param>
+        /// <returns>Reset password view</returns>
         // GET: /Account/ResetPassword
         [AllowAnonymous]
         public ActionResult ResetPassword(string code)
@@ -270,7 +332,11 @@ namespace ParkEasyV1.Controllers
             return code == null ? View("Error") : View();
         }
 
-        //
+        /// <summary>
+        /// HttpPost ActionResult for handling user reset password output
+        /// </summary>
+        /// <param name="model">ResetPasswordViewModel with inputted data</param>
+        /// <returns>Reset Password Confirmation</returns>
         // POST: /Account/ResetPassword
         [HttpPost]
         [AllowAnonymous]
@@ -296,7 +362,10 @@ namespace ParkEasyV1.Controllers
             return View();
         }
 
-        //
+        /// <summary>
+        /// HttpGet ActionResult for returning reset password confirmation
+        /// </summary>
+        /// <returns>ResetPasswordConfirmation View</returns>
         // GET: /Account/ResetPasswordConfirmation
         [AllowAnonymous]
         public ActionResult ResetPasswordConfirmation()
@@ -304,7 +373,12 @@ namespace ParkEasyV1.Controllers
             return View();
         }
 
-        //
+        /// <summary>
+        /// HttpPost ActionResult for handling external login output and redirecting to login provider
+        /// </summary>
+        /// <param name="provider">External login provider</param>
+        /// <param name="returnUrl">User's previous URL</param>
+        /// <returns></returns>
         // POST: /Account/ExternalLogin
         [HttpPost]
         [AllowAnonymous]
@@ -315,7 +389,12 @@ namespace ParkEasyV1.Controllers
             return new ChallengeResult(provider, Url.Action("ExternalLoginCallback", "Account", new { ReturnUrl = returnUrl }));
         }
 
-        //
+        /// <summary>
+        /// Async ActionResult for sending SMS code used for 2FA
+        /// </summary>
+        /// <param name="returnUrl">User URL of previous page</param>
+        /// <param name="rememberMe">Boolean for if the user wishes to be remebered on this browser</param>
+        /// <returns></returns>
         // GET: /Account/SendCode
         [AllowAnonymous]
         public async Task<ActionResult> SendCode(string returnUrl, bool rememberMe)
@@ -330,7 +409,11 @@ namespace ParkEasyV1.Controllers
             return View(new SendCodeViewModel { Providers = factorOptions, ReturnUrl = returnUrl, RememberMe = rememberMe });
         }
 
-        //
+        /// <summary>
+        /// HttpPost Async ActionResult for handling SMS verify code result
+        /// </summary>
+        /// <param name="model">SendCodeViewModel with inputted data</param>
+        /// <returns>VerifyCode View</returns>
         // POST: /Account/SendCode
         [HttpPost]
         [AllowAnonymous]
@@ -350,7 +433,11 @@ namespace ParkEasyV1.Controllers
             return RedirectToAction("VerifyCode", new { Provider = model.SelectedProvider, ReturnUrl = model.ReturnUrl, RememberMe = model.RememberMe });
         }
 
-        //
+        /// <summary>
+        /// Async ActionResult for retrieving external login information
+        /// </summary>
+        /// <param name="returnUrl">URL of previous page</param>
+        /// <returns>External login confirmation</returns>
         // GET: /Account/ExternalLoginCallback
         [AllowAnonymous]
         public async Task<ActionResult> ExternalLoginCallback(string returnUrl)
@@ -380,7 +467,12 @@ namespace ParkEasyV1.Controllers
             }
         }
 
-        //
+        /// <summary>
+        /// HttpPost ActionResult for processing user external login registration information upon confirmation
+        /// </summary>
+        /// <param name="model">ExternalLoginConfirmationViewModel with inputted data</param>
+        /// <param name="returnUrl">URL of previous page</param>
+        /// <returns>User Home</returns>
         // POST: /Account/ExternalLoginConfirmation
         [HttpPost]
         [AllowAnonymous]
@@ -421,6 +513,11 @@ namespace ParkEasyV1.Controllers
             return View(model);
         }
 
+        /// <summary>
+        /// HttpGet ActionResult for finding user by id and returning the manage details view
+        /// </summary>
+        /// <param name="Id">User ID</param>
+        /// <returns>Manage View</returns>
         // GET: Account/ManageDetails
         public ActionResult ManageDetails(string Id)
         {
@@ -456,6 +553,12 @@ namespace ParkEasyV1.Controllers
             }));
         }
 
+        /// <summary>
+        /// HttpPost Async ActionResult for processing any changes made to the user details
+        /// </summary>
+        /// <param name="id">User id</param>
+        /// <param name="model">ManageDetailsViewModel with inputted data</param>
+        /// <returns>User home</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Manage(string id, [Bind(Include = "Email, FirstName, LastName, AddressLine1, AddressLine2, City, Postcode, PhoneNo")] ManageDetailsViewModel model)
@@ -482,7 +585,10 @@ namespace ParkEasyV1.Controllers
             return View(model);
         }
 
-        //
+        /// <summary>
+        /// HttpPost ActionResult for logging the user out of the application
+        /// </summary>
+        /// <returns>Home page</returns>
         // POST: /Account/LogOff
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -492,7 +598,10 @@ namespace ParkEasyV1.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        //
+        /// <summary>
+        /// HttpGet ActionResult for returning external login failure view
+        /// </summary>
+        /// <returns>External login failed view</returns>
         // GET: /Account/ExternalLoginFailure
         [AllowAnonymous]
         public ActionResult ExternalLoginFailure()
@@ -500,6 +609,10 @@ namespace ParkEasyV1.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Method for unloading unused resources
+        /// </summary>
+        /// <param name="disposing">true or false for disposing</param>
         protected override void Dispose(bool disposing)
         {
             if (disposing)

@@ -239,7 +239,7 @@ namespace ParkEasyV1.Controllers
                 {
                     await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
                 }
-                return RedirectToAction("Manage", "Account", new { Message = ManageMessageId.AddPhoneSuccess });
+                return RedirectToAction("MyDetails", "Users", new { Message = ManageMessageId.AddPhoneSuccess });
             }
             // If we got this far, something failed, redisplay form
             ModelState.AddModelError("", "Failed to verify phone");
@@ -265,14 +265,14 @@ namespace ParkEasyV1.Controllers
             var result = await UserManager.SetPhoneNumberAsync(userId, null);
             if (!result.Succeeded)
             {
-                return RedirectToAction("Index", new { Message = ManageMessageId.Error });
+                return RedirectToAction("MyDetails", "Users", new { Message = ManageMessageId.Error });
             }
             var user = await UserManager.FindByIdAsync(userId);
             if (user != null)
             {
                 await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
             }
-            return RedirectToAction("Index", new { Message = ManageMessageId.RemovePhoneSuccess });
+            return RedirectToAction("MyDetails", "Users", new { Message = ManageMessageId.RemovePhoneSuccess });
         }
 
         //
