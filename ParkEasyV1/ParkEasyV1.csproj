@@ -700,10 +700,10 @@
     <Content Include="Views\Invoice\Confirmation.cshtml" />
     <Content Include="Views\Home\Test.cshtml" />
     <Content Include="Views\Users\MyInvoices.cshtml" />
+    <Content Include="Views\Scheduler\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Views\Scheduler\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config">

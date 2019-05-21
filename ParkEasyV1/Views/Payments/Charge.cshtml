@@ -42,17 +42,30 @@
         </div>
     </center>
 
-    @if (ViewBag.Corporate && ViewBag.Invoice==null)
+    @if (ViewBag.Corporate != null)
     {
-        <center class="my-4">
-            <div class="col-md-10">
-                <hr />
-                <p>Corporate Clients</p>
-                <p><strong>Note:</strong> This booking payment option is available for our corporate clients ONLY.</p>
-                <center class="my-5"><button class="btn btn-darkblue font-weight-bold" onclick="location.href='@Url.Action("InvoiceCharge", "Payments")'">Invoice Booking Charge</button></center>
-            </div>
-        </center>
+        if (ViewBag.Corporate && ViewBag.Invoice == null)
+        {
+            <center class="my-4">
+                <div class="col-md-10">
+                    <hr />
+                    <p>Corporate Clients</p>
+                    <p><strong>Note:</strong> This booking payment option is available for our corporate clients ONLY.</p>
+                    <center class="my-5"><button class="btn btn-darkblue font-weight-bold" onclick="location.href='@Url.Action("InvoiceCharge", "Payments")'">Invoice Booking Charge</button></center>
+                </div>
+            </center>
+        }
     }
+    else if (!User.IsInRole("Customer"))
+    {
+            <center class="my-4">
+                <div class="col-md-10">
+                    <hr />
+                    <p>Walk-In Booking - Cash Payment</p>
+                    <center class="my-5"><button class="btn btn-darkblue font-weight-bold" onclick="location.href='@Url.Action("CashPayment", "Payments")'">Cash Payment Received</button></center>
+                </div>
+            </center>
+        }
     
 
 </div>

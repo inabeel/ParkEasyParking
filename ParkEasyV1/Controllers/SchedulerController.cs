@@ -10,55 +10,64 @@ using System.Web;
 using System.Web.Mvc;
 using System.Data.Entity;
 using DayPilot.Web.Mvc.Enums;
+using DHTMLX.Scheduler;
+using DHTMLX.Scheduler.Data;
 
 namespace ParkEasyV1.Controllers
 {   
 
-    public class BackendController : Controller
-    {       
-
-        public ActionResult Scheduler()
-        {
-            return new Dps().CallBack(this);
-        }
-
-    }
-
-    class Dps : DayPilotScheduler
+    public class SchedulerController : Controller
     {
-        //instance of DBContext
         private ApplicationDbContext db = new ApplicationDbContext();
 
-        protected void OnInit(InitArgs e)
+        public ActionResult Index()
         {
-            // load resources
-            Resources.Add("Resource 1", "R1");
-            Resources.Add("Resource 2", "R2");
+            //Being initialized in that way, scheduler will use CalendarController.Data as a the datasource and CalendarController. Save to process the changes  
+            var scheduler = new DHXScheduler(this);
+            scheduler.DataAction = "Data";
 
-            // load events
-            //Events = new DataManager().GetData();
-            //DataIdField = "Id";
-            //DataTextField = "Text";
-            //DataResourceField = "ResourceId";
-            //DataStartField = "Start";
-            //DataEndField = "End";
+            /* 
+             * It's possible to use different actions of the current controller 
+             *      var scheduler = new DHXScheduler(this);      
+             *      scheduler.DataAction = "ActionName1"; 
+             *      scheduler.SaveAction = "ActionName2"; 
+             *  
+             * Or to specify full paths 
+             *      var scheduler = new DHXScheduler(); 
+             *      scheduler.DataAction = Url.Action("Data", "Calendar"); 
+             *      scheduler.SaveAction = Url.Action("Save", "Calendar"); 
+             */
 
-            foreach (var booking in db.Bookings.ToList())
-            {
-                DataIdField = booking.ID.ToString();
-                DataTextField = booking.User.FirstName.ToString();
-                DataStartField = booking.Flight.DepartureDate.ToString();
-                DataEndField = booking.Flight.ReturnDate.ToString();
-            }
+            /* 
+             * The default codebase folder is ~/Scripts/dhtmlxScheduler. It can be overriden: 
+             *      scheduler.Codebase = Url.Content("~/customCodebaseFolder"); 
+             */
 
 
-            // request a full update (resources and events)
-            Update(CallBackUpdateType.Full);
+            scheduler.InitialDate = new DateTime(2019, 05, 21);
+
+            scheduler.LoadData = true;
+            scheduler.EnableDataprocessor = true;
+
+            return View(scheduler);
         }
 
-        protected void OnEventMove(EventMoveArgs e)
+        public ContentResult Data()
         {
-            //new DataManager().MoveEvent(e.Id, e.NewStart, e.NewEnd, e.NewResource);
+            try
+            {
+                var details = db.Bookings.ToList();
+
+
+
+                return new SchedulerAjaxData(details);
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
         }
     }
 }

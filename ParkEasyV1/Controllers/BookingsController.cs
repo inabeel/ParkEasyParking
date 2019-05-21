@@ -76,20 +76,20 @@ namespace ParkEasyV1.Controllers
         }
 
         
-        // POST: Bookings/Create        
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "ID,DateBooked,Duration,Total,BookingStatus,ValetService,CheckedIn,CheckedOut,UserID,FlightID,ParkingSlotID,TariffID")] Booking booking)
-        {
-            if (ModelState.IsValid)
-            {
-                db.Bookings.Add(booking);
-                db.SaveChanges();
-                return RedirectToAction("Index");
-            }
+        //// POST: Bookings/Create        
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public ActionResult Create([Bind(Include = "ID,DateBooked,Duration,Total,BookingStatus,ValetService,CheckedIn,CheckedOut,UserID,FlightID,ParkingSlotID,TariffID")] Booking booking)
+        //{
+        //    if (ModelState.IsValid)
+        //    {
+        //        db.Bookings.Add(booking);
+        //        db.SaveChanges();
+        //        return RedirectToAction("Index");
+        //    }
            
-            return View(booking);
-        }
+        //    return View(booking);
+        //}
 
         /// <summary>
         /// HttpPost ActionResult for creating a booking with details provided by a user
@@ -138,10 +138,17 @@ namespace ParkEasyV1.Controllers
                 int uniqueVehicleId = GetLastVehicleId();
                 int uniqueFlightId = GetLastFlightId();
 
+                User bookingUser = userManager.FindByEmail(model.Email);
+
+                if (bookingUser==null)
+                {
+                    bookingUser = userManager.FindByName(User.Identity.Name);
+                }
+
                 //create customer booking
                 db.Bookings.Add(new Booking()
                 {
-                    User = userManager.FindByName(User.Identity.Name),
+                    User = bookingUser,
                     Flight = db.Flights.Find(uniqueFlightId),
                     ParkingSlot = db.ParkingSlots.Find(FindAvailableParkingSlot()),
                     Tariff = db.Tariffs.Find(1),
@@ -163,8 +170,7 @@ namespace ParkEasyV1.Controllers
 
                 createdBooking.BookingLines = new List<BookingLine>() { new BookingLine() { Booking = db.Bookings.Find(uniqueBookingId), Vehicle = db.Vehicles.Find(uniqueVehicleId) } };
 
-                User user = userManager.FindByName(User.Identity.Name);
-                user.PhoneNumber = model.PhoneNo;
+                bookingUser.PhoneNumber = model.PhoneNo;
 
                 db.SaveChanges();
 

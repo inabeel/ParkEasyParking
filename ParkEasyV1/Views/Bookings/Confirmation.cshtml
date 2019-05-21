@@ -86,7 +86,7 @@
         </div>
     </center>
     <div class="row">
-        <button class="btn btn-darkblue font-weight-bold m-3" type="button" onclick="location.href='@Url.Action("MyBookings", "Users")'">Manage Booking</button>
+        <button class="btn btn-darkblue font-weight-bold m-3" type="button" onclick="location.href='@Url.Action("Edit", "Bookings", new { id=Model.BookingID})'">Manage Booking</button>
         <button class="btn btn-darkblue font-weight-bold m-3" type="button" onclick="printDiv('bookingConfirmation')">Print Confirmation</button>
         <button class="btn btn-darkblue font-weight-bold m-3" type="button" onclick="location.href='@Url.Action("PrintConfirmationPdf", "Bookings", new { bookingId=Model.BookingID})'">View As PDF</button>
     </div>

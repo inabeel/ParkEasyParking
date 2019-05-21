@@ -63,8 +63,11 @@ namespace ParkEasyV1.Controllers
                 TempData["Invoice"] = booking.Invoice;
             }
 
-            Models.Customer customer = userManager.FindByEmail(User.Identity.GetUserName()) as Models.Customer;
-            ViewBag.Corporate = customer.Corporate;
+            if (User.IsInRole("Customer"))
+            {
+                Models.Customer customer = userManager.FindByEmail(User.Identity.GetUserName()) as Models.Customer;
+                ViewBag.Corporate = customer.Corporate;
+            }            
 
             ViewBag.Total = booking.Total;
             ViewBag.StripeTotal = (int)Math.Ceiling(booking.Total*100);
@@ -126,6 +129,23 @@ namespace ParkEasyV1.Controllers
             booking.EmailConfirmation();
 
             return RedirectToAction("Confirmation", "Bookings", new { id=booking.ID});
+        }
+
+        public ActionResult CashPayment()
+        {
+            Booking booking = db.Bookings.Find(TempData["bID"]);
+
+            booking.BookingStatus = BookingStatus.Confirmed;
+
+            db.Payments.Add(new Cash()
+            {
+                PaymentDate = DateTime.Now,
+                Amount = booking.Total,
+                User = booking.User
+            });
+            db.SaveChanges();
+
+            return RedirectToAction("Confirmation", "Bookings", new { id = booking.ID });
         }
 
         // GET: Payments/Details/5

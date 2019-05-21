@@ -1,10 +1,8 @@
-﻿@using DayPilot.Web.Mvc
-@using DayPilot.Web.Mvc.Enums
-@using DayPilot.Web.Mvc.Events.Scheduler
-
-@{
-    ViewBag.Title = "Test";
+﻿@{
+    ViewBag.Title = "Index";
 }
+
+<h2>Index</h2>
 
 <div class="container body-content">
     <h1>Scheduler</h1>
@@ -12,7 +10,7 @@
     <script src="~/Scripts/dhtmlxScheduler/dhtmlxscheduler.js"></script>
     <link href="~/Scripts/dhtmlxScheduler/dhtmlxscheduler_material.css" rel="stylesheet" />
 
-    <div id="scheduler" class="dhx_cal_container" style='width:100%; height:100vh;'>
+    <div id="scheduler_here" class="dhx_cal_container" style='width:100%; height:100vh;'>
         <div class="dhx_cal_navline">
             <div class="dhx_cal_prev_button">&nbsp;</div>
             <div class="dhx_cal_next_button">&nbsp;</div>
@@ -26,6 +24,15 @@
         <div class="dhx_cal_data"></div>
     </div>
     <script>
-        scheduler.init('scheduler', new Date(2019, 0, 20), "week");
+        scheduler.config.xml_date = "%Y-%m-%d %H:%i";
+        scheduler.init("scheduler_here", new Date(2019, 0, 20), "week");
+
+        // load data from backend
+        scheduler.load("/api/events", "json");
+        // connect backend to scheduler
+        var dp = new dataProcessor("/api/events");
+        dp.init(scheduler);
+        // set data exchange mode
+        dp.setTransactionMode("REST");
     </script>
 </div>
