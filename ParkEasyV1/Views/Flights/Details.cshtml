@@ -1,0 +1,74 @@
+﻿@model ParkEasyV1.Models.Flight
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Flight</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.DepartureFlightNo)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DepartureFlightNo)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DepartureTime)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DepartureTime)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ReturnFlightNo)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ReturnFlightNo)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ReturnFlightTime)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ReturnFlightTime)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DepartureDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DepartureDate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ReturnDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ReturnDate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DestinationAirport)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DestinationAirport)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.ID }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>
