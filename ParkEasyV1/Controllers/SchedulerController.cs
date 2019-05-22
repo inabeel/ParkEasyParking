@@ -12,9 +12,10 @@ using System.Data.Entity;
 using DayPilot.Web.Mvc.Enums;
 using DHTMLX.Scheduler;
 using DHTMLX.Scheduler.Data;
+using DHTMLX.Common;
 
 namespace ParkEasyV1.Controllers
-{   
+{
 
     public class SchedulerController : Controller
     {
@@ -22,52 +23,53 @@ namespace ParkEasyV1.Controllers
 
         public ActionResult Index()
         {
-            //Being initialized in that way, scheduler will use CalendarController.Data as a the datasource and CalendarController. Save to process the changes  
-            var scheduler = new DHXScheduler(this);
-            scheduler.DataAction = "Data";
-
-            /* 
-             * It's possible to use different actions of the current controller 
-             *      var scheduler = new DHXScheduler(this);      
-             *      scheduler.DataAction = "ActionName1"; 
-             *      scheduler.SaveAction = "ActionName2"; 
-             *  
-             * Or to specify full paths 
-             *      var scheduler = new DHXScheduler(); 
-             *      scheduler.DataAction = Url.Action("Data", "Calendar"); 
-             *      scheduler.SaveAction = Url.Action("Save", "Calendar"); 
-             */
-
-            /* 
-             * The default codebase folder is ~/Scripts/dhtmlxScheduler. It can be overriden: 
-             *      scheduler.Codebase = Url.Content("~/customCodebaseFolder"); 
-             */
-
-
-            scheduler.InitialDate = new DateTime(2019, 05, 21);
-
-            scheduler.LoadData = true;
-            scheduler.EnableDataprocessor = true;
-
-            return View(scheduler);
+            var sched = new DHXScheduler(this);
+            sched.Skin = DHXScheduler.Skins.Terrace;
+            sched.LoadData = true;
+            sched.EnableDataprocessor = true;
+            sched.InitialDate = new DateTime(2019, 05, 22);
+            sched.DataAction = "Data";
+            return View(sched);
         }
 
         public ContentResult Data()
         {
+            return (new SchedulerAjaxData(
+                 new ApplicationDbContext().Bookings.
+                 Select(b => new { b.ID, b.User.FirstName, b.Flight.DepartureDate, b.Flight.ReturnDate })
+                 ));
+        }
+
+        public ContentResult Save(int? id, FormCollection actionValues)
+        {
+            var action = new DataAction(actionValues);
+            var changedEvent = DHXEventsHelper.Bind<Booking>(actionValues);
+            var entities = new ApplicationDbContext();
             try
             {
-                var details = db.Bookings.ToList();
-
-
-
-                return new SchedulerAjaxData(details);
-
+                switch (action.Type)
+                {
+                    case DataActionTypes.Insert:
+                        entities.Bookings.Add(changedEvent);
+                        break;
+                    case DataActionTypes.Delete:
+                        changedEvent = entities.Bookings.FirstOrDefault(ev => ev.ID == action.SourceId);
+                        entities.Bookings.Remove(changedEvent);
+                        break;
+                    default:// "update"
+                        var target = entities.Bookings.Single(e => e.ID == changedEvent.ID);
+                        DHXEventsHelper.Update(target, changedEvent, new List<string> { "ID" });
+                        break;
+                }
+                entities.SaveChanges();
+                action.TargetId = changedEvent.ID;
             }
-            catch (Exception ex)
+            catch (Exception a)
             {
-                throw ex;
+                action.Type = DataActionTypes.Error;
             }
 
+       return (new AjaxSaveResponse(action));
         }
     }
 }
