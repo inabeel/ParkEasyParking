@@ -55,6 +55,9 @@
     <Reference Include="DHTMLX, Version=4.0.6901.32971, Culture=neutral, PublicKeyToken=53f24791214eb8ac, processorArchitecture=MSIL">
       <HintPath>..\packages\DHTMLX.Scheduler.NET.4.0.1\lib\DHTMLX.dll</HintPath>
     </Reference>
+    <Reference Include="Itenso.TimePeriod, Version=2.1.1.0, Culture=neutral, PublicKeyToken=8cb6db75b4e81486, processorArchitecture=MSIL">
+      <HintPath>..\packages\TimePeriodLibrary.NET.2.1.1\lib\net46\Itenso.TimePeriod.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.0\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
     </Reference>
@@ -701,6 +704,7 @@
     <Content Include="Views\Home\Test.cshtml" />
     <Content Include="Views\Users\MyInvoices.cshtml" />
     <Content Include="Views\Scheduler\Index.cshtml" />
+    <Content Include="Views\Bookings\Availability.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

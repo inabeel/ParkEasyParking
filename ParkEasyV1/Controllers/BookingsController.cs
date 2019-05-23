@@ -8,6 +8,7 @@ using System.Net;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using Itenso.TimePeriod;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Newtonsoft.Json;
@@ -72,6 +73,21 @@ namespace ParkEasyV1.Controllers
         // GET: Bookings/Create
         public ActionResult Create()
         {
+            if (TempData["AvailabilityModel"] as AvailabilityViewModel != null)
+            {
+                AvailabilityViewModel availabilityModel = TempData["AvailabilityModel"] as AvailabilityViewModel;
+
+                CreateBookingViewModel model = new CreateBookingViewModel
+                {
+                    DepartureDate = availabilityModel.DepartureDate,
+                    DepartureTime = availabilityModel.DepartureTime,
+                    ReturnDate = availabilityModel.ReturnDate,
+                    ReturnTime = availabilityModel.ReturnTime
+                };
+
+                return View(model);
+            }
+
             return View();
         }
 
@@ -523,6 +539,97 @@ namespace ParkEasyV1.Controllers
             db.SaveChanges();
             TempData["Success"] = "Booking No: " + id + " has been successfully cancelled." + message;
             return RedirectToAction("Index", "Users");
+        }
+
+        /// <summary>
+        /// HttpGet ActionResult to return a view to allow users to check booking availability
+        /// </summary>
+        /// <returns>Availability View</returns>
+        public ActionResult Availability()
+        {
+            return View();
+        }
+
+        /// <summary>
+        /// HttpPost ActionResult to check the availability of a booking and return success
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Availability(AvailabilityViewModel model)
+        {
+            //check view model state is valid
+            if (ModelState.IsValid)
+            {
+                TimeRange selectedTimeRange = new TimeRange(
+                new DateTime(model.DepartureDate.Year, model.DepartureDate.Month, model.DepartureDate.Day, model.DepartureTime.Hours, model.DepartureTime.Minutes, 0),
+                new DateTime(model.ReturnDate.Year, model.ReturnDate.Month, model.ReturnDate.Day, model.ReturnTime.Hours, model.ReturnTime.Minutes, 0));
+
+                int unavailableSlots = GetUnavailbleSlots(selectedTimeRange);
+
+                //!=1 for testing
+                if (unavailableSlots != 1)
+                {
+                    TempData["Available"] = "Booking Available!";
+                    TempData["AvailabilityModel"] = model;
+                    return View(model);
+                }
+                else
+                {
+                    TempData["UnAvailable"] = "Booking Not Available, Please select new booking dates.";
+                    return View(model);
+                }
+            }
+            //if model state is not valid return the availability view with model
+            return View(model);
+        }
+
+        /// <summary>
+        /// Function to determine how many unavailable parking slots there are for a certain TimeRange
+        /// </summary>
+        /// <param name="selectedTimeRange">TimeRange slots should be checked against</param>
+        /// <returns>Number of unavailable parking slots</returns>
+        public int GetUnavailbleSlots(TimeRange selectedTimeRange)
+        {
+            //initialize unavailable slots to 0
+            int unavailableSlots = 0;
+
+            //loop through all parking slots
+            //remove where clause for live version
+            foreach (var slot in db.ParkingSlots.Where(s => s.ID == 102).ToList())
+            {
+                //loop through all bookings associated with parking slot
+                foreach (var booking in slot.Bookings.ToList())
+                {
+                    //create a TimeRange variable to hold the range of dates of the booking
+                    TimeRange bookingRange = new TimeRange(
+                    new DateTime(
+                        booking.Flight.DepartureDate.Year,
+                        booking.Flight.DepartureDate.Month,
+                        booking.Flight.DepartureDate.Day,
+                        booking.Flight.DepartureTime.Hours,
+                        booking.Flight.DepartureTime.Minutes,
+                        0),
+                    new DateTime(
+                        booking.Flight.ReturnDate.Year,
+                        booking.Flight.ReturnDate.Month,
+                        booking.Flight.ReturnDate.Day,
+                        booking.Flight.ReturnFlightTime.Hours,
+                        booking.Flight.ReturnFlightTime.Minutes,
+                        0));
+
+                    //check if the booking time range overlaps with the user's selected booking time range
+                    if (selectedTimeRange.OverlapsWith(bookingRange))
+                    {
+                        //if overlap - this slot is unavailable during the time range
+                        //increase counter
+                        unavailableSlots++;
+                    }
+                }
+            }
+            //return the number of unavailable parking slots
+            return unavailableSlots;
         }
 
         /// <summary>
