@@ -12,7 +12,7 @@
     <center>
         <div class="col-md-8 bg-dark-blue rounded" style="margin-bottom: 40px; margin-top: 20px;">
             <div class="row">
-                @using (Html.BeginForm("Create", "Bookings", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+                @using (Html.BeginForm("CreateBooking", "Bookings", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
                 {
                     @Html.AntiForgeryToken()
 

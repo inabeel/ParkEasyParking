@@ -9,7 +9,7 @@
 <div class="container body-content">
     <h2 class="text-center" style="margin-top: 20px; margin-bottom: 30px;">Make a Booking</h2>
 
-    @using (Html.BeginForm("Create", "Bookings", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+    @using (Html.BeginForm("CreateBooking", "Bookings", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
     {
         @Html.AntiForgeryToken()
 
