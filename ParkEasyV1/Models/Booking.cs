@@ -14,6 +14,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Twilio.Clients;
 using Twilio;
+using Itenso.TimePeriod;
 
 namespace ParkEasyV1.Models
 {
@@ -30,6 +31,16 @@ namespace ParkEasyV1.Models
         public bool ValetService { get; set; }
         public bool CheckedIn { get; set; }
         public bool CheckedOut { get; set; }
+
+        [NotMapped]
+        public TimeRange TimeRange { get; set; }
+
+        public Booking()
+        {
+            TimeRange = new TimeRange(
+                new DateTime(BookingStart.Year, BookingStart.Month, BookingStart.Day, 0, 0 ,0),
+                new DateTime(BookingEnd.Year, BookingEnd.Month, BookingEnd.Day, 0, 0, 0));
+        }
 
         //Navigational Properties
 
