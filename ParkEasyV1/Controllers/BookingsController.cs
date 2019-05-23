@@ -75,23 +75,8 @@ namespace ParkEasyV1.Controllers
         public ActionResult Create()
         {
             return View();
-        }
-
+        }       
         
-        //// POST: Bookings/Create        
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public ActionResult Create([Bind(Include = "ID,DateBooked,Duration,Total,BookingStatus,ValetService,CheckedIn,CheckedOut,UserID,FlightID,ParkingSlotID,TariffID")] Booking booking)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        db.Bookings.Add(booking);
-        //        db.SaveChanges();
-        //        return RedirectToAction("Index");
-        //    }
-           
-        //    return View(booking);
-        //}
 
         /// <summary>
         /// HttpPost ActionResult for creating a booking with details provided by a user
@@ -102,7 +87,7 @@ namespace ParkEasyV1.Controllers
         [HttpPost]
         [Authorize]
         [ValidateAntiForgeryToken]
-        public ActionResult CreateBooking(CreateBookingViewModel model)
+        public ActionResult Create(CreateBookingViewModel model)
         {
             UserManager<User> userManager = new UserManager<User>(new UserStore<User>(db));
 
@@ -187,7 +172,7 @@ namespace ParkEasyV1.Controllers
             }
 
             // If we got this far, something failed, redisplay form
-            return View("Create");
+            return View();
         }
 
         /// <summary>  
@@ -525,6 +510,33 @@ namespace ParkEasyV1.Controllers
             db.SaveChanges();
             TempData["Success"] = "Booking No: " + id + " has been successfully cancelled." + message;
             return RedirectToAction("Index", "Users");
+        }
+
+        /// <summary>
+        /// HttpGet ActionResult to return a view to allow users to check booking availability
+        /// </summary>
+        /// <returns>Availability View</returns>
+        public ActionResult Availability()
+        {
+            return View();
+        }
+
+        /// <summary>
+        /// HttpPost ActionResult to check the availability of a booking and return success
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Availability(AvailabilityViewModel model)
+        {
+            //check view model state is valid
+            if (ModelState.IsValid)
+            {
+                
+            }
+            //if model state is not valid return the availability view with model
+            return View(model);
         }
 
         /// <summary>

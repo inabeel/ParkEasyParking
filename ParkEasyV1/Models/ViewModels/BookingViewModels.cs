@@ -205,4 +205,29 @@ namespace ParkEasyV1.Models.ViewModels
         [Display(Name = "Number of Passengers")]
         public int NoOfPassengers { get; set; }
     }
+
+    public class AvailabilityViewModel
+    {
+        [Required]
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
+        [Display(Name = "Departure Date")]
+        public DateTime DepartureDate { get; set; }
+
+        [Required]
+        [DataType(DataType.Time)]
+        [Display(Name = "Departure Time")]
+        public TimeSpan DepartureTime { get; set; }
+
+        [Required]
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
+        [Display(Name = "Return Date")]
+        public DateTime ReturnDate { get; set; }
+
+        [Required]
+        [DataType(DataType.Time)]
+        [Display(Name = "Return Time")]
+        public TimeSpan ReturnTime { get; set; }
+    }
 }
