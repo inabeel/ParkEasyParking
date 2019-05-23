@@ -8,7 +8,6 @@ using System.Net;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
-using Itenso.TimePeriod;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Newtonsoft.Json;
@@ -531,36 +530,10 @@ namespace ParkEasyV1.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Availability(AvailabilityViewModel model)
         {
-            TimeRange selectedTimeRange = new TimeRange(
-            new DateTime(model.DepartureDate.Year, model.DepartureDate.Month, model.DepartureDate.Day, model.DepartureTime.Hours, model.DepartureTime.Minutes, 0),
-            new DateTime(model.ReturnDate.Year, model.ReturnDate.Month, model.ReturnDate.Day, model.ReturnTime.Hours, model.ReturnTime.Minutes, 0));
-
-            bool bookingAvailable = false;
-
             //check view model state is valid
             if (ModelState.IsValid)
             {
-                foreach (var slot in db.ParkingSlots.ToList())
-                {
-                    foreach (var booking in slot.Bookings)
-                    {
-                        if (!booking.TimeRange.OverlapsWith(selectedTimeRange))
-                        {
-                            bookingAvailable = true;
-                        }
-                    }
-                }
-
-                if (bookingAvailable)
-                {
-                    TempData["Available"] = "Booking Available!";
-                    return View(model);
-                }
-                else
-                {
-                    TempData["UnAvailable"] = "Booking Not Available, Please select new booking dates.";
-                    return View(model);
-                }
+                
             }
             //if model state is not valid return the availability view with model
             return View(model);
