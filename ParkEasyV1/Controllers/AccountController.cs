@@ -20,17 +20,8 @@ namespace ParkEasyV1.Controllers
     [Authorize]
     public class AccountController : Controller
     {
-        /// <summary>
-        /// Global variable to store instance of sign in manager
-        /// </summary>
         private ApplicationSignInManager _signInManager;
-        /// <summary>
-        /// Global variable to store instance of the user manager
-        /// </summary>
         private ApplicationUserManager _userManager;
-        /// <summary>
-        /// Global variable to store the ApplicationDbContext
-        /// </summary>
         private ApplicationDbContext db = new ApplicationDbContext();
 
         /// <summary>

@@ -1,40 +1,17 @@
-﻿@using DayPilot.Web.Mvc;
-@using DayPilot.Web.Mvc.Events.Calendar;
-
-@{
+﻿@{
     ViewBag.Title = "Index";
 }
-
-<script src="@Url.Content("~/Scripts/DayPilot/daypilot-all.min.js")" type="text/javascript"></script>
 
 <h2>Index</h2>
 
 <div class="container body-content">
     <h1>Scheduler</h1>
 
-    <div class="container my-5">
-        <div class="space">
-            Week:
-            <a href="javascript:Dpc.commandCallBack('previous');">Previous</a>
-            |
-            <a href="javascript:Dpc.commandCallBack('next');">Next</a>
-        </div>
-        @Html.DayPilotCalendar("Dpc", new DayPilotCalendarConfig
-        {
-            Width = "85%",
-            BusinessBeginsHour = 10,
-            BackendUrl = Url.Content("~/Scheduler/Backend"),
-            EventClickHandling = EventClickHandlingType.CallBack,
-            TimeRangeSelectedHandling = TimeRangeSelectedHandlingType.CallBack,
-            EventMoveHandling = EventMoveHandlingType.Disabled,
-            EventResizeHandling = EventResizeHandlingType.Disabled,
-            ShowToolTip = true,
-            ViewType = DayPilot.Web.Mvc.Enums.Calendar.ViewType.Week,
-            Days = 7,
-            CssOnly = true,
-        })
+    <script src="~/Scripts/dhtmlxScheduler/dhtmlxscheduler.js"></script>
+    <link href="~/Scripts/dhtmlxScheduler/dhtmlxscheduler_material.css" rel="stylesheet" />
+
+    <div style="height:700px;width:900px;margin:0 auto">
+        @Html.Raw(Model.Render())
     </div>
-
-
 
 </div>
