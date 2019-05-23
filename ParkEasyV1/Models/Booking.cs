@@ -22,6 +22,8 @@ namespace ParkEasyV1.Models
         [Key]
         public int ID { get; set; }
         public DateTime DateBooked { get; set; }
+        public DateTime BookingStart { get; set; }
+        public DateTime BookingEnd { get; set; }
         public int Duration { get; set; }
         public double Total { get; set; }
         public BookingStatus BookingStatus { get; set; }

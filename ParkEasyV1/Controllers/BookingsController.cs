@@ -22,7 +22,9 @@ namespace ParkEasyV1.Controllers
     /// </summary>
     public class BookingsController : Controller
     {
-        //instance of DBContext
+        /// <summary>
+        /// Global variable to store instance of the ApplicationDbManager
+        /// </summary>
         private ApplicationDbContext db = new ApplicationDbContext();
 
         // GET: Bookings

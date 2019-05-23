@@ -304,6 +304,8 @@ namespace ParkEasyV1.Models
                 ValetService = false,
                 CheckedIn = true,
                 CheckedOut = true,
+                BookingStart = flight.DepartureDate,
+                BookingEnd = flight.ReturnDate,
 
                 //add booking lines
                 BookingLines = new List<BookingLine>()
@@ -382,6 +384,8 @@ namespace ParkEasyV1.Models
                 ValetService = true,
                 CheckedIn = false,
                 CheckedOut = false,
+                BookingStart = flight.DepartureDate,
+                BookingEnd = flight.ReturnDate,
 
                 //add booking lines
                 BookingLines = new List<BookingLine>()
@@ -455,6 +459,8 @@ namespace ParkEasyV1.Models
                 ValetService = true,
                 CheckedIn = false,
                 CheckedOut = false,
+                BookingStart = flight.DepartureDate,
+                BookingEnd = flight.ReturnDate,
 
                 //add booking lines
                 BookingLines = new List<BookingLine>()
@@ -528,6 +534,8 @@ namespace ParkEasyV1.Models
                 ValetService = true,
                 CheckedIn = false,
                 CheckedOut = false,
+                BookingStart = flight.DepartureDate,
+                BookingEnd = flight.ReturnDate,
 
                 //add booking lines
                 BookingLines = new List<BookingLine>()
