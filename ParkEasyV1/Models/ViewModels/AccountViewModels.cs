@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace ParkEasyV1.Models
@@ -181,6 +182,61 @@ namespace ParkEasyV1.Models
         public override bool IsValid(object value)
         {
             return value is bool && (bool)value;
+        }
+    }
+
+    /// <summary>
+    /// Validation attribute used for ensuring the booking end date is not before the booking start
+    /// </summary>
+    public class DateGreaterThanAttribute : ValidationAttribute
+    {
+        public DateGreaterThanAttribute(string dateToCompareToFieldName)
+        {
+            DateToCompareToFieldName = dateToCompareToFieldName;
+        }
+
+        private string DateToCompareToFieldName { get; set; }
+
+        protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+        {
+            DateTime earlierDate = (DateTime)value;
+
+            DateTime laterDate = (DateTime)validationContext.ObjectType.GetProperty(DateToCompareToFieldName).GetValue(validationContext.ObjectInstance, null);
+
+            if (laterDate > earlierDate)
+            {
+                return ValidationResult.Success;
+            }
+            else
+            {
+                return new ValidationResult("Booking Return Date Can't Be Earlier Than Departure Date");
+            }
+        }
+    }
+
+
+    /// <summary>
+    /// Validation attribute to validate that the booking departure date is not in the past or equal to today's date
+    /// </summary>
+    public class DateMoreThanOrEqualToToday : ValidationAttribute
+    {
+        public override string FormatErrorMessage(string name)
+        {
+            return "Departure date must be a future date";
+        }
+
+        protected override ValidationResult IsValid(object objValue,
+                                                       ValidationContext validationContext)
+        {
+            var dateValue = objValue as DateTime? ?? new DateTime();
+
+            //alter this as needed. I am doing the date comparison if the value is not null
+
+            if (dateValue.Date <= DateTime.Now.Date)
+            {
+                return new ValidationResult(FormatErrorMessage(validationContext.DisplayName));
+            }
+            return ValidationResult.Success;
         }
     }
 

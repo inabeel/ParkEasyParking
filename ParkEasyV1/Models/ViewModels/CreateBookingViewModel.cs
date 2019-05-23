@@ -12,6 +12,8 @@ namespace ParkEasyV1.Models.ViewModels
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         [Display(Name ="Departure Date")]
+        [DateGreaterThan("ReturnDate")]
+        [DateMoreThanOrEqualToToday]
         public DateTime DepartureDate { get; set; }
 
         [Required]
