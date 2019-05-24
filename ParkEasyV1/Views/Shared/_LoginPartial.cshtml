@@ -7,37 +7,7 @@
 
     <ul class="navbar-nav ml-auto small mb-2 mb-md-0" style="position: relative; top: -10px;">
         <li><button type="button" onclick="location.href='@Url.Action("Create", "Bookings")'" class="btn btn-outline-white btn-sm my-2 my-sm-0 mr-sm-2 text-white font-weight-bold">Book Online</button></li>
-        <li>
-            <button type="button" id="navAccountDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="btn btn-outline-white dropdown-toggle btn-sm my-2 my-sm-0 mr-sm-2 text-white font-weight-bold">My Account</button>
-
-            @*<div class="dropdown-menu" aria-labelledby="navAccountDropdown">
-                <a class="dropdown-item" href="#" onclick="location.href='@Url.Action("Index", "Users")'">Dashboard</a>
-                <a class="dropdown-item" href="#" onclick="location.href='@Url.Action("ManageDetails", "Account")'">My Details</a>
-                <a class="dropdown-item" href="#" onclick="location.href='@Url.Action("ChangePassword", "Manage")'">Change Password</a>
-                @if (User.IsInRole("Customer"))
-                {
-                    <a class="dropdown-item" href="#" onclick="location.href='@Url.Action("MyBookings", "Users")'">My Bookings</a>
-                }
-                else
-                {
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="#" onclick="location.href='@Url.Action("Manage", "Users")'">Manage Users</a>
-                    <a class="dropdown-item" href="#" onclick="location.href='@Url.Action("Manage", "Bookings")'">Manage Bookings</a>
-                    <a class="dropdown-item" href="#" onclick="location.href='@Url.Action("Departures", "Users")'">Customer Departures</a>
-                    <a class="dropdown-item" href="#" onclick="location.href='@Url.Action("Returns", "Users")'">Customer Returns</a>
-                    @if (User.IsInRole("Manager") || User.IsInRole("Admin") || User.IsInRole("Invoice Clerk"))
-                    {
-                        <a class="dropdown-item" href="#" onclick="location.href='@Url.Action("Manage", "Invoice")'">Manage Invoices</a>
-                    }                    
-                    @if (User.IsInRole("Manager") || User.IsInRole("Admin"))
-                    {
-                        <a class="dropdown-item" href="#" onclick="location.href='@Url.Action("Manage", "Tariffs")'">Manage Tariffs</a>
-                    }                    
-                    <a class="dropdown-item" href="#" onclick="location.href='@Url.Action("Returns", "Users")'">Analytical Reports</a>
-                }
-            </div>*@
-
-        </li>
+        <li><button type="button" onclick="location.href='@Url.Action("Index", "Users")'" class="btn btn-outline-white btn-sm my-2 my-sm-0 mr-sm-2 text-white font-weight-bold">Dashboard</button></li>
         <li><button type="submit" onclick="javascript:document.getElementById('logoutForm').submit()" class="btn btn-outline-white btn-sm my-2 my-sm-0 mr-sm-2 text-white font-weight-bold"><i class="fas fa-sign-out-alt"></i> Logout</button></li>
     </ul>
     }

@@ -116,83 +116,102 @@ namespace ParkEasyV1.Controllers
         [HttpPost]
         [Authorize]
         [ValidateAntiForgeryToken]
-        public ActionResult CreateBooking(CreateBookingViewModel model)
+        public ActionResult Create(CreateBookingViewModel model)
         {
+            //declare instance of usermanager
             UserManager<User> userManager = new UserManager<User>(new UserStore<User>(db));
 
+            //get Google reCaptcha API response
             CaptchaResponse response = ValidateCaptcha(Request["g-recaptcha-response"]);
 
+            //if Google reCaptcha API response and model are valid
             if (response.Success && ModelState.IsValid)
             {
-                //create customer vehicle
-                db.Vehicles.Add(new Vehicle()
+                //get the TimeRange for the selected dates
+                TimeRange selectedTimeRange = new TimeRange(
+                new DateTime(model.DepartureDate.Year, model.DepartureDate.Month, model.DepartureDate.Day, model.DepartureTime.Hours, model.DepartureTime.Minutes, 0),
+                new DateTime(model.ReturnDate.Year, model.ReturnDate.Month, model.ReturnDate.Day, model.ReturnTime.Hours, model.ReturnTime.Minutes, 0));
+
+                //if available parking space is NOT 0
+                if (FindAvailableParkingSlot(selectedTimeRange)!=0)
                 {
-                    RegistrationNumber = model.VehicleRegistration,
-                    Make = model.VehicleMake,
-                    Model = model.VehicleModel,
-                    Colour = model.VehicleModel,
-                    NoOfPassengers = model.NoOfPassengers
-                });
+                    //create customer vehicle
+                    Vehicle vehicle = db.Vehicles.Add(new Vehicle()
+                    {
+                        RegistrationNumber = model.VehicleRegistration,
+                        Make = model.VehicleMake,
+                        Model = model.VehicleModel,
+                        Colour = model.VehicleModel,
+                        NoOfPassengers = model.NoOfPassengers
+                    });
 
-                //create customer flight
-                db.Flights.Add(new Flight()
-                {
-                    DepartureFlightNo = model.DepartureFlightNo,
-                    DepartureTime = model.DepartureTime,
-                    ReturnFlightNo = model.ReturnFlightNo,
-                    ReturnFlightTime = model.ReturnTime,
-                    DepartureDate = model.DepartureDate,
-                    ReturnDate = model.ReturnDate,
-                    DestinationAirport = model.DestinationAirport
-                });
+                    //create customer flight
+                    Flight flight = db.Flights.Add(new Flight()
+                    {
+                        DepartureFlightNo = model.DepartureFlightNo,
+                        DepartureTime = model.DepartureTime,
+                        ReturnFlightNo = model.ReturnFlightNo,
+                        ReturnFlightTime = model.ReturnTime,
+                        DepartureDate = model.DepartureDate,
+                        ReturnDate = model.ReturnDate,
+                        DestinationAirport = model.DestinationAirport
+                    });
 
-                db.SaveChanges();
+                    db.SaveChanges();
 
 
-                //CREATE NEW BOOKING
+                    //CREATE NEW BOOKING
 
-                int uniqueVehicleId = GetLastVehicleId();
-                int uniqueFlightId = GetLastFlightId();
+                    //int uniqueVehicleId = GetLastVehicleId();
+                    //int uniqueFlightId = GetLastFlightId();
 
-                User bookingUser = userManager.FindByEmail(model.Email);
+                    User bookingUser = userManager.FindByEmail(model.Email);
 
-                if (bookingUser==null)
-                {
-                    bookingUser = userManager.FindByName(User.Identity.Name);
+                    if (bookingUser == null)
+                    {
+                        bookingUser = userManager.FindByName(User.Identity.Name);
+                    }
+
+                    //create customer booking
+                    Booking booking = db.Bookings.Add(new Booking()
+                    {
+                        User = bookingUser,
+                        Flight = db.Flights.Find(flight.ID),
+                        ParkingSlot = db.ParkingSlots.Find(FindAvailableParkingSlot(selectedTimeRange)),
+                        Tariff = db.Tariffs.Find(1),
+
+                        DateBooked = DateTime.Now,
+                        Duration = CalculateBookingDuration(model.DepartureDate, model.ReturnDate),
+                        Total = db.Tariffs.Find(1).Amount * Convert.ToInt32(CalculateBookingDuration(model.DepartureDate, model.ReturnDate)),
+                        BookingStatus = BookingStatus.Unpaid,
+                        ValetService = false,
+                        CheckedIn = false,
+                        CheckedOut = false,
+                    });
+
+                    db.SaveChanges();
+
+                    //int uniqueBookingId = GetLastBookingId();
+
+                    Booking createdBooking = db.Bookings.Find(booking.ID);
+
+                    createdBooking.BookingLines = new List<BookingLine>() { new BookingLine() { Booking = db.Bookings.Find(booking.ID), Vehicle = db.Vehicles.Find(vehicle.ID) } };
+
+                    bookingUser.PhoneNumber = model.PhoneNo;
+
+                    db.SaveChanges();
+
+                    TempData["bookingID"] = createdBooking.ID;
+
+                    return RedirectToAction("Valet");
                 }
-
-                //create customer booking
-                db.Bookings.Add(new Booking()
+                //if available parking space id = 0 (no spaces are available)
+                else                
                 {
-                    User = bookingUser,
-                    Flight = db.Flights.Find(uniqueFlightId),
-                    ParkingSlot = db.ParkingSlots.Find(FindAvailableParkingSlot()),
-                    Tariff = db.Tariffs.Find(1),
-
-                    DateBooked = DateTime.Now,
-                    Duration = CalculateBookingDuration(model.DepartureDate, model.ReturnDate),
-                    Total = db.Tariffs.Find(1).Amount * Convert.ToInt32(CalculateBookingDuration(model.DepartureDate, model.ReturnDate)),
-                    BookingStatus = BookingStatus.Unpaid,
-                    ValetService = false,
-                    CheckedIn = false,
-                    CheckedOut = false,
-                });
-
-                db.SaveChanges();
-
-                int uniqueBookingId = GetLastBookingId();
-
-                Booking createdBooking = db.Bookings.Find(uniqueBookingId);
-
-                createdBooking.BookingLines = new List<BookingLine>() { new BookingLine() { Booking = db.Bookings.Find(uniqueBookingId), Vehicle = db.Vehicles.Find(uniqueVehicleId) } };
-
-                bookingUser.PhoneNumber = model.PhoneNo;
-
-                db.SaveChanges();
-
-                TempData["bookingID"] = createdBooking.ID;
-
-                return RedirectToAction("Valet");
+                    //return view with error message
+                    TempData["Error"] = "No Parking Slots Available For Your Selected Dates. Please Enter New Dates And Try Again.";
+                    return View(model);
+                }
 
             }
             else if(response.Success==false)
@@ -201,7 +220,51 @@ namespace ParkEasyV1.Controllers
             }
 
             // If we got this far, something failed, redisplay form
-            return View("Create");
+            return View(model);
+        }
+
+        public int FindAvailableParkingSlot(TimeRange selectedTimeRange)
+        {
+            //loop through all parking slots
+            //remove where clause for live version
+            foreach (var slot in db.ParkingSlots.ToList())
+            {
+                int overlapCounter = 0;
+
+                //loop through all bookings associated with parking slot
+                foreach (var slotBooking in slot.Bookings.ToList())
+                {
+                    //create a TimeRange variable to hold the range of dates of the booking
+                    TimeRange bookingRange = new TimeRange(
+                    new DateTime(
+                        slotBooking.Flight.DepartureDate.Year,
+                        slotBooking.Flight.DepartureDate.Month,
+                        slotBooking.Flight.DepartureDate.Day,
+                        slotBooking.Flight.DepartureTime.Hours,
+                        slotBooking.Flight.DepartureTime.Minutes,
+                        0),
+                    new DateTime(
+                        slotBooking.Flight.ReturnDate.Year,
+                        slotBooking.Flight.ReturnDate.Month,
+                        slotBooking.Flight.ReturnDate.Day,
+                        slotBooking.Flight.ReturnFlightTime.Hours,
+                        slotBooking.Flight.ReturnFlightTime.Minutes,
+                        0));
+
+                    //check if the booking time range overlaps with the user's selected booking time range
+                    if (selectedTimeRange.OverlapsWith(bookingRange))
+                    {
+                        overlapCounter++;
+                    }
+                }
+
+                if (overlapCounter == 0)
+                {
+                    return slot.ID;
+                }
+            }
+
+            return 0;
         }
 
         /// <summary>  
