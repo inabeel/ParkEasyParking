@@ -23,10 +23,15 @@ namespace ParkEasyV1.Controllers
     /// </summary>
     public class BookingsController : Controller
     {
-        //instance of DBContext
+        /// <summary>
+        /// Global instance of ApplicationDbContext
+        /// </summary>
         private ApplicationDbContext db = new ApplicationDbContext();
 
-        // GET: Bookings
+        /// <summary>
+        /// HttpGet ActionResult for returning Bookings Index
+        /// </summary>
+        /// <returns>Index view</returns>
         public ActionResult Index()
         {
             var bookings = db.Bookings.Include(b => b.Flight).Include(b => b.Invoice).Include(b => b.ParkingSlot).Include(b => b.Tariff).Include(b => b.User);
@@ -159,16 +164,13 @@ namespace ParkEasyV1.Controllers
 
                     db.SaveChanges();
 
-
-                    //CREATE NEW BOOKING
-
-                    //int uniqueVehicleId = GetLastVehicleId();
-                    //int uniqueFlightId = GetLastFlightId();
-
+                    //try to find the booking user by email from booking form
                     User bookingUser = userManager.FindByEmail(model.Email);
 
+                    //if user cannot be found via email from booking form
                     if (bookingUser == null)
                     {
+                        //find the current logged in user
                         bookingUser = userManager.FindByName(User.Identity.Name);
                     }
 
@@ -179,7 +181,6 @@ namespace ParkEasyV1.Controllers
                         Flight = db.Flights.Find(flight.ID),
                         ParkingSlot = db.ParkingSlots.Find(FindAvailableParkingSlot(selectedTimeRange)),
                         Tariff = db.Tariffs.Find(1),
-
                         DateBooked = DateTime.Now,
                         Duration = CalculateBookingDuration(model.DepartureDate, model.ReturnDate),
                         Total = db.Tariffs.Find(1).Amount * Convert.ToInt32(CalculateBookingDuration(model.DepartureDate, model.ReturnDate)),
@@ -189,20 +190,22 @@ namespace ParkEasyV1.Controllers
                         CheckedOut = false,
                     });
 
+                    //save database changes
                     db.SaveChanges();
 
-                    //int uniqueBookingId = GetLastBookingId();
+                    //create a new booking line for the booking with customer vehicle
+                    booking.BookingLines = new List<BookingLine>() { new BookingLine() { Booking = db.Bookings.Find(booking.ID), Vehicle = db.Vehicles.Find(vehicle.ID) } };
 
-                    Booking createdBooking = db.Bookings.Find(booking.ID);
-
-                    createdBooking.BookingLines = new List<BookingLine>() { new BookingLine() { Booking = db.Bookings.Find(booking.ID), Vehicle = db.Vehicles.Find(vehicle.ID) } };
-
+                    //update the contact phone number on the user's account from the booking form
                     bookingUser.PhoneNumber = model.PhoneNo;
 
+                    //save database changes
                     db.SaveChanges();
 
-                    TempData["bookingID"] = createdBooking.ID;
+                    //store the booking id in a TempData
+                    TempData["bookingID"] = booking.ID;
 
+                    //return the Valet options view to the user
                     return RedirectToAction("Valet");
                 }
                 //if available parking space id = 0 (no spaces are available)
@@ -223,12 +226,17 @@ namespace ParkEasyV1.Controllers
             return View(model);
         }
 
+        /// <summary>
+        /// Function to find the next available parking slot for the booking period selected by the user, and return the id of the available parking slot
+        /// </summary>
+        /// <param name="selectedTimeRange">Booking date period selected by user</param>
+        /// <returns>Available parking slot id</returns>
         public int FindAvailableParkingSlot(TimeRange selectedTimeRange)
         {
             //loop through all parking slots
-            //remove where clause for live version
             foreach (var slot in db.ParkingSlots.ToList())
             {
+                //set the overlap counter to 0
                 int overlapCounter = 0;
 
                 //loop through all bookings associated with parking slot
@@ -254,16 +262,21 @@ namespace ParkEasyV1.Controllers
                     //check if the booking time range overlaps with the user's selected booking time range
                     if (selectedTimeRange.OverlapsWith(bookingRange))
                     {
+                        //if there is an overlap, then there is already a booking in this parking slot during the user's selected date period
+                        //update the overlap counter
                         overlapCounter++;
                     }
                 }
 
+                //if there are no overlaps in the parking slot bookings
                 if (overlapCounter == 0)
                 {
+                    //return the parking slot id as this parking slot is available during the selected dates
                     return slot.ID;
                 }
             }
 
+            //if no available parking slots could be found, return 0
             return 0;
         }
 
@@ -491,6 +504,11 @@ namespace ParkEasyV1.Controllers
             return report;
         }
 
+        /// <summary>
+        /// HttpGet ActionResult to return the delete booking view
+        /// </summary>
+        /// <param name="id">booking id</param>
+        /// <returns>delete booking view</returns>
         // GET: Bookings/Delete/5
         public ActionResult Delete(int? id)
         {
@@ -506,6 +524,11 @@ namespace ParkEasyV1.Controllers
             return View(booking);
         }
 
+        /// <summary>
+        /// HttpPost ActionResult for deleting a booking
+        /// </summary>
+        /// <param name="id">booking id</param>
+        /// <returns>Index view</returns>
         // POST: Bookings/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
@@ -543,27 +566,39 @@ namespace ParkEasyV1.Controllers
         // GET: Bookings/Cancel/5
         public ActionResult Cancel(int? id)
         {
+            //if the booking id is null
             if (id == null)
             {
+                //return badrequest error
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
+            //find the booking using booking id parameter
             Booking booking = db.Bookings.Find(id);
+            //if the booking returns null
             if (booking == null)
             {
+                //return httpnotfound error
                 return HttpNotFound();
             }
 
+            //declare a variable to hold the result of the comparision between the current date and the booking departure date - 48 hours
             int dateCompareResult = DateTime.Compare(booking.Flight.DepartureDate.AddHours(-48), DateTime.Now);
 
+            //if the result is more than 0
+            //the cancellation is outwith 48 hours of departure date
             if (dateCompareResult > 0)
             {
+                //display no cancellation charge message
                 ViewBag.Message = "If you cancel this booking now, you will not be charged.";
             }
+            //if the result is less than or equal to 0
+            //the cancellation is within 48 hours of departure date
             else if (dateCompareResult <= 0)
             {
+                //display cancellation charge message
                 ViewBag.Message = "If you cancel this booking now, you will only recieve a partial refund of 70%.";
             }            
-
+            //return the cancellation view
             return View(booking);
         }
 
@@ -577,28 +612,41 @@ namespace ParkEasyV1.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult CancelConfirmed(int id)
         {
+            //declare and initialize a variable to hold a message to the user
             string message=null;
 
+            //find the booking using the id parameter
             Booking booking = db.Bookings.Find(id);
 
+            //declare a variable to hold the result of a date comparison between the current date and the booking departure date - 48 hours
             int dateCompareResult = DateTime.Compare(booking.Flight.DepartureDate.AddHours(-48), DateTime.Now);
 
+            //if the departure date is before or equal to the current date
             if (booking.Flight.DepartureDate<=DateTime.Now)
             {
+                //check if date compare result is more than 0 and booking is being cancelled by Customer
+                //if date compare result is more than 0 - cancellation is outwith the 48 hours surplus charge period
                 if (dateCompareResult > 0 && User.IsInRole("Customer"))
                 {
+                    //set message to the user stating they will not be charged for cancel
                     message = "Your full refund will be processed to your card or PayPal account.";
                 }
+                //check if date compare result is less than or equal to 0 and booking is being cancelled by Customer
+                //if date compare result less than or equal to 0 - cancellation is witin the 48 hours surplus charge period
                 else if (dateCompareResult <= 0 && User.IsInRole("Customer"))
                 {
+                    //set message to the user stating they will only receieve partial refund for cancellation
                     message = "Your partial refund will be processed to your card or PayPal account.";
                 }
             }            
 
+            //update booking status
             booking.BookingStatus = BookingStatus.Cancelled;
 
+            //set parking slot status to available
             booking.ParkingSlot.Status = Status.Available;
 
+            //save db changes and set success message
             db.SaveChanges();
             TempData["Success"] = "Booking No: " + id + " has been successfully cancelled." + message;
             return RedirectToAction("Index", "Users");
@@ -616,8 +664,8 @@ namespace ParkEasyV1.Controllers
         /// <summary>
         /// HttpPost ActionResult to check the availability of a booking and return success
         /// </summary>
-        /// <param name="model"></param>
-        /// <returns></returns>
+        /// <param name="model">AvailabilityViewModel with selected booking dates inputted</param>
+        /// <returns>Availability view</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Availability(AvailabilityViewModel model)
@@ -625,21 +673,28 @@ namespace ParkEasyV1.Controllers
             //check view model state is valid
             if (ModelState.IsValid)
             {
+                //create a TimeRange from the selected departure/return date and time in model
                 TimeRange selectedTimeRange = new TimeRange(
                 new DateTime(model.DepartureDate.Year, model.DepartureDate.Month, model.DepartureDate.Day, model.DepartureTime.Hours, model.DepartureTime.Minutes, 0),
                 new DateTime(model.ReturnDate.Year, model.ReturnDate.Month, model.ReturnDate.Day, model.ReturnTime.Hours, model.ReturnTime.Minutes, 0));
 
+                //call function to calculate the number of unavailable parking slots during this time period
                 int unavailableSlots = GetUnavailbleSlots(selectedTimeRange);
 
+                //if the number of unavailable parking slots DOES NOT equal 150 (150 is the total number of parking spaces)
+                //then a parking slot is available during this time period
                 //!=1 for testing
                 if (unavailableSlots != 1)
                 {
+                    //update availability message, store the model and return the availability view
                     TempData["Available"] = "Booking Available!";
                     TempData["AvailabilityModel"] = model;
                     return View(model);
                 }
+                //if number of unavailble slots IS equal to 150 - then parking slot is not available
                 else
                 {
+                    //update message in TempData and return the view
                     TempData["UnAvailable"] = "Booking Not Available, Please select new booking dates.";
                     return View(model);
                 }
@@ -702,13 +757,16 @@ namespace ParkEasyV1.Controllers
         /// <returns>Booking Check In View</returns>
         public ActionResult CheckIn(int id)
         {
+            //if check in booking function returns true (success)
             if (CheckInBooking(id))
             {
+                //update success message in tempdata and return departures view
                 TempData["Success"] = "Booking Checked In Successfully";
                 return RedirectToAction("Departures", "Users");
             }
             else
             {
+                //return index view
                 return RedirectToAction("Index");
             }            
         }
@@ -720,13 +778,16 @@ namespace ParkEasyV1.Controllers
         /// <returns>Booking check out view</returns>
         public ActionResult CheckOut(int id)
         {
+            //if check out function returns true (success)
             if (CheckOutBooking(id))
             {
+                //update success message in tempdata and return user returns
                 TempData["Success"] = "Booking Checked Out Successfully";
                 return RedirectToAction("Returns", "Users");
             }
             else
             {
+                //return index view
                 return RedirectToAction("Index");
             }
         }
@@ -740,17 +801,23 @@ namespace ParkEasyV1.Controllers
         {
             try
             {
+                //find the booking using the id parameter
                 Booking booking = db.Bookings.Find(id);
 
+                //update the booking status to no show
                 booking.BookingStatus = BookingStatus.NoShow;
 
+                //save database changes
                 db.SaveChanges();
 
+                //update success message in tempdata and return the manage view
                 TempData["Success"] = "Booking Successfully Marked As No Show";
                 return RedirectToAction("Manage");
             }
             catch (Exception ex)
             {
+                //if exception occurs
+                //update error message in tempdata and return the manage view
                 TempData["Error"] = "Booking Could Not Be Marked As No Show";
                 return RedirectToAction("Manage");
             }
@@ -765,20 +832,26 @@ namespace ParkEasyV1.Controllers
         {
             try
             {
+                //find the booking via id parameter
                 Booking booking = db.Bookings.Find(id);
 
+                //add 1 additonal day to the booking return date
                 booking.Flight.ReturnDate.AddDays(1);
-                booking.Duration++;
-                booking.BookingStatus = BookingStatus.Delayed;
-                booking.Total = booking.Total + booking.Tariff.Amount;
+                booking.Duration++; //update booking duration
+                booking.BookingStatus = BookingStatus.Delayed;  //update booking status to delayed
+                booking.Total = booking.Total + booking.Tariff.Amount;  //update booking total for additional day
 
+                //save database changes
                 db.SaveChanges();
 
+                //update success message and return to manage bookings view
                 TempData["Success"] = "Booking Delay Successfully Updated";
                 return RedirectToAction("Manage");
             }
             catch (Exception ex)
             {
+                //if exception occurs
+                //update error message in tempdata and return manage bookings view
                 TempData["Error"] = "Booking Delay Could Not Be Updated";
                 return RedirectToAction("Manage");
             }
@@ -791,10 +864,13 @@ namespace ParkEasyV1.Controllers
         /// <returns>true/false</returns>
         private bool CheckInBooking(int id)
         {
+            //loop through all bookings
             foreach (var booking in db.Bookings.ToList())
             {
+                //if the booking matches the booking id parameter
                 if (booking.ID == id)
                 {
+                    //check booking in and update parking slot ststaus
                     booking.CheckedOut = false;
                     booking.CheckedIn = true;
                     booking.ParkingSlot.Status = Status.Occupied;
@@ -812,10 +888,13 @@ namespace ParkEasyV1.Controllers
         /// <returns>true or false</returns>
         private bool CheckOutBooking(int id)
         {
+            //loop through all bookings
             foreach (var booking in db.Bookings.ToList())
             {
+                //if booking matches id parameter
                 if (booking.ID == id)
                 {
+                    //check booking out and update parking slot status
                     booking.CheckedIn = false;
                     booking.CheckedOut = true;
                     booking.ParkingSlot.Status = Status.Available;
@@ -824,81 +903,6 @@ namespace ParkEasyV1.Controllers
                 }
             }
             return false;
-        }
-
-        /// <summary>
-        /// Function for getting the last booking id inserted into the database
-        /// </summary>
-        /// <returns>booking id</returns>
-        private int GetLastBookingId()
-        {
-            Booking lastBookingEntry = db.Bookings
-                       .OrderByDescending(b => b.ID)
-                       .FirstOrDefault();
-
-            if (lastBookingEntry!=null)
-            {
-                return lastBookingEntry.ID;
-            }
-
-            return 1;
-            
-        }
-
-        /// <summary>
-        /// Function for getting the id of the last flight inserted into the database
-        /// </summary>
-        /// <returns>flight id</returns>
-        private int GetLastFlightId()
-        {
-            Flight lastFlightEntry = db.Flights
-                       .OrderByDescending(f => f.ID)
-                       .FirstOrDefault();
-
-            if (lastFlightEntry!=null)
-            {
-                return lastFlightEntry.ID;
-            }
-
-            return 1;
-            
-        }
-
-        /// <summary>
-        /// Function for getting the id of the last vehicle inserted into the database
-        /// </summary>
-        /// <returns>vehicle id</returns>
-        private int GetLastVehicleId()
-        {
-            Vehicle lastVehicleEntry = db.Vehicles
-                       .OrderByDescending(v => v.ID)
-                       .FirstOrDefault();
-
-            if (lastVehicleEntry!=null)
-            {
-                return lastVehicleEntry.ID;
-            }
-
-            return 1;
-        }
-
-        /// <summary>
-        /// Function to find the next available parking slot
-        /// </summary>
-        /// <returns>id of available parking slot</returns>
-        private int FindAvailableParkingSlot()
-        {
-            foreach (var slot in db.ParkingSlots)
-            {
-                if (slot.Status.Equals(Status.Available))
-                {
-                    slot.Status = Status.Reserved;
-
-                    return slot.ID;
-                }
-            }
-
-            return 0;
         }
 
         /// <summary>
