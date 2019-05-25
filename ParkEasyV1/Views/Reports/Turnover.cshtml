@@ -4,42 +4,71 @@
     ViewBag.Title = "Monthly Turnover Report";
 }
 
-<div class="container body-content">
+<div class="container body-content" style="padding-bottom: 200px;">
     <h2 class="text-center my-4">Monthly Turnover Report</h2>
 
-    <table class="table my-3">
-        <tr>
-            <th>
-                Booking ID
-            </th>
-            <th>
-                Booking Date
-            </th>
-            <th>
-                Booking Total
-            </th>
-        </tr>
-
-        @foreach (var item in Model)
-        {
+    <table class="table my-3" id="tblBookings">
+        <thead>
             <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.ID)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.DateBooked)
-                </td>
-                <td>
-                    £@Html.DisplayFor(modelItem => item.Total)
-                </td>
+                <th>
+                    Booking ID
+                </th>
+                <th>
+                    Booking Date
+                </th>
+                <th>
+                    Booking Total
+                </th>
             </tr>
-        }
-
-        <tr>
-            <td></td>
-            <td></td>
-            <td><strong>Total Turnover: </strong> £@ViewBag.Total</td>
-        </tr>
-
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ID)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.DateBooked)
+                    </td>
+                    <td>
+                        £@Html.DisplayFor(modelItem => item.Total)
+                    </td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td></td>
+                <td></td>
+                <td><strong>Total Turnover: </strong> £@ViewBag.Total</td>
+            </tr>
+        </tfoot>
     </table>
+    <button class="btn btn-darkblue font-weight-bold" type="button" onclick="exportexcel()">Export Excel</button>
+    <button class="btn btn-darkblue font-weight-bold" type="button" onclick="exportpdf()">Export PDF</button>
 </div>
+
+<!--table2excel Plugin Code for Exporting Report as Excel File-->
+<script type="text/javascript">
+    function exportexcel() {
+        $("#tblBookings").table2excel({
+            name: "Table2Excel",
+            filename: "@DateTime.Today.ToString("MMMM")"+"_Monthly_Turnover_Report",
+            fileext: ".xls"
+        });
+    }
+</script>
+
+<!--jsPDF Plugin Code for Exporting Report as PDF-->
+<script src="https://unpkg.com/jspdf@1.5.3/dist/jspdf.min.js"></script>
+<script src="https://unpkg.com/jspdf-autotable@3.1.1/dist/jspdf.plugin.autotable.js"></script>
+<script>
+    function exportpdf() {
+        var doc = new jsPDF();
+        // You can use html:
+        doc.autoTable({ html: '#tblBookings' });
+
+        doc.save('@DateTime.Today.ToString("MMMM")'+'_Monthly_Turnover_Report.pdf');
+    }
+</script>

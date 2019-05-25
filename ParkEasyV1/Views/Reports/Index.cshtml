@@ -45,8 +45,6 @@
                             <th>Report Type</th>
                             <th>Time Period</th>
                             <th></th>
-                            <th></th>
-                            <th></th>
                         </tr>
 
                         <tr>
@@ -55,11 +53,37 @@
                             <td>
                                 <center><button class="btn btn-darkblue font-weight-bold" type="button" onclick="location.href='@Url.Action("DailyBookings", "Reports")'">View</button></center>
                             </td>
+                        </tr>
+
+                        <tr>
+                            <td>Cars Release Report</td>
+                            <td>Daily</td>
                             <td>
-                                <center><button class="btn btn-darkblue font-weight-bold" type="button" onclick="location.href='@Url.Action("Edit", "Tariffs")'">Export PDF</button></center>
+                                <center><button class="btn btn-darkblue font-weight-bold" type="button" onclick="location.href='@Url.Action("DailyCarsRelease", "Reports")'">View</button></center>
                             </td>
+                        </tr>
+
+                        <tr>
+                            <td>Valeting Cars</td>
+                            <td>Daily</td>
                             <td>
-                                <center><button class="btn btn-darkblue font-weight-bold" type="button" onclick="location.href='@Url.Action("GenerateExcelFile", "Reports")'">Export Excel</button></center>
+                                <center><button class="btn btn-darkblue font-weight-bold" type="button" onclick="location.href='@Url.Action("DailyValetingCars", "Reports")'">View</button></center>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Booking Report</td>
+                            <td>Monthly</td>
+                            <td>
+                                <center><button class="btn btn-darkblue font-weight-bold" type="button" onclick="location.href='@Url.Action("Bookings", "Reports")'">View</button></center>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Turnover Report</td>
+                            <td>Monthly</td>
+                            <td>
+                                <center><button class="btn btn-darkblue font-weight-bold" type="button" onclick="location.href='@Url.Action("Turnover", "Reports")'">View</button></center>
                             </td>
                         </tr>
                     </table>
