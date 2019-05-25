@@ -1,0 +1,63 @@
+﻿@model IEnumerable<ParkEasyV1.Models.Booking>
+
+@{
+    ViewBag.Title = "Daily Bookings Report";
+}
+
+<div class="container body-content">
+    <h2 class="text-center my-4">Daily Bookings Report</h2>
+
+    <table class="table my-3">
+        <tr>
+            <th>
+                Customer Name
+            </th>
+            <th>
+                Contact Email
+            </th>
+            <th>
+                Contact Phone No.
+            </th>
+            <th>
+                Vehicle Registration
+            </th>
+            <th>
+                Vehicle Make
+            </th>
+            <th>
+                Vehicle Model
+            </th>
+            <th>
+                Airline Departure Time
+            </th>            
+        </tr>
+
+        @foreach (var item in Model)
+        {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.User.FirstName) @Html.DisplayFor(modelItem => item.User.LastName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.User.Email)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.User.PhoneNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.BookingLines.First().Vehicle.RegistrationNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.BookingLines.First().Vehicle.Make)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.BookingLines.First().Vehicle.Model)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Flight.DepartureTime)
+            </td>
+        </tr>
+        }
+
+    </table>
+</div>

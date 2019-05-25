@@ -1,0 +1,50 @@
+﻿@model IEnumerable<ParkEasyV1.Models.Booking>
+
+@{
+    ViewBag.Title = "Monthly Bookings Report";
+}
+
+<div class="container body-content">
+    <h2 class="text-center my-4">Monthly Bookings Report</h2>
+
+    <table class="table my-3">
+        <tr>
+            <th>
+                Booking Date
+            </th>
+            <th>
+                Customer
+            </th>
+            <th>
+                Total
+            </th>
+        </tr>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DateBooked)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.User.Email)
+                </td>
+                <td>
+                    £@Html.DisplayFor(modelItem => item.Total)
+                </td>
+            </tr>
+        }
+
+        <tr>
+            <td></td>
+            <td></td>
+            <td><strong>Total Income: </strong> £@ViewBag.Total</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td><strong>Total Bookings: </strong> @Model.Count()</td>
+        </tr>
+
+    </table>
+</div>
