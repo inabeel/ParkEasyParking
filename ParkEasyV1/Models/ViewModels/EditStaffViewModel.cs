@@ -6,6 +6,9 @@ using System.Web;
 
 namespace ParkEasyV1.Models.ViewModels
 {
+    /// <summary>
+    /// view model for holding all details required to display and edit staff members
+    /// </summary>
     public class EditStaffViewModel
     {
         /// <summary>
@@ -71,17 +74,29 @@ namespace ParkEasyV1.Models.ViewModels
         [Display(Name = "Post Code")]
         public string Postcode { get; set; }
 
+        /// <summary>
+        /// job title of staff
+        /// </summary>
         [Required]
         [Display(Name = "Job Title")]
         public string JobTitle { get; set; }
 
+        /// <summary>
+        /// current qualification held
+        /// </summary>
         [Display(Name = "Current Qualification")]
         public string CurrentQualification { get; set; }
 
+        /// <summary>
+        /// name of emergency contact
+        /// </summary>
         [Required]
         [Display(Name = "Emergency Contact Name")]
         public string EmergencyContactName { get; set; }
 
+        /// <summary>
+        /// phone number of emergency contact
+        /// </summary>
         [Required]
         [Display(Name = "Emergency Contact Phone Number")]
         [DataType(DataType.PhoneNumber)]

@@ -6,6 +6,9 @@ using System.Web;
 
 namespace ParkEasyV1.Models.ViewModels
 {
+    /// <summary>
+    /// view model for all details displayed/edited during edit customer process
+    /// </summary>
     public class EditCustomerViewModel
     {
         /// <summary>
@@ -72,6 +75,9 @@ namespace ParkEasyV1.Models.ViewModels
         [Display(Name = "Post Code")]
         public string Postcode { get; set; }
 
+        /// <summary>
+        /// boolean for if customer is corporate or not
+        /// </summary>
         [Required]
         [Display(Name ="Corporate Customer?")]
         public bool Corporate { get; set; }

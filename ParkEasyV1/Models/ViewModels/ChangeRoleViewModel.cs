@@ -7,6 +7,9 @@ using System.Web.Mvc;
 
 namespace ParkEasyV1.Models.ViewModels
 {
+    /// <summary>
+    /// view model to hold change role attributes
+    /// </summary>
     public class ChangeRoleViewModel
     {
         /// <summary>

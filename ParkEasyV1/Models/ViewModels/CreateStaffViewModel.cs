@@ -6,6 +6,9 @@ using System.Web;
 
 namespace ParkEasyV1.Models.ViewModels
 {
+    /// <summary>
+    /// view model to hold all information required for creating staff member
+    /// </summary>
     public class CreateStaffViewModel
     {
         /// <summary>
@@ -57,17 +60,29 @@ namespace ParkEasyV1.Models.ViewModels
         [Display(Name = "Post Code")]
         public string Postcode { get; set; }
 
+        /// <summary>
+        /// job title of staff member
+        /// </summary>
         [Required]
         [Display(Name = "Job Title")]
         public string JobTitle { get; set; }
         
+        /// <summary>
+        /// current qualification held by staff member
+        /// </summary>
         [Display(Name = "Current Qualification")]
         public string CurrentQualification { get; set; }
 
+        /// <summary>
+        /// name of staff emergency contact
+        /// </summary>
         [Required]
         [Display(Name = "Emergency Contact Name")]
         public string EmergencyContactName { get; set; }
 
+        /// <summary>
+        /// phone number of staff emergency contact
+        /// </summary>
         [Required]
         [Display(Name = "Emergency Contact Phone Number")]
         [DataType(DataType.PhoneNumber)]
