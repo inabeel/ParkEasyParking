@@ -390,9 +390,6 @@ namespace ParkEasyV1.Models
                 },
             });
 
-            ParkingSlot slot = context.ParkingSlots.Find(100);
-            slot.Status = Status.Reserved;
-
             //create customer payment
             context.Payments.Add(new Cash()
             {
@@ -430,8 +427,8 @@ namespace ParkEasyV1.Models
                 DepartureTime = new TimeSpan(09, 00, 00),
                 ReturnFlightNo = "FID98",
                 ReturnFlightTime = new TimeSpan(10, 00, 00),
-                DepartureDate = new DateTime(DateTime.Today.Year, DateTime.Today.Month, DateTime.Today.Day),
-                ReturnDate = new DateTime(DateTime.Today.Year, DateTime.Today.Month, DateTime.Today.Day+3),
+                DepartureDate = DateTime.Today,
+                ReturnDate = DateTime.Today.AddDays(7),
                 DestinationAirport = "Portugal"
             });
 
@@ -445,7 +442,7 @@ namespace ParkEasyV1.Models
             {
                 User = userManager.FindByEmail("john@gmail.com"),
                 Flight = context.Flights.Find(3),
-                ParkingSlot = context.ParkingSlots.Find(101),
+                ParkingSlot = context.ParkingSlots.Find(1),
                 Tariff = context.Tariffs.Find(1),
 
                 DateBooked = DateTime.Now,
@@ -453,7 +450,7 @@ namespace ParkEasyV1.Models
                 Total = price,
                 BookingStatus = BookingStatus.Confirmed,
                 ValetService = true,
-                CheckedIn = false,
+                CheckedIn = true,
                 CheckedOut = false,
 
                 //add booking lines
@@ -463,8 +460,8 @@ namespace ParkEasyV1.Models
                 },
             });
 
-            ParkingSlot slot = context.ParkingSlots.Find(101);
-            slot.Status = Status.Reserved;
+            ParkingSlot slot = context.ParkingSlots.Find(1);
+            slot.Status = Status.Occupied;
 
             //create customer payment
             context.Payments.Add(new Cash()
@@ -537,7 +534,6 @@ namespace ParkEasyV1.Models
             });
 
             ParkingSlot slot = context.ParkingSlots.Find(102);
-            slot.Status = Status.Reserved;
             
 
             context.SaveChanges();

@@ -6,6 +6,8 @@ using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
 using ParkEasyV1.Models;
 
 namespace ParkEasyV1.Controllers
@@ -17,6 +19,27 @@ namespace ParkEasyV1.Controllers
         // GET: ParkingSlots
         public ActionResult Index()
         {
+            UserManager<User> userManager = new UserManager<User>(new UserStore<User>(db));
+
+            User loggedInUser = userManager.FindByEmail(User.Identity.GetUserName());
+
+            ViewBag.UserID = loggedInUser.Id;
+
+            List<Booking> activeBookings = new List<Booking>();
+
+            foreach (var slot in db.ParkingSlots.ToList())
+            {
+                foreach (var booking in slot.Bookings)
+                {
+                    if (booking.CheckedIn == true && booking.CheckedOut==false)
+                    {
+                        activeBookings.Add(booking);
+                    }
+                }
+            }
+
+            TempData["ActiveBookings"] = activeBookings;
+
             return View(db.ParkingSlots.ToList());
         }
 

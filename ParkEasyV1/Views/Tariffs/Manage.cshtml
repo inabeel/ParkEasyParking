@@ -24,6 +24,7 @@
                     @Html.ActionLink("Dashboard", "Index", "Users", new { area = "" }, new { @class = "list-group-item" })
                     @Html.ActionLink("Manage Users", "Manage", "Users", new { area = "" }, new { @class = "list-group-item" })
                     @Html.ActionLink("Manage Bookings", "Manage", "Bookings", new { area = "" }, new { @class = "list-group-item" })
+                    @Html.ActionLink("Manage Parking Slots", "Index", "ParkingSlots", new { area = "" }, new { @class = "list-group-item" })
                     @Html.ActionLink("Customer Departures", "Departures", "Users", new { area = "" }, new { @class = "list-group-item" })
                     @Html.ActionLink("Customer Returns", "Returns", "Users", new { area = "" }, new { @class = "list-group-item" })
                     @if (User.IsInRole("Invoice Clerk") || User.IsInRole("Admin"))

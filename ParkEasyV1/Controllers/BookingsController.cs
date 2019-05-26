@@ -693,7 +693,7 @@ namespace ParkEasyV1.Controllers
                     //update availability message, store the model and return the availability view
                     TempData["Available"] = "Booking Available!";
                     TempData["AvailabilityModel"] = model;
-                    ViewBag.Total = CalculateBookingTotal(model.DepartureDate, model.ReturnDate);
+                    ViewBag.Total = Math.Round(CalculateBookingTotal(model.DepartureDate, model.ReturnDate), 2);
                     return View(model);
                 }
                 //if number of unavailble slots IS equal to 150 - then parking slot is not available
