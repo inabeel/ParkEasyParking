@@ -4,29 +4,55 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using ParkEasyV1.Models;
 
 namespace ParkEasyV1.Controllers
 {
+    /// <summary>
+    /// Controller to handle all Manage actions or events
+    /// </summary>
     [Authorize]
     public class ManageController : Controller
     {
+        /// <summary>
+        /// instance of sign in manager
+        /// </summary>
         private ApplicationSignInManager _signInManager;
+
+        /// <summary>
+        /// instance of user manager
+        /// </summary>
         private ApplicationUserManager _userManager;
+
+        /// <summary>
+        /// instance of applicationdbcontext
+        /// </summary>
         private ApplicationDbContext db = new ApplicationDbContext();
 
+        /// <summary>
+        /// default constructor
+        /// </summary>
         public ManageController()
         {
         }
 
+        /// <summary>
+        /// overloaded constructor
+        /// </summary>
+        /// <param name="userManager"></param>
+        /// <param name="signInManager"></param>
         public ManageController(ApplicationUserManager userManager, ApplicationSignInManager signInManager)
         {
             UserManager = userManager;
             SignInManager = signInManager;
         }
 
+        /// <summary>
+        /// sign in manager class
+        /// </summary>
         public ApplicationSignInManager SignInManager
         {
             get
@@ -39,6 +65,9 @@ namespace ParkEasyV1.Controllers
             }
         }
 
+        /// <summary>
+        /// user manager class
+        /// </summary>
         public ApplicationUserManager UserManager
         {
             get
@@ -51,7 +80,11 @@ namespace ParkEasyV1.Controllers
             }
         }
 
-        //
+        /// <summary>
+        /// HttpGet Async ActionResult to return the Manage Index
+        /// </summary>
+        /// <param name="message">Nullable Manage Message</param>
+        /// <returns>Manage Index view</returns>
         // GET: /Manage/Index
         public async Task<ActionResult> Index(ManageMessageId? message)
         {
@@ -76,7 +109,12 @@ namespace ParkEasyV1.Controllers
             return View(model);
         }
 
-        //
+        /// <summary>
+        /// HttpPost Async ActionResult to remove a login from account
+        /// </summary>
+        /// <param name="loginProvider">Login provider</param>
+        /// <param name="providerKey">Login provider key</param>
+        /// <returns>ManageLogins view</returns>
         // POST: /Manage/RemoveLogin
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -100,14 +138,21 @@ namespace ParkEasyV1.Controllers
             return RedirectToAction("ManageLogins", new { Message = message });
         }
 
-        //
+        /// <summary>
+        /// HttpGet ActionResult to return add phone number view
+        /// </summary>
+        /// <returns>AddPhoneNumber view</returns>
         // GET: /Manage/AddPhoneNumber
         public ActionResult AddPhoneNumber()
         {
             return View();
         }
 
-        //
+        /// <summary>
+        /// HttpPost Async ActionResult to add a phone number to user account and send verification code
+        /// </summary>
+        /// <param name="model">AddPhoneNumberViewModel with phone number data</param>
+        /// <returns>VerifyPhoneNumber view</returns>
         // POST: /Manage/AddPhoneNumber
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -118,17 +163,13 @@ namespace ParkEasyV1.Controllers
                 return View(model);
             }
 
-            string userId = null;
+            //declare instance of usermanager
+            UserManager<User> userManager = new UserManager<User>(new UserStore<User>(db));
 
-            foreach (var user in db.Users.ToList())
-            {
-                if (user.Email.Equals(User.Identity.GetUserName()))
-                {
-                    userId = user.Id;
-                }
-            }
+            //get the user id of the current logged in user
+            string userId = UserManager.FindByEmail(User.Identity.GetUserName()).Id;
 
-            // Generate the token and send it
+            // Generate the token and send it using Twilio API SMS Service
             var code = await UserManager.GenerateChangePhoneNumberTokenAsync(userId, model.Number);
             if (UserManager.SmsService != null)
             {
@@ -142,21 +183,20 @@ namespace ParkEasyV1.Controllers
             return RedirectToAction("VerifyPhoneNumber", new { PhoneNumber = model.Number });
         }
 
-        //
+        /// <summary>
+        /// HttpPost ActionResult to enable Two Factor Authentication on user account
+        /// </summary>
+        /// <returns>Account ManageDetails View</returns>
         // POST: /Manage/EnableTwoFactorAuthentication
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> EnableTwoFactorAuthentication()
         {
-            string userId = null;
+            //declare instance of usermanager
+            UserManager<User> userManager = new UserManager<User>(new UserStore<User>(db));
 
-            foreach (var u in db.Users.ToList())
-            {
-                if (u.Email.Equals(User.Identity.GetUserName()))
-                {
-                    userId = u.Id;
-                }
-            }
+            //get user id of current logged in user
+            string userId = UserManager.FindByEmail(User.Identity.GetUserName()).Id;
 
             await UserManager.SetTwoFactorEnabledAsync(userId, true);
             var user = await UserManager.FindByIdAsync(userId);
@@ -164,24 +204,23 @@ namespace ParkEasyV1.Controllers
             {
                 await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
             }
-            return RedirectToAction("Manage", "Account");
+            return RedirectToAction("ManageDetails", "Account", new { Id=userId});
         }
 
-        //
+        /// <summary>
+        /// HttpPost ActionResult to disable Two Factor Authentication from user account
+        /// </summary>
+        /// <returns>ManageDetails View</returns>
         // POST: /Manage/DisableTwoFactorAuthentication
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DisableTwoFactorAuthentication()
         {
-            string userId = null;
+            //declare instance of usermanager
+            UserManager<User> userManager = new UserManager<User>(new UserStore<User>(db));
 
-            foreach (var u in db.Users.ToList())
-            {
-                if (u.Email.Equals(User.Identity.GetUserName()))
-                {
-                    userId = u.Id;
-                }
-            }
+            //get user id of current logged in user
+            string userId = UserManager.FindByEmail(User.Identity.GetUserName()).Id;
 
             await UserManager.SetTwoFactorEnabledAsync(userId, false);
             var user = await UserManager.FindByIdAsync(userId);
@@ -189,43 +228,43 @@ namespace ParkEasyV1.Controllers
             {
                 await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
             }
-            return RedirectToAction("Manage", "Account");
+            return RedirectToAction("ManageDetails", "Account", new { Id = userId });
         }
 
-        //
+        /// <summary>
+        /// HttpGet ActionResult to return the verify phone number view
+        /// </summary>
+        /// <param name="phoneNumber">phone number to be verified</param>
+        /// <returns>VerifyPhoneNumber View</returns>
         // GET: /Manage/VerifyPhoneNumber
         public async Task<ActionResult> VerifyPhoneNumber(string phoneNumber)
         {
-            string userId = null;
+            //declare instance of usermanager
+            UserManager<User> userManager = new UserManager<User>(new UserStore<User>(db));
 
-            foreach (var user in db.Users.ToList())
-            {
-                if (user.Email.Equals(User.Identity.GetUserName()))
-                {
-                    userId = user.Id;
-                }
-            }
+            //get the user id of the current logged in user
+            string userId = UserManager.FindByEmail(User.Identity.GetUserName()).Id;
 
             var code = await UserManager.GenerateChangePhoneNumberTokenAsync(userId, phoneNumber);
             // Send an SMS through the SMS provider to verify the phone number
             return phoneNumber == null ? View("Error") : View(new VerifyPhoneNumberViewModel { PhoneNumber = phoneNumber });
         }
 
-        //
+        /// <summary>
+        /// HttpPost Async ActionResult to verify a phone number for a user account
+        /// </summary>
+        /// <param name="model">VerifyPhoneNumberViewModel with SMS code data</param>
+        /// <returns>ManageDetails view</returns>
         // POST: /Manage/VerifyPhoneNumber
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> VerifyPhoneNumber(VerifyPhoneNumberViewModel model)
         {
-            string userId = null;
+            //declare instance of usermanager
+            UserManager<User> userManager = new UserManager<User>(new UserStore<User>(db));
 
-            foreach (var user in db.Users.ToList())
-            {
-                if (user.Email.Equals(User.Identity.GetUserName()))
-                {
-                    userId = user.Id;
-                }
-            }
+            //get the user id of the current logged in user
+            string userId = UserManager.FindByEmail(User.Identity.GetUserName()).Id;
 
             if (!ModelState.IsValid)
             {
@@ -246,21 +285,20 @@ namespace ParkEasyV1.Controllers
             return View(model);
         }
 
-        //
+        /// <summary>
+        /// HttpPost Async ActionResult to remove a phone number from user account
+        /// </summary>
+        /// <returns>ManageDetails view</returns>
         // POST: /Manage/RemovePhoneNumber
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> RemovePhoneNumber()
         {
-            string userId = null;
+            //declare instance of usermanager
+            UserManager<User> userManager = new UserManager<User>(new UserStore<User>(db));
 
-            foreach (var u in db.Users.ToList())
-            {
-                if (u.Email.Equals(User.Identity.GetUserName()))
-                {
-                    userId = u.Id;
-                }
-            }
+            //get the user id of the current logged in user
+            string userId = UserManager.FindByEmail(User.Identity.GetUserName()).Id;
 
             var result = await UserManager.SetPhoneNumberAsync(userId, null);
             if (!result.Succeeded)
@@ -275,14 +313,21 @@ namespace ParkEasyV1.Controllers
             return RedirectToAction("ManageDetails", "Account", new { Id=userId });
         }
 
-        //
+        /// <summary>
+        /// HttpGet ActionResult to return the ChangePassword view
+        /// </summary>
+        /// <returns>ChangePassword View</returns>
         // GET: /Manage/ChangePassword
         public ActionResult ChangePassword()
         {
             return View();
         }
 
-        //
+        /// <summary>
+        /// HttpPost Async ActionResult to change the password of a user account 
+        /// </summary>
+        /// <param name="model">ChangePasswordViewModel with new password information</param>
+        /// <returns>User Index</returns>
         // POST: /Manage/ChangePassword
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -293,15 +338,11 @@ namespace ParkEasyV1.Controllers
                 return View(model);
             }
 
-            string userId = null;
+            //declare instance of usermanager
+            UserManager<User> userManager = new UserManager<User>(new UserStore<User>(db));
 
-            foreach (var user in db.Users.ToList())
-            {
-                if (user.Email.Equals(User.Identity.GetUserName()))
-                {
-                    userId = user.Id;
-                }
-            }
+            //get the user id of the current logged in user
+            string userId = UserManager.FindByEmail(User.Identity.GetUserName()).Id;
 
             var result = await UserManager.ChangePasswordAsync(userId, model.OldPassword, model.NewPassword);
             if (result.Succeeded)
@@ -318,14 +359,21 @@ namespace ParkEasyV1.Controllers
             return View(model);
         }
 
-        //
+        /// <summary>
+        /// HttpGet ActionResult to return the set password view
+        /// </summary>
+        /// <returns></returns>
         // GET: /Manage/SetPassword
         public ActionResult SetPassword()
         {
             return View();
         }
 
-        //
+        /// <summary>
+        /// HttpPost Async ActionResult to set the password on a user account
+        /// </summary>
+        /// <param name="model">SetPasswordViewModel with password information</param>
+        /// <returns>Manage Index</returns>
         // POST: /Manage/SetPassword
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -333,15 +381,11 @@ namespace ParkEasyV1.Controllers
         {
             if (ModelState.IsValid)
             {
-                string userId = null;
+                //declare instance of usermanager
+                UserManager<User> userManager = new UserManager<User>(new UserStore<User>(db));
 
-                foreach (var user in db.Users.ToList())
-                {
-                    if (user.Email.Equals(User.Identity.GetUserName()))
-                    {
-                        userId = user.Id;
-                    }
-                }
+                //get the user id of the current logged in user
+                string userId = UserManager.FindByEmail(User.Identity.GetUserName()).Id;
 
                 var result = await UserManager.AddPasswordAsync(userId, model.NewPassword);
                 if (result.Succeeded)
@@ -360,7 +404,11 @@ namespace ParkEasyV1.Controllers
             return View(model);
         }
 
-        //
+        /// <summary>
+        /// HttpGet Async ActionResult to return the ManageLogins view
+        /// </summary>
+        /// <param name="message">Nullable Manage Message</param>
+        /// <returns>ManageLogins view</returns>
         // GET: /Manage/ManageLogins
         public async Task<ActionResult> ManageLogins(ManageMessageId? message)
         {
@@ -383,7 +431,11 @@ namespace ParkEasyV1.Controllers
             });
         }
 
-        //
+        /// <summary>
+        /// HttpPost ActionResult to link a login to user account
+        /// </summary>
+        /// <param name="provider">login provider</param>
+        /// <returns>External login provider link login</returns>
         // POST: /Manage/LinkLogin
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -393,7 +445,10 @@ namespace ParkEasyV1.Controllers
             return new AccountController.ChallengeResult(provider, Url.Action("LinkLoginCallback", "Manage"), User.Identity.GetUserId());
         }
 
-        //
+        /// <summary>
+        /// HttpGet Async ActionResult for link login callback
+        /// </summary>
+        /// <returns>ManageLogins view</returns>
         // GET: /Manage/LinkLoginCallback
         public async Task<ActionResult> LinkLoginCallback()
         {
@@ -406,6 +461,10 @@ namespace ParkEasyV1.Controllers
             return result.Succeeded ? RedirectToAction("ManageLogins") : RedirectToAction("ManageLogins", new { Message = ManageMessageId.Error });
         }
 
+        /// <summary>
+        /// Method to release unused resources
+        /// </summary>
+        /// <param name="disposing"></param>
         protected override void Dispose(bool disposing)
         {
             if (disposing && _userManager != null)

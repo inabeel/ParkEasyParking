@@ -7,35 +7,53 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
 using ParkEasyV1.Models;
 
 namespace ParkEasyV1.Controllers
 {
+    /// <summary>
+    /// Controller for handling all Tariff management and events/actions
+    /// </summary>
     [Authorize(Roles ="Admin, Manager")]
     public class TariffsController : Controller
     {
+        /// <summary>
+        /// Global instance of ApplicationDbContext
+        /// </summary>
         private ApplicationDbContext db = new ApplicationDbContext();
 
+        /// <summary>
+        /// HttpGet ActionResult to return the Tariff Index view
+        /// </summary>
+        /// <returns>Index view</returns>
         // GET: Tariffs
         public ActionResult Index()
         {
             return View(db.Tariffs.ToList());
         }
 
+        /// <summary>
+        /// HttpGet ActionResult to return the Manage Tariffs View
+        /// </summary>
+        /// <returns>Manage view</returns>
         // GET: Tariffs/Manage
         public ActionResult Manage()
         {
-            foreach (var user in db.Users.ToList())
-            {
-                if (user.Email.Equals(User.Identity.Name))
-                {
-                    ViewBag.UserID = user.Id;
-                }
-            }
+            //declare instance of usermanager
+            UserManager<User> userManager = new UserManager<User>(new UserStore<User>(db));
+
+            //get the current user's ID and store in viewbag for front-end display
+            ViewBag.UserID = userManager.FindByEmail(User.Identity.GetUserName()).Id;
 
             return View(db.Tariffs.ToList());
         }
 
+        /// <summary>
+        /// HttpGet ActionResult to return the Details view
+        /// </summary>
+        /// <param name="id">Tariff id</param>
+        /// <returns>Details view</returns>
         // GET: Tariffs/Details/5
         public ActionResult Details(int? id)
         {
@@ -51,12 +69,21 @@ namespace ParkEasyV1.Controllers
             return View(tariff);
         }
 
+        /// <summary>
+        /// HttpGet ActionResult to return the Create view
+        /// </summary>
+        /// <returns>Create view</returns>
         // GET: Tariffs/Create
         public ActionResult Create()
         {
             return View();
         }
 
+        /// <summary>
+        /// HttpPost ActionResult to create a new tariff
+        /// </summary>
+        /// <param name="tariff">Created Tariff</param>
+        /// <returns>Manage view</returns>
         // POST: Tariffs/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
@@ -68,12 +95,17 @@ namespace ParkEasyV1.Controllers
             {
                 db.Tariffs.Add(tariff);
                 db.SaveChanges();
-                return RedirectToAction("Index");
+                return RedirectToAction("Manage");
             }
 
             return View(tariff);
         }
 
+        /// <summary>
+        /// HttpGet ActionResult to return the edit tariff view
+        /// </summary>
+        /// <param name="id">Tariff id</param>
+        /// <returns>Edit view</returns>
         // GET: Tariffs/Edit/5
         public ActionResult Edit(int? id)
         {
@@ -89,6 +121,11 @@ namespace ParkEasyV1.Controllers
             return View(tariff);
         }
 
+        /// <summary>
+        /// HttpPost ActionResult to update a tariff
+        /// </summary>
+        /// <param name="tariff">Updated tariff</param>
+        /// <returns>Manage view</returns>
         // POST: Tariffs/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
@@ -100,11 +137,16 @@ namespace ParkEasyV1.Controllers
             {
                 db.Entry(tariff).State = EntityState.Modified;
                 db.SaveChanges();
-                return RedirectToAction("Index");
+                return RedirectToAction("Manage");
             }
             return View(tariff);
         }
 
+        /// <summary>
+        /// HttpGet ActionResult to return the delete tariff view
+        /// </summary>
+        /// <param name="id">Tariff id</param>
+        /// <returns>Delete view</returns>
         // GET: Tariffs/Delete/5
         public ActionResult Delete(int? id)
         {
@@ -120,6 +162,11 @@ namespace ParkEasyV1.Controllers
             return View(tariff);
         }
 
+        /// <summary>
+        /// HttpPost ActionResult to delete a tariff
+        /// </summary>
+        /// <param name="id">Tariff Id</param>
+        /// <returns>Manage view</returns>
         // POST: Tariffs/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
@@ -128,9 +175,13 @@ namespace ParkEasyV1.Controllers
             Tariff tariff = db.Tariffs.Find(id);
             db.Tariffs.Remove(tariff);
             db.SaveChanges();
-            return RedirectToAction("Index");
+            return RedirectToAction("Manage");
         }
 
+        /// <summary>
+        /// Method to release unused resources
+        /// </summary>
+        /// <param name="disposing"></param>
         protected override void Dispose(bool disposing)
         {
             if (disposing)

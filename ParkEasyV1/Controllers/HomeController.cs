@@ -26,11 +26,6 @@ namespace ParkEasyV1.Controllers
             return View();
         }
 
-        public ActionResult Test()
-        {
-            return View();
-        }
-
         /// <summary>
         /// ActionResult to return About view
         /// </summary>
@@ -60,21 +55,27 @@ namespace ParkEasyV1.Controllers
             //get tarrifs from db
             var tariffs = db.Tariffs.ToList();
 
-            //loop through tariffs and get current prices
+            //loop through tariffs 
             foreach (var tariff in tariffs)
             {
+                //if tariff is parking slot tariff
                 if (tariff.Type.Equals("Parking Slot"))
                 {
+                    //store price * 8 (days) in ViewBag for front-end display
                     ViewBag.SlotPrice = tariff.Amount*8;
                 }
 
+                //if tarrif is mini valet
                 if (tariff.Type.Equals("Mini Valet"))
                 {
+                    //store price in ViewBag for front-end display
                     ViewBag.MiniValetPrice = tariff.Amount;
                 }
 
+                //if tariff is full valet
                 if (tariff.Type.Equals("Full Valet"))
                 {
+                    //store price in viewbag for front-end display
                     ViewBag.FullValetPrice = tariff.Amount;
                 }
             }
@@ -131,20 +132,24 @@ namespace ParkEasyV1.Controllers
             //get tariffs from db
             var tariffs = db.Tariffs.ToList();
 
-            //loop through tariffs and get valet prices
+            //loop through tariffs
             foreach (var tariff in tariffs)
             {
+                //if tariff is mini valet
                 if (tariff.Type.Equals("Mini Valet"))
                 {
+                    //store price in ViewBag for front-end display
                     ViewBag.MiniValetPrice = tariff.Amount;
                 }
 
+                //if tariff is full valet
                 if (tariff.Type.Equals("Full Valet"))
                 {
+                    //store price in ViewBag for front-end display
                     ViewBag.FullValetPrice = tariff.Amount;
                 }
             }
-
+            //return FAQ view
             return View();
         }
     }

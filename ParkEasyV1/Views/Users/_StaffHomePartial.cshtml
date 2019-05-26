@@ -40,22 +40,20 @@
         </div>
         <!-- /.col-lg-3 -->
         <div class="col-lg-9" style="padding-bottom: 50px;">
-            <h3 class="font-weight-bold" style="padding-top: 50px; padding-bottom: 30px;">Staff Dashboard</h3>
+            <h3 class="font-weight-bold" style="padding-top: 50px; padding-bottom: 10px;">Staff Dashboard</h3>
             @if (TempData["Success"] != null)
             {
+            <center>
                 <div class="row">
-                    <div class="col-md-2"></div>
                     <div class="col-md-6 alert alert-success text-center" role="alert" style="margin-top: 15px;"><strong>Success: </strong>@TempData["Success"]</div>
-                    <div class="col-md-2"></div>
                 </div>
+            </center>
             }
             @if (TempData["Error"] != null)
             {
-                <div class="row">
-                    <div class="col-md-2"></div>
+                <center>
                     <div class="col-md-6 alert alert-danger text-center" role="alert" style="margin-top: 15px;"><strong>Error: </strong>@TempData["Error"]</div>
-                    <div class="col-md-2"></div>
-                </div>
+                </center>
             }
             <div class="row">
                 <div class="col-md-3">

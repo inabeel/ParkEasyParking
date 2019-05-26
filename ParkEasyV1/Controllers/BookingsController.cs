@@ -46,17 +46,21 @@ namespace ParkEasyV1.Controllers
         [Authorize(Roles = "Admin, Manager, Invoice Clerk, Booking Clerk")]
         public ActionResult Manage()
         {
-            foreach (var user in db.Users.ToList())
-            {
-                if (user.Email.Equals(User.Identity.Name))
-                {
-                    ViewBag.UserID = user.Id;
-                }
-            }
+            //declare instance of usermanager
+            UserManager<User> userManager = new UserManager<User>(new UserStore<User>(db));
 
+            //get the current user's ID and store in viewbag for front-end display
+            ViewBag.UserID = userManager.FindByEmail(User.Identity.GetUserName()).Id;
+
+            //return view with collection of bookings ordered by date booked
             return View(db.Bookings.OrderBy(b => b.DateBooked).ToList());
         }
 
+        /// <summary>
+        /// HttpGet ActionResult to return Booking details view
+        /// </summary>
+        /// <param name="id">Booking id</param>
+        /// <returns>Details view</returns>
         // GET: Bookings/Details/5
         public ActionResult Details(int? id)
         {
@@ -80,13 +84,16 @@ namespace ParkEasyV1.Controllers
         [Authorize]
         public ActionResult Create()
         {
+            //check if logged in user is in Customer role
             if (User.IsInRole("Customer"))
             {
                 //declare instance of usermanager
                 UserManager<User> userManager = new UserManager<User>(new UserStore<User>(db));
 
+                //get the current logged in user 
                 User currentUser = userManager.FindByEmail(User.Identity.GetUserName());
 
+                //create a new CreateBookingViewModel and populate with current user data
                 CreateBookingViewModel model = new CreateBookingViewModel
                 {
                     FirstName = currentUser.FirstName,
@@ -101,19 +108,24 @@ namespace ParkEasyV1.Controllers
                     ReturnDate = DateTime.Today.AddDays(7)
                 };
 
-
+                //check if AvailabilityViewModel stored in TempData is NOT null
+                //if NOT null then user has came from Availability Checker view
                 if (TempData["AvailabilityModel"] as AvailabilityViewModel != null)
                 {
+                    //retrieve the view model from TempData
                     AvailabilityViewModel availabilityModel = TempData["AvailabilityModel"] as AvailabilityViewModel;
 
+                    //input the departure/return details to the CreateBookingViewModel
                     model.DepartureDate = availabilityModel.DepartureDate;
                     model.DepartureTime = availabilityModel.DepartureTime;
                     model.ReturnDate = availabilityModel.ReturnDate;
                     model.ReturnTime = availabilityModel.ReturnTime;                                
                 }
 
+                //return the View with the CreateBookingViewModel attached
                 return View(model);
             }
+            //if the current user is not a Customer - return the Create view with no model
             return View();
         }
 
@@ -183,6 +195,7 @@ namespace ParkEasyV1.Controllers
                         DestinationAirport = model.DestinationAirport
                     });
 
+                    //save database changes
                     db.SaveChanges();
 
                     //try to find the booking user by email from booking form
@@ -240,6 +253,7 @@ namespace ParkEasyV1.Controllers
             }
             else if(response.Success==false)
             {
+                //return Google reCaptcha API error
                 return Content("Error From Google ReCaptcha : " + response.ErrorMessage[0].ToString());
             }
 
@@ -333,29 +347,42 @@ namespace ParkEasyV1.Controllers
         [Authorize]
         public ActionResult Edit(int? id)
         {
+            //check if booking id is null
             if (id == null)
             {
+                //return Bad Request error
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
+            //find the booking via id and check if booking is null
             Booking booking = db.Bookings.Find(id);
             if (booking == null)
             {
+                //return httpnotfound if booking is null
                 return HttpNotFound();
             }
 
+            //create a variable to hold the result of the date comparison between the booking departure date and the current date
             int dateCompareResult = DateTime.Compare(booking.Flight.DepartureDate.AddHours(-24), DateTime.Now);
 
+            //if the date compare result is more than 0
             if (dateCompareResult > 0)
             {
+                //the booking is outside the 24 hour booking amendment period
+                //store message in ViewBag to be displayed on the front-end
                 ViewBag.Message = "You will not be charged for any amendments to this booking.";
             }
+            //if the date compare result is less than or equal to 0
             else if (dateCompareResult <= 0)
             {
+                //the booking is inside the 24 hour booking amendment period
+                //store message in ViewBag to be displayed on the front-end
                 ViewBag.Message = "Any amendmends made to this booking will result in an admin charge to be paid on arrival.";
             }
 
+            //find the vehicle attached to the booking via bookingline
            Vehicle vehicle = db.Vehicles.Find(booking.BookingLines.First().VehicleID);
 
+            //create a new viewbooking view model and input all booking/flight/vehicle data
             ViewBookingViewModel model = new ViewBookingViewModel
             {
                 BookingID = booking.ID,
@@ -382,6 +409,7 @@ namespace ParkEasyV1.Controllers
                 Status = booking.BookingStatus
             };
 
+            //return the edit view with model 
             return View(model);
         }
 
@@ -396,14 +424,16 @@ namespace ParkEasyV1.Controllers
         [Authorize]
         public ActionResult Edit(ViewBookingViewModel model)
         {
+            //check if model state is valid
             if (ModelState.IsValid)
             {
-                //get the booking
+                //get the booking via id
                 Booking booking = db.Bookings.Find(model.BookingID);
 
-                //get the vehicle linked to booking
+                //get the vehicle linked to booking via bookingline
                 Vehicle vehicle = db.Vehicles.Find(booking.BookingLines.First().VehicleID);
 
+                //check if the booking departure date is later than the current date - 24hours and departure date is earlier than the current date
                 if (booking.Flight.DepartureDate > DateTime.Now.AddHours(-24) && booking.Flight.DepartureDate <= DateTime.Now)
                 {
                     //update booking
@@ -420,22 +450,28 @@ namespace ParkEasyV1.Controllers
                     vehicle.RegistrationNumber = model.VehicleRegistration;
                     vehicle.NoOfPassengers = model.NoOfPassengers;
 
+                    //save changes
                     db.SaveChanges();
 
+                    //store success message in tempdata
                     TempData["Success"] = "Booking Successfully Updated";
 
+                    //check if user is in customer role
                     if (User.IsInRole("Customer"))
                     {
+                        //return customer to my bookings
                         return RedirectToAction("MyBookings", "Users");
                     }
                     else
                     {
+                        //return staff to manage bookings
                         return RedirectToAction("Manage", "Bookings");
                     }
                 }
 
                 
             }
+            //if model state is not valid, return view with model
             return View(model);
         }
 
@@ -446,25 +482,18 @@ namespace ParkEasyV1.Controllers
         /// <returns>Booking confirmation view</returns>
         public ActionResult Confirmation(int id)
         {
+            //find booking via id and check if booking is null
             Booking booking = db.Bookings.Find(id);
             if (booking == null)
             {
+                //if booking is null, return httpnotfound error
                 return HttpNotFound();
             }
 
-            int vehicleID = 0;
+            //get the vehicle associated with the booking via booking line
+            Vehicle vehicle = booking.BookingLines.First().Vehicle;
 
-            //get bookingline vehicle id
-            foreach (var line in db.BookingLines.ToList())
-            {
-                if (line.BookingID == id)
-                {
-                    vehicleID = line.VehicleID;
-                }
-            }
-
-            Vehicle vehicle = db.Vehicles.Find(vehicleID);
-
+            //create a new viewbookingviewmodel and populate with booking/flight/vehicle data
             ViewBookingViewModel model = new ViewBookingViewModel
             {
                 BookingID = booking.ID,
@@ -490,7 +519,7 @@ namespace ParkEasyV1.Controllers
                 NoOfPassengers = vehicle.NoOfPassengers
             };
 
-
+            //return the view with model
             return View(model);
         }
 
@@ -501,8 +530,10 @@ namespace ParkEasyV1.Controllers
         /// <returns>booking confirmation view as PDF file</returns>
         public ActionResult PrintConfirmationPdf(int? bookingId)
         {
-            var report = new ActionAsPdf("Confirmation", new { id = bookingId });
-            return report;
+            //create new ActionAsPdf of the Confirmation view using Rotativa
+            var pdf = new ActionAsPdf("Confirmation", new { id = bookingId });
+            //return PDF
+            return pdf;
         }
 
         /// <summary>
@@ -513,15 +544,21 @@ namespace ParkEasyV1.Controllers
         // GET: Bookings/Delete/5
         public ActionResult Delete(int? id)
         {
+            //check if booking id is null
             if (id == null)
             {
+                //return bad request
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
+            //get the booking via id
             Booking booking = db.Bookings.Find(id);
+            //check if booking is null
             if (booking == null)
             {
+                //return httpnotfound
                 return HttpNotFound();
             }
+            //return the view with booking
             return View(booking);
         }
 
@@ -535,6 +572,7 @@ namespace ParkEasyV1.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
+            //find the booking and remove it from the database, save changes and return view
             Booking booking = db.Bookings.Find(id);
             db.Bookings.Remove(booking);
             db.SaveChanges();
@@ -549,14 +587,17 @@ namespace ParkEasyV1.Controllers
         [Authorize]
         public ActionResult PurchaseValet(int valetID)
         {
+            //find booking via id stored in TempData
             Booking booking = db.Bookings.Find(TempData["bookingID"]);
 
+            //set valet service attribute to true
             booking.ValetService = true;
+            //update booking total for selected valet ID tariff charge
             booking.Total = booking.Total + db.Tariffs.Find(valetID).Amount;
-
+            //save database changes
             db.SaveChanges();
 
-
+            //return charge payment view
             return RedirectToAction("Charge", "Payments");
         }
 
@@ -662,6 +703,7 @@ namespace ParkEasyV1.Controllers
         /// <returns>Availability View</returns>
         public ActionResult Availability()
         {
+            //return availability view
             return View();
         }
 

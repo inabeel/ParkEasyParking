@@ -17,10 +17,20 @@ using Stripe;
 
 namespace ParkEasyV1.Controllers
 {
+    /// <summary>
+    /// Controller to handle all Payments events and actions
+    /// </summary>
     public class PaymentsController : Controller
     {
+        /// <summary>
+        /// Global instance of ApplicationDbContext
+        /// </summary>
         private ApplicationDbContext db = new ApplicationDbContext();        
 
+        /// <summary>
+        /// HttpGet ActionResult to return Index view
+        /// </summary>
+        /// <returns>Index view</returns>
         // GET: Payments
         public ActionResult Index()
         {
@@ -29,21 +39,25 @@ namespace ParkEasyV1.Controllers
         }
 
         /// <summary>
-        /// HTTP GET ActionResult for processing booking payments
+        /// HttpGet ActionResult to return the Payments Charge view - to allow Customers to enter their payment details and complete booking
         /// </summary>
-        /// <returns>Payment view</returns>
+        /// <param name="id">Nullable Booking ID - used to pay for existing bookings (via invoice)</param>
+        /// <returns>Charge View</returns>
         // GET: Payments/Charge
         [Authorize]
         public ActionResult Charge(int? id)
         {
+            //create instance of user manager
             UserManager<User> userManager = new UserManager<User>(new UserStore<User>(db));
 
+            //store Stripe Payment Gateway API Publishable Key in ViewBag to be used with front-end JavaScript
             ViewBag.StripePublishableKey = ConfigurationManager.AppSettings["StripePublishableKey"];
 
+            //create instance of a booking and default it to null
             Booking booking=null;
 
             //check if the payment is linked to a specific booking id parameter
-            //new bookings will not have an id parameter - but invoice booking payments will
+            //new bookings will not have an id parameter - but payments made from an invoice for an existing booking will
             if (id==null)
             {
                 //find booking from tempdata
@@ -63,41 +77,54 @@ namespace ParkEasyV1.Controllers
                 TempData["Invoice"] = booking.Invoice;
             }
 
+            //if the user is a customer
             if (User.IsInRole("Customer"))
             {
+                //get the current User and parse to Customer
                 Models.Customer customer = userManager.FindByEmail(User.Identity.GetUserName()) as Models.Customer;
+                //store in ViewBag if the customer is a corporate customer or not to be used on the front-end
                 ViewBag.Corporate = customer.Corporate;
             }            
 
-            ViewBag.Total = booking.Total;
+            //store the booking total (rounded to 2 decimal places) in ViewBag for front-end use
+            ViewBag.Total = Math.Round(booking.Total,2);
+            
+            //Stripe Payments are in stored in cent/pence format
+            //store the stripe payment total (booking total * 100) in ViewBag for front-end use
             ViewBag.StripeTotal = (int)Math.Ceiling(booking.Total*100);
 
+            //re-store the booking ID in new TempData - this avoids it being cleared by the session during payment
             TempData["bID"] = booking.ID;
+            //return view
             return View();
         }
 
         /// <summary>
         /// HttpPost ActionResult for processing a Stripe API card payment
         /// </summary>
-        /// <param name="stripeEmail"></param>
-        /// <param name="stripeToken"></param>
-        /// <returns>Redirect MyBookings</returns>
+        /// <param name="stripeEmail">Email associated with Stripe</param>
+        /// <param name="stripeToken">Token associated with Stripe</param>
+        /// <returns>Booking Confirmation View</returns>
         // POST: Payments/Charge
         [HttpPost]
         [Authorize]
         public ActionResult Charge(string stripeEmail, string stripeToken)
         {
+            //find the booking via Booking ID stored in TempData
             Booking booking = db.Bookings.Find(TempData["bID"]);
             
+            //create instances of Stripe customers and charges objects
             var customers = new CustomerService();
             var charges = new ChargeService();
 
+            //create stripe customer
             var customer = customers.Create(new CustomerCreateOptions
             {
                 Email = stripeEmail,
                 SourceToken = stripeToken,
             });
 
+            //create stripe charge
             var charge = charges.Create(new ChargeCreateOptions
             {
                 Amount = (int)Math.Ceiling(booking.Total * 100),
@@ -107,8 +134,10 @@ namespace ParkEasyV1.Controllers
                 ReceiptEmail = customer.Email,
             });
 
+            //update booking status to confirmed
             booking.BookingStatus = BookingStatus.Confirmed;            
 
+            //store the payment in the databse
             db.Payments.Add(new ExternalPayment()
             {
                 PaymentDate = DateTime.Now,
@@ -118,38 +147,60 @@ namespace ParkEasyV1.Controllers
             });
             db.SaveChanges();
 
+            //check if Invoice TempData is NOT null
+            //if this is NOT null then the payment is being made for an existing booking from an Invoice
             if (TempData["Invoice"]!=null)
             {
+                //update the invoice status on the booking to paid
                 booking.Invoice.Status = InvoiceStatus.Paid;
-                db.SaveChanges();
+                db.SaveChanges();   //save database changes
+                //return to Invoice confirmation
                 return RedirectToAction("Confirmation", "Invoice", new { id=booking.ID});
             }
-
             
-
+            //email booking confirmation
             booking.EmailConfirmation();
 
+            //redirect to booking confirmation
             return RedirectToAction("Confirmation", "Bookings", new { id=booking.ID});
         }
 
+        /// <summary>
+        /// ActionResult to process the event a Staff member is creating a walk-in booking and has recieved cash from the Customer
+        /// </summary>
+        /// <returns></returns>
         [Authorize(Roles = "Admin, Manager, Invoice Clerk, Booking Clerk")]
         public ActionResult CashPayment()
         {
+            //find the booking via booking id stored in temp data
             Booking booking = db.Bookings.Find(TempData["bID"]);
 
+            //set the booking status to confirmed
             booking.BookingStatus = BookingStatus.Confirmed;
 
+            //as the payment is for a walk-in booking
+            //set the parking slot status to occupied as the booking will commence immediately
+            booking.ParkingSlot.Status = Status.Occupied;
+
+            //store record of the payment in database
             db.Payments.Add(new Cash()
             {
                 PaymentDate = DateTime.Now,
                 Amount = booking.Total,
                 User = booking.User
             });
+            //save database changes
             db.SaveChanges();
 
+            //return booking confirmation
             return RedirectToAction("Confirmation", "Bookings", new { id = booking.ID });
         }
 
+        /// <summary>
+        /// HttpGet ActionResult to return the payment details view
+        /// </summary>
+        /// <param name="id">Payment id</param>
+        /// <returns>Details view</returns>
         // GET: Payments/Details/5
         public ActionResult Details(int? id)
         {
@@ -165,7 +216,11 @@ namespace ParkEasyV1.Controllers
             return View(payment);
         }
         
-
+        /// <summary>
+        /// HttpPost ActionResult to create a new payment
+        /// </summary>
+        /// <param name="payment">Created payment</param>
+        /// <returns>Payments index</returns>
         // POST: Payments/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
@@ -186,7 +241,11 @@ namespace ParkEasyV1.Controllers
             return View(payment);
         }                     
 
-
+        /// <summary>
+        /// HttpGet ActionResult to return the Edit payment view
+        /// </summary>
+        /// <param name="id">Payment id</param>
+        /// <returns>Edit view</returns>
         // GET: Payments/Edit/5
         public ActionResult Edit(int? id)
         {
@@ -203,6 +262,11 @@ namespace ParkEasyV1.Controllers
             return View(payment);
         }
 
+        /// <summary>
+        /// HttpPost ActionResult to update a payment
+        /// </summary>
+        /// <param name="payment">Updated payment</param>
+        /// <returns>Payments index</returns>
         // POST: Payments/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
@@ -220,6 +284,11 @@ namespace ParkEasyV1.Controllers
             return View(payment);
         }
 
+        /// <summary>
+        /// HttpGet ActionResult to return the delete payment view
+        /// </summary>
+        /// <param name="id">Payment id</param>
+        /// <returns>Delete view</returns>
         // GET: Payments/Delete/5
         public ActionResult Delete(int? id)
         {
@@ -235,6 +304,11 @@ namespace ParkEasyV1.Controllers
             return View(payment);
         }
 
+        /// <summary>
+        /// HttpPost ActionResult to delete a payment
+        /// </summary>
+        /// <param name="id">Payment id</param>
+        /// <returns>Index view</returns>
         // POST: Payments/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
@@ -249,11 +323,12 @@ namespace ParkEasyV1.Controllers
         /// <summary>
         /// ActionResult for making a payment using PayPal API
         /// </summary>
-        /// <param name="Cancel"></param>
-        /// <returns></returns>
+        /// <param name="Cancel">Cancel status</param>
+        /// <returns>Confirmation view</returns>
         [Authorize]
         public ActionResult PaymentWithPaypal(string Cancel = null)
         {
+            //get the booking using booking id stored in TempData
             Booking booking = db.Bookings.Find(TempData["bID"]);
 
             //getting the apiContext  
@@ -306,21 +381,30 @@ namespace ParkEasyV1.Controllers
                     }
                 }
             }
+            //if exception occurs
             catch (Exception ex)
             {
+                //return booking charge View with error message
                 TempData["Error"] = "We were unable to process your payment. Please try again.";
                 ViewBag.Total = booking.Total;
                 return View("Charge");
             }
 
+            //if TempData Invoice is NOT null
+            //then this payment is for an existing booking (payment for invoice)
             if (TempData["Invoice"]!=null)
             {
+                //update booking invoice status to paid and save changes
                 booking.Invoice.Status = InvoiceStatus.Paid;
+                db.SaveChanges();
+                //return invoice confirmation
                 return RedirectToAction("Confirmation", "Invoice", new { id = booking.ID });
             }
 
+            //update booking status and save changes
             booking.BookingStatus = BookingStatus.Confirmed;
             db.SaveChanges();
+            //email booking confirmation
             booking.EmailConfirmation();
             //on successful payment, show success page to user.  
             return RedirectToAction("Confirmation", "Bookings", new { id=booking.ID});
@@ -406,20 +490,32 @@ namespace ParkEasyV1.Controllers
         /// <summary>
         /// ActionResult to Confirm a booking for corporate customers who will be invoiced for payment
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Confirmation View</returns>
         [Authorize]
         public ActionResult InvoiceCharge()
         {
+            //find the booking via id stored in TempData
             Booking booking = db.Bookings.Find(TempData["bID"]);
 
+            //as this booking is for a corporate customer
+            //confirm booking without payment instantly (they will be invoiced at later date)
+            //update booking status and save changes
             booking.BookingStatus = BookingStatus.Confirmed;
             db.SaveChanges();
 
+            //return booking confirmation
             return RedirectToAction("Confirmation", "Bookings", new { id = booking.ID });
         }
 
+        /// <summary>
+        /// Method to save payment to database
+        /// </summary>
+        /// <param name="amount">Payment amount</param>
+        /// <param name="user">Payment user</param>
+        /// <param name="transactionId">Payment ID</param>
         private void SavePayment(double amount, User user, string transactionId)
         {
+            //add the new payment to the database
            db.Payments.Add(new ExternalPayment()
             {
                 PaymentDate = DateTime.Now,
@@ -428,9 +524,14 @@ namespace ParkEasyV1.Controllers
                 TransactionID = transactionId
             });
 
+            //save changes
             db.SaveChanges();
         }
 
+        /// <summary>
+        /// Method to release unused resources
+        /// </summary>
+        /// <param name="disposing"></param>
         protected override void Dispose(bool disposing)
         {
             if (disposing)

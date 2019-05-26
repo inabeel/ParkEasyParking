@@ -10,10 +10,20 @@ using ParkEasyV1.Models;
 
 namespace ParkEasyV1.Controllers
 {
+    /// <summary>
+    /// Controller to handle any booking line events or actions
+    /// </summary>
     public class BookingLinesController : Controller
     {
+        /// <summary>
+        /// Global instance of ApplicationDbContext
+        /// </summary>
         private ApplicationDbContext db = new ApplicationDbContext();
 
+        /// <summary>
+        /// HttpGet ActionResult to return the index view
+        /// </summary>
+        /// <returns>Index view</returns>
         // GET: BookingLines
         public ActionResult Index()
         {
@@ -21,6 +31,11 @@ namespace ParkEasyV1.Controllers
             return View(bookingLines.ToList());
         }
 
+        /// <summary>
+        /// HttpGet ActionResult to return the details of a booking line
+        /// </summary>
+        /// <param name="id">booking line id</param>
+        /// <returns>booking line details view</returns>
         // GET: BookingLines/Details/5
         public ActionResult Details(int? id)
         {
@@ -36,6 +51,10 @@ namespace ParkEasyV1.Controllers
             return View(bookingLine);
         }
 
+        /// <summary>
+        /// HttpGet ActionResult for returning the create booking line view
+        /// </summary>
+        /// <returns>Create view</returns>
         // GET: BookingLines/Create
         public ActionResult Create()
         {
@@ -44,6 +63,11 @@ namespace ParkEasyV1.Controllers
             return View();
         }
 
+        /// <summary>
+        /// HttpPost ActionResult to create a booking line
+        /// </summary>
+        /// <param name="bookingLine">created bookingline</param>
+        /// <returns>booking line index</returns>
         // POST: BookingLines/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
@@ -63,6 +87,11 @@ namespace ParkEasyV1.Controllers
             return View(bookingLine);
         }
 
+        /// <summary>
+        /// HttpGet ActionResult to return the edit booking line view
+        /// </summary>
+        /// <param name="id">booking line id</param>
+        /// <returns>Edit booking line view</returns>
         // GET: BookingLines/Edit/5
         public ActionResult Edit(int? id)
         {
@@ -80,6 +109,11 @@ namespace ParkEasyV1.Controllers
             return View(bookingLine);
         }
 
+        /// <summary>
+        /// HttpPost ActionResult for updating the booking line for any edits made
+        /// </summary>
+        /// <param name="bookingLine">edited booking line</param>
+        /// <returns>Booking line index</returns>
         // POST: BookingLines/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
@@ -98,6 +132,11 @@ namespace ParkEasyV1.Controllers
             return View(bookingLine);
         }
 
+        /// <summary>
+        /// HttpGet ActionResult for returning the Delete booking line view
+        /// </summary>
+        /// <param name="id">Booking line id</param>
+        /// <returns>Delete view</returns>
         // GET: BookingLines/Delete/5
         public ActionResult Delete(int? id)
         {
@@ -113,6 +152,11 @@ namespace ParkEasyV1.Controllers
             return View(bookingLine);
         }
 
+        /// <summary>
+        /// HttpPost ActionResult for deleting a booking line
+        /// </summary>
+        /// <param name="id">Booking line id</param>
+        /// <returns>Booking line index</returns>
         // POST: BookingLines/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
@@ -124,6 +168,10 @@ namespace ParkEasyV1.Controllers
             return RedirectToAction("Index");
         }
 
+        /// <summary>
+        /// Method for releasing unused resources
+        /// </summary>
+        /// <param name="disposing">boolean to dispose</param>
         protected override void Dispose(bool disposing)
         {
             if (disposing)

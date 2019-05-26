@@ -14,9 +14,15 @@ using ParkEasyV1.Models.ViewModels;
 
 namespace ParkEasyV1.Controllers
 {
+    /// <summary>
+    /// Controller for handling all User events and actions (such as User Dashboard, Departures, Returns, Invoices, Bookings)
+    /// </summary>
     [Authorize]
     public class UsersController : AccountController
     {
+        /// <summary>
+        /// Global instance of ApplicationDbContext
+        /// </summary>
         private ApplicationDbContext db = new ApplicationDbContext();        
 
         /// <summary>
@@ -37,154 +43,211 @@ namespace ParkEasyV1.Controllers
 
         }
 
+        /// <summary>
+        /// HttpGet ActionResult to return the Users Index View
+        /// </summary>
+        /// <returns>Index view</returns>
         // GET: Users
         public ActionResult Index()
         {
+            //get all bookings from database and store in TempData to be used on the front-end
             var bookings = db.Bookings.ToList();
             TempData["Bookings"] = bookings;
 
+            //Store the count of total bookings and bookings today in ViewBag to be used on front-end
             ViewBag.BookingCount = bookings.Count;
             ViewBag.BookingsToday = bookings.Where(b => b.DateBooked.Day.Equals(DateTime.Today.Day)).Count();
 
+            //get all flights from database
             var flights = db.Flights.ToList();
+            //store count of flights that depart today and return today in ViewBag to be used on the front-end
             ViewBag.DepartingToday = flights.Where(f=>f.DepartureDate.Day.Equals(DateTime.Today.Day)).Count();
             ViewBag.ReturningToday = flights.Where(f => f.ReturnDate.Day.Equals(DateTime.Today.Day)).Count();
 
-            foreach (var user in db.Users.ToList())
+            //declare instance of usermanager
+            UserManager<User> userManager = new UserManager<User>(new UserStore<User>(db));
+
+            //get the current logged in user
+            User user = userManager.FindByEmail(User.Identity.GetUserName());
+
+            //get the current user's ID and store in viewbag for front-end display
+            ViewBag.UserID = user.Id;
+
+            //check if User is Customer
+            if (User.IsInRole("Customer"))
             {
-                if (user.Email.Equals(User.Identity.Name))
+                //parse User to Customer and store Customer Corportate attribute in ViewBag
+                Customer customer = user as Customer;
+                ViewBag.Corporate = customer.Corporate;
+
+                //initialize invoice counter to 0
+                int invoiceCounter = 0;
+
+                //loop through all bookings for the current customer
+                foreach (var booking in customer.Bookings.ToList())
                 {
-                    ViewBag.UserID = user.Id;
-
-                    if (User.IsInRole("Customer"))
+                    //if the booking invoice is NOT null
+                    if (booking.Invoice!=null)
                     {
-                        Customer customer = user as Customer;
-                        ViewBag.Corporate = customer.Corporate;
-
-                        int invoiceCounter = 0;
-
-                        foreach (var booking in customer.Bookings.ToList())
+                        //check if the invoice status is SENT
+                        if (booking.Invoice.Status==InvoiceStatus.Sent)
                         {
-                            if (booking.Invoice!=null)
-                            {
-                                if (booking.Invoice.Status==InvoiceStatus.Sent)
-                                {
-                                    invoiceCounter++;
-                                }
-                            }
-                        }
-
-                        if (invoiceCounter!=0)
-                        {
-                            ViewBag.Notification = "You have " + invoiceCounter + " unpaid invoices.";
+                            //if invoice status is sent
+                            //update the invoice counter
+                            invoiceCounter++;
                         }
                     }
-                    
+                }
+
+                //if the invoice counter does not equal 0
+                if (invoiceCounter!=0)
+                {
+                    //store display message informing Customer the number of unpaid invoices they have in ViewBag to be used on front-end
+                    ViewBag.Notification = "You have " + invoiceCounter + " unpaid invoices.";
                 }
             }
+            //return View
             return View(db.Users.ToList());
         }
 
+        /// <summary>
+        /// HttpGet ActionResult to return the Manage Users view
+        /// </summary>
+        /// <returns>Manage Users view</returns>
         // GET: Users/Manage
         [Authorize(Roles ="Admin, Manager, Invoice Clerk, Booking Clerk")]
         public ActionResult Manage()
         {
-            foreach (var user in db.Users.ToList())
-            {
-                if (user.Email.Equals(User.Identity.Name))
-                {
-                    ViewBag.UserID = user.Id;
-                }
-            }
+            //declare instance of usermanager
+            UserManager<User> userManager = new UserManager<User>(new UserStore<User>(db));
 
+            //get the current user's ID and store in viewbag for front-end display
+            ViewBag.UserID = userManager.FindByEmail(User.Identity.GetUserName()).Id;
+
+            //initialize a list of customers
             List<Customer> customers = new List<Customer>();
 
+            //loop through all users
             foreach (var user in db.Users.ToList())
             {
+                //check if the user is an instance of a customer
                 if (user is Customer)
                 {
+                    //add the customer to the list
                     customers.Add(user as Customer);
                 }
             }
 
+            //return the view with customers
             return View(customers);
         }
 
+        /// <summary>
+        /// HttpGet ActionResult to return the Departures view (all customers with flights departing today)
+        /// </summary>
+        /// <returns>Departures view</returns>
         // GET: Users/Departures
         [Authorize(Roles = "Admin, Manager, Invoice Clerk, Booking Clerk")]
         public ActionResult Departures()
         {
-            foreach (var user in db.Users.ToList())
-            {
-                if (user.Email.Equals(User.Identity.Name))
-                {
-                    ViewBag.UserID = user.Id;
-                }
-            }
+            //declare instance of usermanager
+            UserManager<User> userManager = new UserManager<User>(new UserStore<User>(db));
+
+            //get the current user's ID and store in viewbag for front-end display
+            ViewBag.UserID = userManager.FindByEmail(User.Identity.GetUserName()).Id;
+
+            //return Departures view with bookings where departure date is today and have not checked in yet
             return View(db.Bookings.Where(b => 
                 b.Flight.DepartureDate.Day.Equals(DateTime.Today.Day)
                 &&b.CheckedIn==false)
                 .ToList());
         }
 
+        /// <summary>
+        /// HttpGet ActionResult to return the Returns view (all customers with flights returning today)
+        /// </summary>
+        /// <returns>Returns view</returns>
         //  GET: Users/Returns
         [Authorize(Roles = "Admin, Manager, Invoice Clerk, Booking Clerk")]
         public ActionResult Returns()
         {
-            foreach (var user in db.Users.ToList())
-            {
-                if (user.Email.Equals(User.Identity.Name))
-                {
-                    ViewBag.UserID = user.Id;
-                }
-            }
+            //declare instance of usermanager
+            UserManager<User> userManager = new UserManager<User>(new UserStore<User>(db));
+
+            //get the current user's ID and store in viewbag for front-end display
+            ViewBag.UserID = userManager.FindByEmail(User.Identity.GetUserName()).Id;
+
+            //return Returns view with bookings where return date is today and have not been checked out yet
             return View(db.Bookings.Where(b => 
                 b.Flight.ReturnDate.Day.Equals(DateTime.Today.Day) 
                 && b.CheckedOut == false)
                 .ToList());
         }
 
+        /// <summary>
+        /// HttpGet ActionResult to return MyBookings view
+        /// </summary>
+        /// <returns>MyBookingsView</returns>
         // GET: Users/MyBookings
         public ActionResult MyBookings()
         {
-            string id = null;
-
-            foreach (var user in db.Users.ToList())
-            {
-                if (user.Email.Equals(User.Identity.Name))
-                {
-                    ViewBag.UserID = user.Id;
-                    id = user.Id;
-                    Customer customer = user as Customer;
-                    ViewBag.Corporate = customer.Corporate;
-                }
-            }
-
-            return View(db.Bookings.Where(b=>b.UserID.Equals(id)).ToList());
-        }
-
-        public ActionResult MyInvoices()
-        {
+            //declare instance of usermanager
             UserManager<User> userManager = new UserManager<User>(new UserStore<User>(db));
 
+            //get the current logged in user
             User user = userManager.FindByEmail(User.Identity.GetUserName());
+
+            //store current logged in user id in viewbag for front-end display
             ViewBag.UserID = user.Id;
+
+            //parse User to Customer and store Corporate attribute in ViewBag for front-end use
             Customer customer = user as Customer;
             ViewBag.Corporate = customer.Corporate;
 
+            //return view with bookings of the current user's
+            return View(db.Bookings.Where(b=>b.UserID.Equals(user.Id)).ToList());
+        }
+
+        /// <summary>
+        /// HttpGet ActionResult to return all invoices for the current User
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult MyInvoices()
+        {
+            //declare instance of usermanager
+            UserManager<User> userManager = new UserManager<User>(new UserStore<User>(db));
+
+            //get the current logged in user and store id in viewbag for front-end use
+            User user = userManager.FindByEmail(User.Identity.GetUserName());
+            ViewBag.UserID = user.Id;
+
+            //convert User to Customer and store corporate attribute in ViewBag for front-end use
+            Customer customer = user as Customer;
+            ViewBag.Corporate = customer.Corporate;
+            
+            //initialize a list of Bookings 
             List<Booking> invoiceBookings = new List<Booking>();
 
-            foreach (var booking in db.Bookings.ToList())
+            //loop through all user bookings
+            foreach (var booking in db.Bookings.Where(b=>b.UserID.Equals(user.Id)).ToList())
             {
-                if (booking.Invoice!=null && booking.User.Email.Equals(user.Email))
+                //if the booking invoice is NOT null
+                if (booking.Invoice!=null)
                 {
+                    //add the booking with invoice to the list
                     invoiceBookings.Add(booking);
                 }
             }
 
+            //return myinvoices view with invoice bookings
             return View(invoiceBookings);
         }
 
+        /// <summary>
+        /// HttpGet ActionResult to return the details for a user
+        /// </summary>
+        /// <param name="id">user id</param>
+        /// <returns>Details view</returns>
         // GET: Users/Details/5
         public ActionResult Details(string id)
         {
@@ -200,12 +263,21 @@ namespace ParkEasyV1.Controllers
             return View(user);
         }
 
+        /// <summary>
+        /// HttpGet ActionResult to return the create view
+        /// </summary>
+        /// <returns>Create view</returns>
         // GET: Users/Create
         public ActionResult Create()
         {
             return View();
         }
 
+        /// <summary>
+        /// HttpPost ActionResult to create a new user
+        /// </summary>
+        /// <param name="user">created user</param>
+        /// <returns>Users index</returns>
         // POST: Users/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
@@ -223,6 +295,11 @@ namespace ParkEasyV1.Controllers
             return View(user);
         }
 
+        /// <summary>
+        /// HttpGet ActionResult to return the edit user view
+        /// </summary>
+        /// <param name="id">User id</param>
+        /// <returns>Edit view</returns>
         // GET: Users/Edit/5
         public ActionResult Edit(string id)
         {
@@ -238,6 +315,11 @@ namespace ParkEasyV1.Controllers
             return View(user);
         }
 
+        /// <summary>
+        /// HttpPost ActionResult to update a user
+        /// </summary>
+        /// <param name="user">Edited user</param>
+        /// <returns>User index</returns>
         // POST: Users/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
@@ -283,7 +365,6 @@ namespace ParkEasyV1.Controllers
                 //initialize new staff
                 Staff staff = new Staff();
                 UpdateModel(staff); //update model
-                //staff.RegisteredAt = DateTime.Now;  //set registered time to now
                 staff.UserName = model.Email;   //set username to email
 
                 //create user result
@@ -494,10 +575,6 @@ namespace ParkEasyV1.Controllers
             return RedirectToAction("Index");
         }
 
-        //**********************************************************************
-        //Admin to Create New Roles
-        //**********************************************************************
-
         /// <summary>
         /// ActionResult to return the create role view
         /// </summary>
@@ -546,10 +623,6 @@ namespace ParkEasyV1.Controllers
         }
 
 
-        //**********************************************************************
-        //Display all Roles
-        //**********************************************************************
-
         /// <summary>
         /// ActionResult to return display all roles view
         /// </summary>
@@ -562,10 +635,6 @@ namespace ParkEasyV1.Controllers
             var roles = db.Roles.ToList();
             return View(roles);
         }
-
-        //**********************************************************************
-        //Delete a Role
-        //**********************************************************************
 
         /// <summary>
         /// ActionResult to delete a user role
@@ -631,10 +700,6 @@ namespace ParkEasyV1.Controllers
         }
 
 
-        //**********************************************************************
-        //Admin to Change Roles
-        //**************************************************************************
-
         /// <summary>
         /// ActionResult to return the change role view
         /// </summary>
@@ -649,10 +714,11 @@ namespace ParkEasyV1.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-
+            //declare instance of usermanager
+            UserManager<User> userManager = new UserManager<User>(new UserStore<User>(db));
 
             // Can't change your own role.
-            if (id == User.Identity.GetUserId())
+            if (id == userManager.FindByEmail(User.Identity.GetUserName()).Id)
             {
                 //TempData["Error"] = "You cannot change your own role";
                 return RedirectToAction("index", "users");
@@ -692,14 +758,15 @@ namespace ParkEasyV1.Controllers
         public async Task<ActionResult> ChangeRoleConfirmation(string id,
             [Bind(Include = "Role")] ChangeRoleViewModel model)
         {
-
+            //declare instance of usermanager
+            UserManager<User> userManager = new UserManager<User>(new UserStore<User>(db));
 
             // Can't change your own role.
-            if (id == User.Identity.GetUserId())
+            if (id == userManager.FindByEmail(User.Identity.GetUserName()).Id)
             {
-                return RedirectToAction("Index", "Users");
+                //TempData["Error"] = "You cannot change your own role";
+                return RedirectToAction("index", "users");
             }
-
 
             if (ModelState.IsValid)
             {
@@ -750,6 +817,10 @@ namespace ParkEasyV1.Controllers
             return View(model);
         }
 
+        /// <summary>
+        /// Method to release unused resources
+        /// </summary>
+        /// <param name="disposing"></param>
         protected override void Dispose(bool disposing)
         {
             if (disposing)

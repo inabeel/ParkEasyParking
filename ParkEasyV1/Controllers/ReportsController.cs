@@ -14,6 +14,9 @@ using System.Web.UI.WebControls;
 
 namespace ParkEasyV1.Controllers
 {
+    /// <summary>
+    /// Controller for handling all analytic report events and actions
+    /// </summary>
     [Authorize(Roles ="Admin, Manager")]
     public class ReportsController : Controller
     {

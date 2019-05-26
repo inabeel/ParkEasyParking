@@ -211,14 +211,15 @@ namespace ParkEasyV1.Controllers
                     //ADD USER TO THE CUSTOMER ROLE
                     await UserManager.AddToRoleAsync(user.Id, "Customer");
                     await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
-                    
+
                     // UNCOMMENT TO ENABLE EMAIL ACCOUNT CONFIRMATION
 
                     // Send an email with this link
-                     //string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-                     //var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                     //await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
+                    string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
+                    var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
+                    await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
 
+                    //return User home
                     return RedirectToAction("Index", "Users");
                 }
                 AddErrors(result);

@@ -34,17 +34,17 @@
             <h3 class="font-weight-bold" style="padding-top: 50px; padding-bottom: 30px;">Staff Panel</h3>
             @if (TempData["Success"] != null)
             {
-                <div class="col-md-8 alert alert-success text-center my-2" role="alert">
+            <center>
+                <div class="col-md-6 alert alert-success text-center my-2" role="alert">
                     <strong>Success: </strong>@TempData["Success"]
                 </div>
+            </center>
             }
             @if (TempData["Error"] != null)
             {
-                <div class="row">
-                    <div class="col-md-2"></div>
-                    <div class="col-md-6 alert alert-danger text-center" role="alert" style="margin-top: 15px;"><strong>Error: </strong>@TempData["Error"]</div>
-                    <div class="col-md-2"></div>
-                </div>
+                <center>
+                    <div class="col-md-6 alert alert-danger text-center my-2" role="alert" style="margin-top: 15px;"><strong>Error: </strong>@TempData["Error"]</div>
+                </center>
             }
             <div class="row">
                 <div class="col-md-3">

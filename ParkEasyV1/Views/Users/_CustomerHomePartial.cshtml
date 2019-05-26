@@ -30,14 +30,28 @@
         <!-- /.col-lg-3 -->
         <div class="col-lg-9" style="padding-bottom: 50px;">
             <h3 class="font-weight-bold" style="padding-top: 50px; padding-bottom: 30px;">Dashboard</h3>
-            @if (ViewBag.Notification!=null)
+            @if (TempData["Success"] != null)
             {
-            <center>
-                <div class="alert alert-warning col-md-6" role="alert">
-                    <i class="fas fa-exclamation-triangle"></i> @ViewBag.Notification <br>
-                    @Html.ActionLink("View My Invoices", "MyInvoices", "Users")
-                </div>
-            </center>
+                <center>
+                    <div class="col-md-6 alert alert-success text-center my-2" role="alert">
+                        <strong>Success: </strong>@TempData["Success"]
+                    </div>
+                </center>
+            }
+            @if (TempData["Error"] != null)
+            {
+                <center>
+                    <div class="col-md-6 alert alert-danger text-center my-2" role="alert" style="margin-top: 15px;"><strong>Error: </strong>@TempData["Error"]</div>
+                </center>
+            }
+            @if (ViewBag.Notification != null)
+            {
+                <center>
+                    <div class="alert alert-warning col-md-6" role="alert">
+                        <i class="fas fa-exclamation-triangle"></i> @ViewBag.Notification <br>
+                        @Html.ActionLink("View My Invoices", "MyInvoices", "Users")
+                    </div>
+                </center>
             }
             <p>
                 Hello @User.Identity.Name, Welcome to the ParkEasy Customer Dashboard.
@@ -45,38 +59,38 @@
                 What would you like to do?
             </p>
             @* Tabs *@
-                <div class="row my-5">
-                        <div class="col-md-3">
-                            <center>
-                                <a href="@Url.Action("ManageDetails", "Account", new { id = ViewBag.UserID})">
-                                    <div class="stats stats-dark">
-                                        <i class="fas fa-database fa-5x" style="padding-bottom: 20px;"></i>
-                                        <h3 class="stats-title"> My Details </h3>
-                                    </div>
-                                </a>
-                            </center>
-                        </div>
-                        <div class="col-md-3">
-                            <center>
-                                <a href="@Url.Action("MyBookings", "Users")">
-                                    <div class="stats stats-dark">
-                                        <i class="fas fa-user-cog fa-5x" style="padding-bottom: 20px;"></i>
-                                        <h3 class="stats-title"> Manage Bookings </h3>
-                                    </div>
-                                </a>
-                            </center>
-                        </div>
-                        <div class="col-md-3">
-                            <center>
-                                <a href="@Url.Action("Create", "Bookings")">
-                                    <div class="stats stats-dark">
-                                        <i class="far fa-calendar-plus fa-5x" style="padding-bottom: 20px;"></i>
-                                        <h3 class="stats-title"> New Booking </h3>
-                                    </div>
-                                </a>
-                            </center>
-                        </div>
+            <div class="row my-5">
+                <div class="col-md-3">
+                    <center>
+                        <a href="@Url.Action("ManageDetails", "Account", new { id = ViewBag.UserID})">
+                            <div class="stats stats-dark">
+                                <i class="fas fa-database fa-5x" style="padding-bottom: 20px;"></i>
+                                <h3 class="stats-title"> My Details </h3>
+                            </div>
+                        </a>
+                    </center>
                 </div>
+                <div class="col-md-3">
+                    <center>
+                        <a href="@Url.Action("MyBookings", "Users")">
+                            <div class="stats stats-dark">
+                                <i class="fas fa-user-cog fa-5x" style="padding-bottom: 20px;"></i>
+                                <h3 class="stats-title"> Manage Bookings </h3>
+                            </div>
+                        </a>
+                    </center>
+                </div>
+                <div class="col-md-3">
+                    <center>
+                        <a href="@Url.Action("Create", "Bookings")">
+                            <div class="stats stats-dark">
+                                <i class="far fa-calendar-plus fa-5x" style="padding-bottom: 20px;"></i>
+                                <h3 class="stats-title"> New Booking </h3>
+                            </div>
+                        </a>
+                    </center>
+                </div>
+            </div>
         </div>
         <!-- /.col-lg-9 -->
     </div>
