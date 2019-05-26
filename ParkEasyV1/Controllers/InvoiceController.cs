@@ -19,6 +19,7 @@ namespace ParkEasyV1.Controllers
         private ApplicationDbContext db = new ApplicationDbContext();
 
         // GET: Invoice
+        [Authorize(Roles = "Admin, Manager, Invoice Clerk")]
         public ActionResult Index()
         {
             UserManager<User> userManager = new UserManager<User>(new UserStore<User>(db));
@@ -85,18 +86,7 @@ namespace ParkEasyV1.Controllers
                 return HttpNotFound();
             }
 
-            int vehicleID = 0;
-
-            //get bookingline vehicle id
-            foreach (var line in db.BookingLines.ToList())
-            {
-                if (line.BookingID == id)
-                {
-                    vehicleID = line.VehicleID;
-                }
-            }
-
-            Vehicle vehicle = db.Vehicles.Find(vehicleID);
+            Vehicle vehicle = db.Vehicles.Find(booking.BookingLines.First().VehicleID);
 
             ViewBookingViewModel model = new ViewBookingViewModel
             {
@@ -165,6 +155,7 @@ namespace ParkEasyV1.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        [Authorize(Roles = "Admin, Manager, Invoice Clerk")]
         public ActionResult Generate(int id)
         {
             if (GenerateInvoice(id))
@@ -184,6 +175,7 @@ namespace ParkEasyV1.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        [Authorize(Roles = "Admin, Manager, Invoice Clerk")]
         public ActionResult WriteOff(int id)
         {
             try

@@ -27,6 +27,8 @@ namespace ParkEasyV1.Models
 
         public void EmailInvoice()
         {
+            string link = "http://localhost:44350/Invoice/View/" + ID;
+
             var apiKey = ConfigurationManager.AppSettings["SendGridKey"];
             var client = new SendGridClient(apiKey);
             var msg = new SendGridMessage()
@@ -39,7 +41,7 @@ namespace ParkEasyV1.Models
                 HtmlContent = "Hello, " + Booking.User.FirstName + "<br>" +
                 "Your invoice for booking reference #" + Booking.ID + " has been processed.<br>" +
                 "This invoice will expire within 30 days of the sending of this email." +
-                "You can view a copy of your invoice by clicking the link <a href=localhost:44350/Invoice/View/" + ID + ">here</a>"
+                "You can view a copy of your invoice by clicking the link <a href=\"" + link + "\">here</a>"
             };
             msg.AddTo(new EmailAddress(Booking.User.Email));
             var response = client.SendEmailAsync(msg);

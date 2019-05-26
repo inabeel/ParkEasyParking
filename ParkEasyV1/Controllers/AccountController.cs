@@ -519,6 +519,7 @@ namespace ParkEasyV1.Controllers
         /// <param name="Id">User ID</param>
         /// <returns>Manage View</returns>
         // GET: Account/ManageDetails
+        [Authorize]
         public ActionResult ManageDetails(string Id)
         {
             //check if id is null
@@ -561,6 +562,7 @@ namespace ParkEasyV1.Controllers
         /// <returns>User home</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public async Task<ActionResult> Manage(string id, [Bind(Include = "Email, FirstName, LastName, AddressLine1, AddressLine2, City, Postcode, PhoneNo")] ManageDetailsViewModel model)
         {
             //if model is valid

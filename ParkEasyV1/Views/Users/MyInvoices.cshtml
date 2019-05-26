@@ -36,13 +36,13 @@
                 <div class="table-responsive">
                     <table class="table table-bordered table-striped table-hover">
                         <tr>
-                            <th>Customer</th>
+                            <th>Booking ID</th>
                             <th>Booking Placed</th>
                             <th>Departure Date</th>
                             <th>Return Date</th>
-                            <th>Valet</th>
                             <th>Total Cost</th>
                             <th>Status</th>
+                            <th>Expiry Date</th>
                             <th></th>
                             <th></th>
                         </tr>
@@ -50,7 +50,7 @@
                         @foreach (var item in Model)
                         {
                             <tr>
-                                <td>@Html.DisplayFor(modelItem => item.User.Email)</td>
+                                <td>@Html.DisplayFor(modelItem => item.ID)</td>
                                 <td>
                                     @Html.DisplayFor(modelItem => item.DateBooked)
                                 </td>
@@ -61,20 +61,13 @@
                                     @item.Flight.ReturnDate.ToShortDateString()
                                 </td>
                                 <td>
-                                    @if (item.ValetService == true)
-                                    {
-                                        <i class="fas fa-check text-success"></i>
-                                    }
-                                    else
-                                    {
-                                        <i class="fas fa-times text-danger"></i>
-                                    }
-                                </td>
-                                <td>
                                     @Html.DisplayFor(modelItem => item.Total)
                                 </td>
                                 <td>
-                                    @Html.DisplayFor(modelItem => item.BookingStatus)
+                                    @Html.DisplayFor(modelItem => item.Invoice.Status)
+                                </td>
+                                <td>
+                                    @item.Invoice.ExpiryDate.ToShortDateString()
                                 </td>
                                 <td>
                                     <center><button class="btn btn-darkblue font-weight-bold" type="button" onclick="location.href='@Url.Action("Edit", "Bookings", new { id = item.ID})'">View Booking</button></center>

@@ -14,6 +14,7 @@ using ParkEasyV1.Models.ViewModels;
 
 namespace ParkEasyV1.Controllers
 {
+    [Authorize]
     public class UsersController : AccountController
     {
         private ApplicationDbContext db = new ApplicationDbContext();        
@@ -59,15 +60,33 @@ namespace ParkEasyV1.Controllers
                     {
                         Customer customer = user as Customer;
                         ViewBag.Corporate = customer.Corporate;
+
+                        int invoiceCounter = 0;
+
+                        foreach (var booking in customer.Bookings.ToList())
+                        {
+                            if (booking.Invoice!=null)
+                            {
+                                if (booking.Invoice.Status==InvoiceStatus.Sent)
+                                {
+                                    invoiceCounter++;
+                                }
+                            }
+                        }
+
+                        if (invoiceCounter!=0)
+                        {
+                            ViewBag.Notification = "You have " + invoiceCounter + " unpaid invoices.";
+                        }
                     }
                     
                 }
             }
-
             return View(db.Users.ToList());
         }
 
         // GET: Users/Manage
+        [Authorize(Roles ="Admin, Manager, Invoice Clerk, Booking Clerk")]
         public ActionResult Manage()
         {
             foreach (var user in db.Users.ToList())
@@ -92,6 +111,7 @@ namespace ParkEasyV1.Controllers
         }
 
         // GET: Users/Departures
+        [Authorize(Roles = "Admin, Manager, Invoice Clerk, Booking Clerk")]
         public ActionResult Departures()
         {
             foreach (var user in db.Users.ToList())
@@ -108,6 +128,7 @@ namespace ParkEasyV1.Controllers
         }
 
         //  GET: Users/Returns
+        [Authorize(Roles = "Admin, Manager, Invoice Clerk, Booking Clerk")]
         public ActionResult Returns()
         {
             foreach (var user in db.Users.ToList())

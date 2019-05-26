@@ -34,9 +34,10 @@
                     @if (User.IsInRole("Manager") || User.IsInRole("Admin"))
                     {
                         @Html.ActionLink("Manage Tariffs", "Manage", "Tariffs", new { area = "" }, new { @class = "list-group-item" })
+                        @Html.ActionLink("Analytic Reports", "Index", "Reports", new { area = "" }, new { @class = "list-group-item" })
                     }
 
-                    @Html.ActionLink("Analytic Reports", "Index", "Reports", new { area = "" }, new { @class = "list-group-item" })
+
                 </div>
             </div>
             <!-- /.col-lg-3 -->

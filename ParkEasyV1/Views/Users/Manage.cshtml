@@ -35,9 +35,10 @@
                     @if (User.IsInRole("Manager") || User.IsInRole("Admin"))
                     {
                         @Html.ActionLink("Manage Tariffs", "Manage", "Tariffs", new { area = "" }, new { @class = "list-group-item" })
+                        @Html.ActionLink("Analytic Reports", "Index", "Reports", new { area = "" }, new { @class = "list-group-item" })
                     }
 
-                    @Html.ActionLink("Analytic Reports", "Index", "Reports", new { area = "" }, new { @class = "list-group-item" })
+                    
                 </div>
             </div>
             <!-- /.col-lg-3 -->
@@ -103,7 +104,6 @@
                             </tr>
                         }
                     </table>
-                    <button class="btn btn-darkblue font-weight-bold" type="button" onclick="location.href='@Url.Action("CreateStaff", "Users")'">Create New User</button>
                 </div>
             </div>
             <!-- /.col-lg-9 -->

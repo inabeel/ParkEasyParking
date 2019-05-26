@@ -84,6 +84,7 @@ namespace ParkEasyV1.Controllers
         /// <returns>Redirect MyBookings</returns>
         // POST: Payments/Charge
         [HttpPost]
+        [Authorize]
         public ActionResult Charge(string stripeEmail, string stripeToken)
         {
             Booking booking = db.Bookings.Find(TempData["bID"]);
@@ -131,6 +132,7 @@ namespace ParkEasyV1.Controllers
             return RedirectToAction("Confirmation", "Bookings", new { id=booking.ID});
         }
 
+        [Authorize(Roles = "Admin, Manager, Invoice Clerk, Booking Clerk")]
         public ActionResult CashPayment()
         {
             Booking booking = db.Bookings.Find(TempData["bID"]);
@@ -249,6 +251,7 @@ namespace ParkEasyV1.Controllers
         /// </summary>
         /// <param name="Cancel"></param>
         /// <returns></returns>
+        [Authorize]
         public ActionResult PaymentWithPaypal(string Cancel = null)
         {
             Booking booking = db.Bookings.Find(TempData["bID"]);
@@ -310,7 +313,7 @@ namespace ParkEasyV1.Controllers
                 return View("Charge");
             }
 
-            if ((bool)TempData["InvoicePayment"])
+            if (TempData["Invoice"]!=null)
             {
                 booking.Invoice.Status = InvoiceStatus.Paid;
                 return RedirectToAction("Confirmation", "Invoice", new { id = booking.ID });
@@ -404,6 +407,7 @@ namespace ParkEasyV1.Controllers
         /// ActionResult to Confirm a booking for corporate customers who will be invoiced for payment
         /// </summary>
         /// <returns></returns>
+        [Authorize]
         public ActionResult InvoiceCharge()
         {
             Booking booking = db.Bookings.Find(TempData["bID"]);

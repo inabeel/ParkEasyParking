@@ -30,6 +30,15 @@
         <!-- /.col-lg-3 -->
         <div class="col-lg-9" style="padding-bottom: 50px;">
             <h3 class="font-weight-bold" style="padding-top: 50px; padding-bottom: 30px;">Dashboard</h3>
+            @if (ViewBag.Notification!=null)
+            {
+            <center>
+                <div class="alert alert-warning col-md-6" role="alert">
+                    <i class="fas fa-exclamation-triangle"></i> @ViewBag.Notification <br>
+                    @Html.ActionLink("View My Invoices", "MyInvoices", "Users")
+                </div>
+            </center>
+            }
             <p>
                 Hello @User.Identity.Name, Welcome to the ParkEasy Customer Dashboard.
                 <br><br>

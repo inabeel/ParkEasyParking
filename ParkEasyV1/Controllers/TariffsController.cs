@@ -11,6 +11,7 @@ using ParkEasyV1.Models;
 
 namespace ParkEasyV1.Controllers
 {
+    [Authorize(Roles ="Admin, Manager")]
     public class TariffsController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();

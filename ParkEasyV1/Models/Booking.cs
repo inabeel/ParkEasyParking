@@ -60,18 +60,20 @@ namespace ParkEasyV1.Models
 
         public void EmailConfirmation()
         {
+            string link = "http://localhost:44350/Bookings/Confirmation/" + ID;
+
             var apiKey = ConfigurationManager.AppSettings["SendGridKey"];
             var client = new SendGridClient(apiKey);
             var msg = new SendGridMessage()
             {
                 From = new EmailAddress("confirmation@parkeasy.co.uk", "ParkEasy Airport Parking"),
                 Subject = "Booking Reference #" + this.ID + " Confirmation",
-                PlainTextContent = 
+                PlainTextContent =
                 "Hello, " + this.User.FirstName +
                 "Your booking has been confirmed.",
                 HtmlContent = "Hello, " + User.FirstName + "<br>" +
                 "Your booking with ParkEasy Airport Parking has been confirmed." + "<br>" +
-                "You can view a copy of your booking confirmation by clicking the link <a href=localhost:44350/Bookings/Confirmation/" + ID + ">here</a>"
+                "You can view a copy of your booking confirmation by clicking the link <a href=\"" + link + "\">here</a>"
             };
             msg.AddTo(new EmailAddress(User.Email));
             var response = client.SendEmailAsync(msg);

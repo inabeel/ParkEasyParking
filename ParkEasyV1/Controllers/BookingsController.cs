@@ -43,6 +43,7 @@ namespace ParkEasyV1.Controllers
         /// </summary>
         /// <returns>Manage view with collection of bookings</returns>
         // GET: Bookings/Manage
+        [Authorize(Roles = "Admin, Manager, Invoice Clerk, Booking Clerk")]
         public ActionResult Manage()
         {
             foreach (var user in db.Users.ToList())
@@ -76,23 +77,43 @@ namespace ParkEasyV1.Controllers
         /// </summary>
         /// <returns>Create view</returns>
         // GET: Bookings/Create
+        [Authorize]
         public ActionResult Create()
         {
-            if (TempData["AvailabilityModel"] as AvailabilityViewModel != null)
+            if (User.IsInRole("Customer"))
             {
-                AvailabilityViewModel availabilityModel = TempData["AvailabilityModel"] as AvailabilityViewModel;
+                //declare instance of usermanager
+                UserManager<User> userManager = new UserManager<User>(new UserStore<User>(db));
+
+                User currentUser = userManager.FindByEmail(User.Identity.GetUserName());
 
                 CreateBookingViewModel model = new CreateBookingViewModel
                 {
-                    DepartureDate = availabilityModel.DepartureDate,
-                    DepartureTime = availabilityModel.DepartureTime,
-                    ReturnDate = availabilityModel.ReturnDate,
-                    ReturnTime = availabilityModel.ReturnTime
+                    FirstName = currentUser.FirstName,
+                    Surname = currentUser.LastName,
+                    Email = currentUser.Email,
+                    AddressLine1 = currentUser.AddressLine1,
+                    AddressLine2 = currentUser.AddressLine2,
+                    City = currentUser.City,
+                    Postcode = currentUser.Postcode,
+                    PhoneNo = currentUser.PhoneNumber,
+                    DepartureDate = DateTime.Today,
+                    ReturnDate = DateTime.Today.AddDays(7)
                 };
+
+
+                if (TempData["AvailabilityModel"] as AvailabilityViewModel != null)
+                {
+                    AvailabilityViewModel availabilityModel = TempData["AvailabilityModel"] as AvailabilityViewModel;
+
+                    model.DepartureDate = availabilityModel.DepartureDate;
+                    model.DepartureTime = availabilityModel.DepartureTime;
+                    model.ReturnDate = availabilityModel.ReturnDate;
+                    model.ReturnTime = availabilityModel.ReturnTime;                                
+                }
 
                 return View(model);
             }
-
             return View();
         }
 
@@ -231,7 +252,7 @@ namespace ParkEasyV1.Controllers
         /// </summary>
         /// <param name="selectedTimeRange">Booking date period selected by user</param>
         /// <returns>Available parking slot id</returns>
-        public int FindAvailableParkingSlot(TimeRange selectedTimeRange)
+        private int FindAvailableParkingSlot(TimeRange selectedTimeRange)
         {
             //loop through all parking slots
             foreach (var slot in db.ParkingSlots.ToList())
@@ -285,7 +306,7 @@ namespace ParkEasyV1.Controllers
         /// </summary>  
         /// <param name="response">reCaptcha reponse</param>  
         /// <returns>Deserialized captcha response</returns>  
-        public static CaptchaResponse ValidateCaptcha(string response)
+        private static CaptchaResponse ValidateCaptcha(string response)
         {
             string secret = System.Web.Configuration.WebConfigurationManager.AppSettings["recaptchaPrivateKey"];
             var client = new WebClient();
@@ -297,6 +318,7 @@ namespace ParkEasyV1.Controllers
         /// HttpGet ActionResult for returning the valet view
         /// </summary>
         /// <returns>Valet view</returns>
+        [Authorize]
         public ActionResult Valet()
         {
             return View();
@@ -308,6 +330,7 @@ namespace ParkEasyV1.Controllers
         /// <param name="id">id of booking being edited</param>
         /// <returns>Edit view with ViewBookingViewModel</returns>
         // GET: Bookings/Edit/5
+        [Authorize]
         public ActionResult Edit(int? id)
         {
             if (id == null)
@@ -331,18 +354,7 @@ namespace ParkEasyV1.Controllers
                 ViewBag.Message = "Any amendmends made to this booking will result in an admin charge to be paid on arrival.";
             }
 
-            int vehicleID=0;
-
-            //get bookingline vehicle id
-            foreach (var line in db.BookingLines.ToList())
-            {
-                if (line.BookingID == id)
-                {
-                    vehicleID = line.VehicleID;
-                }
-            }
-
-            Vehicle vehicle = db.Vehicles.Find(vehicleID);
+           Vehicle vehicle = db.Vehicles.Find(booking.BookingLines.First().VehicleID);
 
             ViewBookingViewModel model = new ViewBookingViewModel
             {
@@ -381,6 +393,7 @@ namespace ParkEasyV1.Controllers
         // POST: Bookings/Edit/5        
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public ActionResult Edit(ViewBookingViewModel model)
         {
             if (ModelState.IsValid)
@@ -388,20 +401,8 @@ namespace ParkEasyV1.Controllers
                 //get the booking
                 Booking booking = db.Bookings.Find(model.BookingID);
 
-                //initialize vehicle id
-                int vehicleID = 0;
-
-                //get bookingline vehicle id
-                foreach (var line in db.BookingLines.ToList())
-                {
-                    if (line.BookingID == model.BookingID)
-                    {
-                        vehicleID = line.VehicleID;
-                    }
-                }
-
                 //get the vehicle linked to booking
-                Vehicle vehicle = db.Vehicles.Find(vehicleID);
+                Vehicle vehicle = db.Vehicles.Find(booking.BookingLines.First().VehicleID);
 
                 if (booking.Flight.DepartureDate > DateTime.Now.AddHours(-24) && booking.Flight.DepartureDate <= DateTime.Now)
                 {
@@ -545,6 +546,7 @@ namespace ParkEasyV1.Controllers
         /// </summary>
         /// <param name="valetID">the id of the valet service selected</param>
         /// <returns>Payment Charge view</returns>
+        [Authorize]
         public ActionResult PurchaseValet(int valetID)
         {
             Booking booking = db.Bookings.Find(TempData["bookingID"]);
@@ -564,6 +566,7 @@ namespace ParkEasyV1.Controllers
         /// <param name="id">booking id</param>
         /// <returns>Cancel view with booking parameter</returns>
         // GET: Bookings/Cancel/5
+        [Authorize]
         public ActionResult Cancel(int? id)
         {
             //if the booking id is null
@@ -610,6 +613,7 @@ namespace ParkEasyV1.Controllers
         // POST: Bookings/Cancel/5
         [HttpPost, ActionName("Cancel")]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public ActionResult CancelConfirmed(int id)
         {
             //declare and initialize a variable to hold a message to the user
@@ -679,7 +683,7 @@ namespace ParkEasyV1.Controllers
                 new DateTime(model.ReturnDate.Year, model.ReturnDate.Month, model.ReturnDate.Day, model.ReturnTime.Hours, model.ReturnTime.Minutes, 0));
 
                 //call function to calculate the number of unavailable parking slots during this time period
-                int unavailableSlots = GetUnavailbleSlots(selectedTimeRange);
+                int unavailableSlots = GetUnavailableSlots(selectedTimeRange);
 
                 //if the number of unavailable parking slots DOES NOT equal 150 (150 is the total number of parking spaces)
                 //then a parking slot is available during this time period
@@ -689,6 +693,7 @@ namespace ParkEasyV1.Controllers
                     //update availability message, store the model and return the availability view
                     TempData["Available"] = "Booking Available!";
                     TempData["AvailabilityModel"] = model;
+                    ViewBag.Total = CalculateBookingTotal(model.DepartureDate, model.ReturnDate);
                     return View(model);
                 }
                 //if number of unavailble slots IS equal to 150 - then parking slot is not available
@@ -708,7 +713,7 @@ namespace ParkEasyV1.Controllers
         /// </summary>
         /// <param name="selectedTimeRange">TimeRange slots should be checked against</param>
         /// <returns>Number of unavailable parking slots</returns>
-        public int GetUnavailbleSlots(TimeRange selectedTimeRange)
+        public int GetUnavailableSlots(TimeRange selectedTimeRange)
         {
             //initialize unavailable slots to 0
             int unavailableSlots = 0;
@@ -755,6 +760,7 @@ namespace ParkEasyV1.Controllers
         /// </summary>
         /// <param name="id">id of booking</param>
         /// <returns>Booking Check In View</returns>
+        [Authorize(Roles = "Admin, Manager, Invoice Clerk, Booking Clerk")]
         public ActionResult CheckIn(int id)
         {
             //if check in booking function returns true (success)
@@ -776,6 +782,7 @@ namespace ParkEasyV1.Controllers
         /// </summary>
         /// <param name="id">id of booking</param>
         /// <returns>Booking check out view</returns>
+        [Authorize(Roles = "Admin, Manager, Invoice Clerk, Booking Clerk")]
         public ActionResult CheckOut(int id)
         {
             //if check out function returns true (success)
@@ -797,6 +804,7 @@ namespace ParkEasyV1.Controllers
         /// </summary>
         /// <param name="id">booking id</param>
         /// <returns>Manage bookings view</returns>
+        [Authorize(Roles = "Admin, Manager, Invoice Clerk, Booking Clerk")]
         public ActionResult NoShow(int id)
         {
             try
@@ -828,6 +836,7 @@ namespace ParkEasyV1.Controllers
         /// </summary>
         /// <param name="id">booking id</param>
         /// <returns>Manage booking view</returns>
+        [Authorize(Roles = "Admin, Manager, Invoice Clerk, Booking Clerk")]
         public ActionResult Delay(int id)
         {
             try
@@ -913,9 +922,23 @@ namespace ParkEasyV1.Controllers
         /// <returns>duration of booking in days</returns>
         private int CalculateBookingDuration(DateTime departureDate, DateTime returnDate)
         {
+            //calculate the total duration of booking dates
             TimeSpan duration = returnDate.Subtract(departureDate);
 
+            //return the total duration in integer number of days
             return Convert.ToInt32(duration.TotalDays);
+        }
+
+        /// <summary>
+        /// Function to calculate the total cost of a booking using the start and end date
+        /// </summary>
+        /// <param name="departureDate">booking flight departure date</param>
+        /// <param name="returnDate">booking flight return date</param>
+        /// <returns>booking total</returns>
+        private double CalculateBookingTotal(DateTime departureDate, DateTime returnDate)
+        {
+            //return the total cost of booking via the tariff price from database and booking duration
+            return db.Tariffs.Find(1).Amount * Convert.ToInt32(CalculateBookingDuration(departureDate, returnDate));
         }
 
         /// <summary>

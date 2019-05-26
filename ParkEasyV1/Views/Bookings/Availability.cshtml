@@ -4,7 +4,7 @@
     ViewBag.Title = "Check Availability";
 }
 
-<div class="container body-content">
+<div class="container body-content" style="padding-bottom: 400px;">
     <h3 class="text-center my-3">Check Availability</h3>
 
     @using (Html.BeginForm("Availability", "Bookings", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
@@ -60,12 +60,14 @@
 
     @if (TempData["Available"] != null)
     {
+        
+        
         <center>
             <div class="alert alert-success col-md-6 my-4" role="alert">
                 <i class="far fa-calendar-check"></i> @TempData["Available"] <br>
+                <h6 class="text-center">Total: £@ViewBag.Total</h6>
                 <button class="btn btn-darkblue font-weight-bold my-2" type="button" onclick="location.href='@Url.Action("Create", "Bookings")'">Book Now</button>
             </div>
-
         </center>
     }
     else if (TempData["UnAvailable"] != null)
