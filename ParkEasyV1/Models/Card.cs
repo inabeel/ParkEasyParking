@@ -10,26 +10,49 @@ using System.Web;
 
 namespace ParkEasyV1.Models
 {
+    /// <summary>
+    /// Subclass of Payment to hold all Card Payment details
+    /// </summary>
     public class Card : Payment
     {
+        /// <summary>
+        /// Enum of the type of payment card
+        /// </summary>
         [Display(Name = "Card Type")]
         public CardType Type { get; set; }
 
+        /// <summary>
+        /// Card number
+        /// </summary>
         [DataType(DataType.CreditCard)]
         [Display(Name = "Card Number")]
         public string CardNumber { get; set; }
 
+        /// <summary>
+        /// Name on payment card
+        /// </summary>
         [Display(Name = "Name on Card")]
         [StringLength(32, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 1)]
         public string NameOnCard { get; set; }
 
+        /// <summary>
+        /// expiry date on card
+        /// </summary>
         [Display(Name = "Expiry Date")]
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:yyyy-MM}", ApplyFormatInEditMode = true)]
         public DateTime ExpiryDate { get; set; }
 
+        /// <summary>
+        /// Card security code
+        /// </summary>
         public int CVV { get; set; }
 
+        /// <summary>
+        /// Function to encrypt the payment card details and return a hashed value to be stored safely in database
+        /// </summary>
+        /// <param name="clearText">the text to be encrypted</param>
+        /// <returns>Hashed text</returns>
         private string Encrypt(string clearText)
         {
             string EncryptionKey = "MAKV2SPBNI99212";
@@ -52,6 +75,11 @@ namespace ParkEasyV1.Models
             return clearText;
         }
 
+        /// <summary>
+        /// Function to decrypt the payment card details and return the clear text value retrieved from database
+        /// </summary>
+        /// <param name="cipherText">Encrpyted text</param>
+        /// <returns>Clear text value</returns>
         private string Decrypt(string cipherText)
         {
             string EncryptionKey = "MAKV2SPBNI99212";
@@ -75,6 +103,9 @@ namespace ParkEasyV1.Models
 
         }
     }
+        /// <summary>
+        /// Enumeration of the different types of ATM card accepted by the system
+        /// </summary>
         public enum CardType
         {
             Visa,

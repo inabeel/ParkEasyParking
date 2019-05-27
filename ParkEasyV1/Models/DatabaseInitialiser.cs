@@ -8,43 +8,62 @@ using System.Web;
 
 namespace ParkEasyV1.Models
 {
+    /// <summary>
+    /// Class used to initialize the database and seed data using the DropCreateDatabaseAlways method for testing
+    /// </summary>
     public class DatabaseInitialiser : DropCreateDatabaseAlways<ApplicationDbContext>
     {
+        /// <summary>
+        /// Override Seed method to seed the database with values
+        /// </summary>
+        /// <param name="context"></param>
         protected override void Seed(ApplicationDbContext context)
         {
+            //call to base with ApplicationDbContext
             base.Seed(context);
 
             if (!context.Users.Any())
             {
-
+                //create instance of role manager
                 RoleManager<IdentityRole> roleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(context));
 
+                //if Admin role does not exist
                 if (!roleManager.RoleExists("Admin"))
                 {
+                    //create admin role
                     roleManager.Create(new IdentityRole("Admin"));
                 }
+                //if manager role does not exist
                 if (!roleManager.RoleExists("Manager"))
                 {
+                    //create manager role
                     roleManager.Create(new IdentityRole("Manager"));
-
                 }
+                //if invoice clerk role does not exist
                 if (!roleManager.RoleExists("Invoice Clerk"))
                 {
+                    //create invoice clerk role
                     roleManager.Create(new IdentityRole("Invoice Clerk"));
                 }
+                //if booking clerk role does not exist
                 if (!roleManager.RoleExists("Booking Clerk"))
                 {
+                    //create booking clerk role
                     roleManager.Create(new IdentityRole("Booking Clerk"));
                 }
+                //if customer role does not exist
                 if (!roleManager.RoleExists("Customer"))
                 {
+                    //create customer role
                     roleManager.Create(new IdentityRole("Customer"));
                 }
 
+                //save changes
                 context.SaveChanges();
 
                 //Create users
 
+                //create instance of user manager
                 UserManager<User> userManager = new UserManager<User>(new UserStore<User>(context));
 
 
@@ -176,48 +195,53 @@ namespace ParkEasyV1.Models
                 }
 
                 //Create Corporate Customer
-                if (userManager.FindByName("samirzarrug@college.co.uk") == null)
+                if (userManager.FindByName("stevengerrard@rangersfootballclub.com") == null)
                 {
                     var customer = new Customer
                     {
-                        UserName = "samirzarrug@college.co.uk",
-                        Email = "samirzarrug@college.co.uk",
+                        UserName = "stevengerrard@rangersfootballclub.com",
+                        Email = "stevengerrard@rangersfootballclub.com",
                         RegistrationDate = DateTime.Now,
                         EmailConfirmed = true,
-                        FirstName = "Samir",
-                        LastName = "Zarrug",
-                        AddressLine1 = "190 Cathedral Street",
-                        AddressLine2 = "Glasgow",
+                        FirstName = "Steven",
+                        LastName = "Gerrard",
+                        AddressLine1 = "150 Edminston Drive",
+                        AddressLine2 = "Govan",
                         City = "Glasgow",
-                        Postcode = "G4 0RF",
+                        Postcode = "G51 2XD",
                         Corporate = true
                     };
-                    userManager.Create(customer, "samir");
+                    userManager.Create(customer, "rangers");
                     userManager.AddToRoles(customer.Id, "Customer");
                 }
 
 
-
+                //save changes
                 context.SaveChanges();
 
-                //call to seed method
-                //context save changes
-
+                //Call to method to create the 150 initial parking slots
                 CreateParkingSlots(context);
+
+                //Call to method to create the initial 3 types of Tariff
                 CreateTariffs(context);
-                //CreateVehicles(context);
-                //CreateFlights(context);
+
+                //Call to method to seed initial bookings in the system
                 CreateBookings(context);
-                //CreatePayments(context);
                 
 
             }
         }//end method
 
+        /// <summary>
+        /// Method to create initial 150 parking slots in the system
+        /// </summary>
+        /// <param name="context">ApplicationDbContext</param>
         private void CreateParkingSlots(ApplicationDbContext context)
         {
+            //loop 150 times
             for (int i = 0; i < 150; i++)
             {
+                //create new available parking slot
                 context.ParkingSlots.Add(new ParkingSlot()
                 {
                     ID = i,
@@ -225,11 +249,17 @@ namespace ParkEasyV1.Models
                 });
             }
 
+            //save changes
             context.SaveChanges();
         }
 
+        /// <summary>
+        /// Method to create initial 3 tariffs in the system
+        /// </summary>
+        /// <param name="context">ApplicationDbContext</param>
         private void CreateTariffs(ApplicationDbContext context)
         {
+            //Create parking slot tariff and set price
             context.Tariffs.Add(new Tariff()
             {
                 ID = 1,
@@ -237,6 +267,7 @@ namespace ParkEasyV1.Models
                 Amount = 4.96
             });
 
+            //Create full valet tariff and set price
             context.Tariffs.Add(new Tariff()
             {
                 ID = 2,
@@ -244,6 +275,7 @@ namespace ParkEasyV1.Models
                 Amount = 20.00
             });
 
+            //Create mini valet tariff and set price
             context.Tariffs.Add(new Tariff()
             {
                 ID = 3,
@@ -251,14 +283,18 @@ namespace ParkEasyV1.Models
                 Amount = 10.00
             });
 
+            //save changes
             context.SaveChanges();
         }
 
+        /// <summary>
+        /// Method to create and seed initial bookings in the system
+        /// </summary>
+        /// <param name="context">ApplicationDbContext</param>
         private void CreateBookings(ApplicationDbContext context)
         {
+            //create instance of user manager
             UserManager<User> userManager = new UserManager<User>(new UserStore<User>(context));
-
-            //CREATE NORMAL BOOKING
 
             //create customer vehicle
             context.Vehicles.Add(new Vehicle()
@@ -284,9 +320,13 @@ namespace ParkEasyV1.Models
                 DestinationAirport = "Barcelona"
             });
 
+            //get the previously inserted flight from database
             Flight flight = context.Flights.Find(1);
+            //get tariff from database
             Tariff tariff = context.Tariffs.Find(1);
+            //calculate the duration of the booking
             TimeSpan duration = flight.ReturnDate - flight.DepartureDate;
+            //calculate the price of the booking
             double price = tariff.Amount * Convert.ToInt32(duration.TotalDays);
 
             //create customer booking
@@ -305,15 +345,12 @@ namespace ParkEasyV1.Models
                 CheckedIn = true,
                 CheckedOut = true,
 
-                //add booking lines
+                //add booking line
                 BookingLines = new List<BookingLine>()
                 {
                     new BookingLine() {Booking = context.Bookings.Find(1), Vehicle = context.Vehicles.Find(1)},
                 },
             });
-
-            //ParkingSlot slot = context.ParkingSlots.Find(99);
-            //slot.Status = Status.Available;
 
             //create customer payment
             context.Payments.Add(new Card()
@@ -328,12 +365,19 @@ namespace ParkEasyV1.Models
                 CVV = 377
             });
 
+            //save changes
             context.SaveChanges();
+            //Call method to create and seed a future booking in the system
             CreateFutureBooking(context);
         }
 
+        /// <summary>
+        /// Method to create and seed a booking that will occur in the future in the system
+        /// </summary>
+        /// <param name="context">ApplicationDbContext</param>
         private void CreateFutureBooking(ApplicationDbContext context)
         {
+            //create instance of user manager
             UserManager<User> userManager = new UserManager<User>(new UserStore<User>(context));
 
             //CREATE FUTURE BOOKING
@@ -362,9 +406,13 @@ namespace ParkEasyV1.Models
                 DestinationAirport = "Tenerife"
             });
 
+            //get the previously inserted flight from database
             Flight flight = context.Flights.Find(2);
+            //get the tariff from database
             Tariff tariff = context.Tariffs.Find(1);
+            //calculate duration of booking
             TimeSpan duration = flight.ReturnDate - flight.DepartureDate;
+            //calculate the booking cost
             double price = tariff.Amount * Convert.ToInt32(duration.TotalDays) + 10;
 
             //create customer booking
@@ -398,12 +446,19 @@ namespace ParkEasyV1.Models
                 Amount = price,
             });
 
+            //save changes
             context.SaveChanges();
+            //call method to create a booking that occurs today
             CreateBookingToday(context);
         }
 
+        /// <summary>
+        /// Method to create and seed a booking that occurs at the current datetime
+        /// </summary>
+        /// <param name="context">ApplicationDbContext</param>
         private void CreateBookingToday(ApplicationDbContext context)
         {
+            //create instance of user manager
             UserManager<User> userManager = new UserManager<User>(new UserStore<User>(context));
 
             //CREATE BOOKING TODAY
@@ -432,9 +487,13 @@ namespace ParkEasyV1.Models
                 DestinationAirport = "Portugal"
             });
 
+            //get the previously inserted flight from database
             Flight flight = context.Flights.Find(3);
+            //get the tariff from database
             Tariff tariff = context.Tariffs.Find(1);
+            //calculate booking duration
             TimeSpan duration = flight.ReturnDate - flight.DepartureDate;
+            //calculate the booking cost
             double price = tariff.Amount * Convert.ToInt32(duration.TotalDays) + 20;
 
             //create customer booking
@@ -460,7 +519,9 @@ namespace ParkEasyV1.Models
                 },
             });
 
+            //find the parking slot allocated to the booking
             ParkingSlot slot = context.ParkingSlots.Find(1);
+            //set parking slot status to occupied - as this seeded booking is occuring today and has been checked in
             slot.Status = Status.Occupied;
 
             //create customer payment
@@ -471,10 +532,16 @@ namespace ParkEasyV1.Models
                 Amount = price,
             });
 
+            //save changes
             context.SaveChanges();
+            //call method to create and seed a corporate booking
             CreateCorporateBooking(context);
         }
 
+        /// <summary>
+        /// Method to create and seed a corporate booking
+        /// </summary>
+        /// <param name="context">ApplicationDbContext</param>
         private void CreateCorporateBooking(ApplicationDbContext context)
         {
             UserManager<User> userManager = new UserManager<User>(new UserStore<User>(context));
@@ -485,7 +552,7 @@ namespace ParkEasyV1.Models
             context.Vehicles.Add(new Vehicle()
             {
                 ID = 4,
-                RegistrationNumber = "ZARRUG1",
+                RegistrationNumber = "SF19 RFC",
                 Make = "Jaguar",
                 Model = "XF",
                 Colour = "Silver",
@@ -505,15 +572,19 @@ namespace ParkEasyV1.Models
                 DestinationAirport = "Dubai"
             });
 
+            //get the previously inserted flight from database
             Flight flight = context.Flights.Find(4);
+            //get the tariff from database
             Tariff tariff = context.Tariffs.Find(1);
+            //calculate the booking duration
             TimeSpan duration = flight.ReturnDate - flight.DepartureDate;
+            //calculate the booking cost
             double price = tariff.Amount * Convert.ToInt32(duration.TotalDays) + 20;
 
             //create customer booking
             context.Bookings.Add(new Booking()
             {
-                User = userManager.FindByEmail("samirzarrug@college.co.uk"),
+                User = userManager.FindByEmail("stevengerrard@rangersfootballclub.com"),
                 Flight = context.Flights.Find(4),
                 ParkingSlot = context.ParkingSlots.Find(102),
                 Tariff = context.Tariffs.Find(1),
@@ -533,9 +604,8 @@ namespace ParkEasyV1.Models
                 },
             });
 
-            ParkingSlot slot = context.ParkingSlots.Find(102);
             
-
+            //save changes
             context.SaveChanges();
         }
 

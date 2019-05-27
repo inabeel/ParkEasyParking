@@ -11,7 +11,9 @@ using System.Web;
 
 namespace ParkEasyV1.Models
 {
-    // You can add profile data for the user by adding more properties to your ApplicationUser class, please visit https://go.microsoft.com/fwlink/?LinkID=317594 to learn more.
+    /// <summary>
+    /// Abstract Class that inherits from IdentityUser and models a User
+    /// </summary>
     public abstract class User : IdentityUser
     {
         /// <summary>
@@ -19,22 +21,49 @@ namespace ParkEasyV1.Models
         /// </summary>
         private ApplicationUserManager userManager;
 
+        /// <summary>
+        /// User first name
+        /// </summary>
         [Display(Name ="First Name")]
         public string FirstName { get; set; }
+
+        /// <summary>
+        /// User last name
+        /// </summary>
         [Display(Name ="Last Name")]
         public string LastName { get; set; }
+
+        /// <summary>
+        /// user address line 1
+        /// </summary>
         [Display(Name ="Address Line 1")]
         public string AddressLine1 { get; set; }
+
+        /// <summary>
+        /// user address line 2
+        /// </summary>
         public string AddressLine2 { get; set; }
+
+        /// <summary>
+        /// user city
+        /// </summary>
         public string City { get; set; }
+
+        /// <summary>
+        /// user postcode
+        /// </summary>
         public string Postcode { get; set; }
 
         //Navigational Properties
 
-        //One user can have many payments
+        /// <summary>
+        /// Virtual list of Payments to model One to Many relationship with Payment
+        /// </summary>
         public virtual List<Payment> Payments { get; set; }
 
-        //One user can have many bookings
+        /// <summary>
+        /// Virtual list of Bookings to model One to Many relationship with Booking
+        /// </summary>
         public virtual List<Booking> Bookings { get; set; }
 
 
@@ -56,6 +85,11 @@ namespace ParkEasyV1.Models
             }
         }
 
+        /// <summary>
+        /// Async Function to generate user identity
+        /// </summary>
+        /// <param name="manager"></param>
+        /// <returns></returns>
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<User> manager)
         {
             // Note the authenticationType must match the one defined in CookieAuthenticationOptions.AuthenticationType

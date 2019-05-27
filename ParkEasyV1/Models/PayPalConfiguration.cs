@@ -6,6 +6,9 @@ using System.Web;
 
 namespace ParkEasyV1.Models
 {
+    /// <summary>
+    /// Class for configuring and setting up PayPal API
+    /// </summary>
     public static class PayPalConfiguration
     {
         //Variables for storing the clientID and clientSecret key  
