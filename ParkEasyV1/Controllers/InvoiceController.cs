@@ -69,25 +69,33 @@ namespace ParkEasyV1.Controllers
         // GET: Invoice/View
         public ActionResult View(int? id)
         {
-            //find the booking via id
-            Booking booking = db.Bookings.Find(id);
-
-            //if the booking invoice is null
-            if (booking.Invoice==null)
+            try
             {
-                //return httpnotfound error
+                //find the booking via id
+                Booking booking = db.Bookings.Find(id);
+
+                //if the booking invoice is null
+                if (booking.Invoice==null)
+                {
+                    //return httpnotfound error
+                    return HttpNotFound();
+                }
+
+                //create variable to hold the booking VAT (20% of booking total) amount
+                double vat = Math.Round(booking.Total / 10 * 2, 2);
+
+                //store subtotal (booking total without VAT) and vat in viewbag for front-end display
+                ViewBag.Subtotal = booking.Total - vat;
+                ViewBag.Vat = vat;
+
+                //return View with booking
+                return View(booking);
+            }
+            catch (Exception ex)
+            {
+                //if exception occurs, throw httpnotfound error
                 return HttpNotFound();
             }
-
-            //create variable to hold the booking VAT (20% of booking total) amount
-            double vat = Math.Round(booking.Total / 10 * 2, 2);
-
-            //store subtotal (booking total without VAT) and vat in viewbag for front-end display
-            ViewBag.Subtotal = booking.Total - vat;
-            ViewBag.Vat = vat;
-
-            //return View with booking
-            return View(booking);
         }
 
         /// <summary>
@@ -97,9 +105,16 @@ namespace ParkEasyV1.Controllers
         /// <returns>View Invoice in PDF format</returns>
         public ActionResult PrintViewToPdf(int? bookingId)
         {
-            //convert View Invoice to PDF and return
-            var pdf = new ActionAsPdf("View", new {id=bookingId});
-            return pdf;
+            try
+            {
+                //convert View Invoice to PDF and return
+                var pdf = new ActionAsPdf("View", new {id=bookingId});
+                return pdf;
+            }
+            catch (Exception ex)
+            {
+                return HttpNotFound();
+            }            
         }
         
 
@@ -110,46 +125,55 @@ namespace ParkEasyV1.Controllers
         /// <returns>Confirmation view</returns>
         public ActionResult Confirmation(int id)
         {
-            //find booking via id
-            Booking booking = db.Bookings.Find(id);
-            //if booking is null
-            if (booking == null)
+            try
             {
-                //return httpnotfound eror
+                //find booking via id
+                Booking booking = db.Bookings.Find(id);
+                //if booking is null
+                if (booking == null)
+                {
+                    //return httpnotfound eror
+                    return HttpNotFound();
+                }
+
+                //get the vehicle associated with booking via booking line
+                Vehicle vehicle = db.Vehicles.Find(booking.BookingLines.First().VehicleID);
+
+                //create new view booking view model and populate with flight/booking/vehicle data
+                ViewBookingViewModel model = new ViewBookingViewModel
+                {
+                    BookingID = booking.ID,
+                    DepartureDate = booking.Flight.DepartureDate,
+                    DepartureTime = booking.Flight.DepartureTime,
+                    ReturnDate = booking.Flight.ReturnDate,
+                    ReturnTime = booking.Flight.ReturnFlightTime,
+                    Duration = booking.Duration,
+                    Total = booking.Total,
+                    Valet = booking.ValetService,
+                    FirstName = booking.User.FirstName,
+                    Surname = booking.User.LastName,
+                    AddressLine1 = booking.User.AddressLine1,
+                    AddressLine2 = booking.User.AddressLine2,
+                    City = booking.User.City,
+                    Postcode = booking.User.Postcode,
+                    Email = booking.User.Email,
+                    PhoneNo = booking.User.PhoneNumber,
+                    VehicleMake = vehicle.Make,
+                    VehicleModel = vehicle.Model,
+                    VehicleColour = vehicle.Colour,
+                    VehicleRegistration = vehicle.RegistrationNumber,
+                    NoOfPassengers = vehicle.NoOfPassengers
+                };
+
+                //return confirmation view with model
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                //if exception occurs, throw httpnotfound error
                 return HttpNotFound();
             }
-
-            //get the vehicle associated with booking via booking line
-            Vehicle vehicle = db.Vehicles.Find(booking.BookingLines.First().VehicleID);
-
-            //create new view booking view model and populate with flight/booking/vehicle data
-            ViewBookingViewModel model = new ViewBookingViewModel
-            {
-                BookingID = booking.ID,
-                DepartureDate = booking.Flight.DepartureDate,
-                DepartureTime = booking.Flight.DepartureTime,
-                ReturnDate = booking.Flight.ReturnDate,
-                ReturnTime = booking.Flight.ReturnFlightTime,
-                Duration = booking.Duration,
-                Total = booking.Total,
-                Valet = booking.ValetService,
-                FirstName = booking.User.FirstName,
-                Surname = booking.User.LastName,
-                AddressLine1 = booking.User.AddressLine1,
-                AddressLine2 = booking.User.AddressLine2,
-                City = booking.User.City,
-                Postcode = booking.User.Postcode,
-                Email = booking.User.Email,
-                PhoneNo = booking.User.PhoneNumber,
-                VehicleMake = vehicle.Make,
-                VehicleModel = vehicle.Model,
-                VehicleColour = vehicle.Colour,
-                VehicleRegistration = vehicle.RegistrationNumber,
-                NoOfPassengers = vehicle.NoOfPassengers
-            };
-
-            //return confirmation view with model
-            return View(model);
+            
         }
 
         /// <summary>
@@ -159,9 +183,18 @@ namespace ParkEasyV1.Controllers
         /// <returns>Confirmation view as PDF</returns>
         public ActionResult PrintConfirmationToPdf(int? bookingId)
         {
-            //convert Confirmation view to PDF and return
-            var pdf = new ActionAsPdf("Confirmation", new { id = bookingId });
-            return pdf;
+            try
+            {
+                //convert Confirmation view to PDF and return
+                var pdf = new ActionAsPdf("Confirmation", new { id = bookingId });
+                return pdf;
+            }
+            catch (Exception ex)
+            {
+                //if exception occurs, throw httpnotfound error
+                return HttpNotFound();
+            }
+            
         }
 
         /// <summary>
@@ -203,20 +236,29 @@ namespace ParkEasyV1.Controllers
         [Authorize(Roles = "Admin, Manager, Invoice Clerk")]
         public ActionResult Generate(int id)
         {
-            //if invoice is successfully generated for booking
-            if (GenerateInvoice(id))
+            try
             {
-                //return index view with success message stored in TempData
-                TempData["Success"] = "Invoice Successfully Generated";
-                return RedirectToAction("Index");
+                //if invoice is successfully generated for booking
+                if (GenerateInvoice(id))
+                {
+                    //return index view with success message stored in TempData
+                    TempData["Success"] = "Invoice Successfully Generated";
+                    return RedirectToAction("Index");
+                }
+                //if invoice is NOT successfully generated for booking
+                else
+                {
+                    //return index view with error message stored in TempData
+                    TempData["Error"] = "Unable to Generate Invoice";
+                    return RedirectToAction("Index");
+                }       
             }
-            //if invoice is NOT successfully generated for booking
-            else
+            catch (Exception ex)
             {
-                //return index view with error message stored in TempData
-                TempData["Error"] = "Unable to Generate Invoice";
+                //if exception occurs, return to invoice index with error message
+                TempData["Error"] = "Error: Something went wrong while generating invoice.";
                 return RedirectToAction("Index");
-            }          
+            }               
         }
 
         /// <summary>

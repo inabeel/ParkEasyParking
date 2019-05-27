@@ -150,17 +150,26 @@ namespace ParkEasyV1.Controllers
         [Authorize(Roles = "Admin, Manager, Invoice Clerk, Booking Clerk")]
         public ActionResult Departures()
         {
-            //declare instance of usermanager
-            UserManager<User> userManager = new UserManager<User>(new UserStore<User>(db));
+            try
+            {
+                //declare instance of usermanager
+                UserManager<User> userManager = new UserManager<User>(new UserStore<User>(db));
 
-            //get the current user's ID and store in viewbag for front-end display
-            ViewBag.UserID = userManager.FindByEmail(User.Identity.GetUserName()).Id;
+                //get the current user's ID and store in viewbag for front-end display
+                ViewBag.UserID = userManager.FindByEmail(User.Identity.GetUserName()).Id;
 
-            //return Departures view with bookings where departure date is today and have not checked in yet
-            return View(db.Bookings.Where(b => 
-                b.Flight.DepartureDate.Day.Equals(DateTime.Today.Day)
-                &&b.CheckedIn==false)
-                .ToList());
+                //return Departures view with bookings where departure date is today and have not checked in yet
+                return View(db.Bookings.Where(b => 
+                    b.Flight.DepartureDate.Day.Equals(DateTime.Today.Day)
+                    &&b.CheckedIn==false)
+                    .ToList());
+            }
+            catch (Exception ex)
+            {
+                //if exception occurs, throw httpnotfound error
+                return HttpNotFound();
+            }
+            
         }
 
         /// <summary>
@@ -171,17 +180,26 @@ namespace ParkEasyV1.Controllers
         [Authorize(Roles = "Admin, Manager, Invoice Clerk, Booking Clerk")]
         public ActionResult Returns()
         {
-            //declare instance of usermanager
-            UserManager<User> userManager = new UserManager<User>(new UserStore<User>(db));
+            try
+            {
+                //declare instance of usermanager
+                UserManager<User> userManager = new UserManager<User>(new UserStore<User>(db));
 
-            //get the current user's ID and store in viewbag for front-end display
-            ViewBag.UserID = userManager.FindByEmail(User.Identity.GetUserName()).Id;
+                //get the current user's ID and store in viewbag for front-end display
+                ViewBag.UserID = userManager.FindByEmail(User.Identity.GetUserName()).Id;
 
-            //return Returns view with bookings where return date is today and have not been checked out yet
-            return View(db.Bookings.Where(b => 
-                b.Flight.ReturnDate.Day.Equals(DateTime.Today.Day) 
-                && b.CheckedOut == false)
-                .ToList());
+                //return Returns view with bookings where return date is today and have not been checked out yet
+                return View(db.Bookings.Where(b => 
+                    b.Flight.ReturnDate.Day.Equals(DateTime.Today.Day) 
+                    && b.CheckedOut == false)
+                    .ToList());
+            }
+            catch (Exception ex)
+            {
+                //if exception occurs, throw httpnotfound error
+                return HttpNotFound();
+            }
+            
         }
 
         /// <summary>
@@ -191,21 +209,30 @@ namespace ParkEasyV1.Controllers
         // GET: Users/MyBookings
         public ActionResult MyBookings()
         {
-            //declare instance of usermanager
-            UserManager<User> userManager = new UserManager<User>(new UserStore<User>(db));
+            try
+            {
+                 //declare instance of usermanager
+                UserManager<User> userManager = new UserManager<User>(new UserStore<User>(db));
 
-            //get the current logged in user
-            User user = userManager.FindByEmail(User.Identity.GetUserName());
+                //get the current logged in user
+                User user = userManager.FindByEmail(User.Identity.GetUserName());
 
-            //store current logged in user id in viewbag for front-end display
-            ViewBag.UserID = user.Id;
+                //store current logged in user id in viewbag for front-end display
+                ViewBag.UserID = user.Id;
 
-            //parse User to Customer and store Corporate attribute in ViewBag for front-end use
-            Customer customer = user as Customer;
-            ViewBag.Corporate = customer.Corporate;
+                //parse User to Customer and store Corporate attribute in ViewBag for front-end use
+                Customer customer = user as Customer;
+                ViewBag.Corporate = customer.Corporate;
 
-            //return view with bookings of the current user's
-            return View(db.Bookings.Where(b=>b.UserID.Equals(user.Id)).ToList());
+                //return view with bookings of the current user's
+                return View(db.Bookings.Where(b=>b.UserID.Equals(user.Id)).ToList());
+            }
+            catch (Exception ex)
+            {
+                //if exception occurs, throw httpnotfound error
+                return HttpNotFound();
+            }
+            
         }
 
         /// <summary>
@@ -214,33 +241,42 @@ namespace ParkEasyV1.Controllers
         /// <returns></returns>
         public ActionResult MyInvoices()
         {
-            //declare instance of usermanager
-            UserManager<User> userManager = new UserManager<User>(new UserStore<User>(db));
-
-            //get the current logged in user and store id in viewbag for front-end use
-            User user = userManager.FindByEmail(User.Identity.GetUserName());
-            ViewBag.UserID = user.Id;
-
-            //convert User to Customer and store corporate attribute in ViewBag for front-end use
-            Customer customer = user as Customer;
-            ViewBag.Corporate = customer.Corporate;
-            
-            //initialize a list of Bookings 
-            List<Booking> invoiceBookings = new List<Booking>();
-
-            //loop through all user bookings
-            foreach (var booking in db.Bookings.Where(b=>b.UserID.Equals(user.Id)).ToList())
+            try
             {
-                //if the booking invoice is NOT null
-                if (booking.Invoice!=null)
-                {
-                    //add the booking with invoice to the list
-                    invoiceBookings.Add(booking);
-                }
-            }
+                //declare instance of usermanager
+                UserManager<User> userManager = new UserManager<User>(new UserStore<User>(db));
 
-            //return myinvoices view with invoice bookings
-            return View(invoiceBookings);
+                //get the current logged in user and store id in viewbag for front-end use
+                User user = userManager.FindByEmail(User.Identity.GetUserName());
+                ViewBag.UserID = user.Id;
+
+                //convert User to Customer and store corporate attribute in ViewBag for front-end use
+                Customer customer = user as Customer;
+                ViewBag.Corporate = customer.Corporate;
+            
+                //initialize a list of Bookings 
+                List<Booking> invoiceBookings = new List<Booking>();
+
+                //loop through all user bookings
+                foreach (var booking in db.Bookings.Where(b=>b.UserID.Equals(user.Id)).ToList())
+                {
+                    //if the booking invoice is NOT null
+                    if (booking.Invoice!=null)
+                    {
+                        //add the booking with invoice to the list
+                        invoiceBookings.Add(booking);
+                    }
+                }
+
+                //return myinvoices view with invoice bookings
+                return View(invoiceBookings);
+            }
+            catch (Exception ex)
+            {
+                //if exception occurs, throw httpnotfound error
+                return HttpNotFound();
+            }
+            
         }
 
         /// <summary>
@@ -359,35 +395,44 @@ namespace ParkEasyV1.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> CreateStaff([Bind(Include = "Email, FirstName, LastName, AddressLine1, AddressLine2, City, Postcode, JobTitle, CurrentQualification, EmergencyContactName, EmergencyContactPhoneNo, Password, PasswordConfirm")] CreateStaffViewModel model)
         {
-            //add new staff member
-            if (ModelState.IsValid)
+            try
             {
-                //initialize new staff
-                Staff staff = new Staff();
-                UpdateModel(staff); //update model
-                staff.UserName = model.Email;   //set username to email
-
-                //create user result
-                IdentityResult result = await UserManager.CreateAsync(staff, model.Password);
-
-                //if succesfully created
-                if (result.Succeeded)
+                //add new staff member
+                if (ModelState.IsValid)
                 {
-                    //Assign role to staff member
-                    await UserManager.AddToRoleAsync(staff.Id, "Booking Clerk");
+                    //initialize new staff
+                    Staff staff = new Staff();
+                    UpdateModel(staff); //update model
+                    staff.UserName = model.Email;   //set username to email
 
-                    //success message and redirect
-                    //TempData["Success"] = "Staff member successfully created";
-                    return RedirectToAction("Index", "Users");
-                }
-                else
-                {
-                    AddErrors(result);
+                    //create user result
+                    IdentityResult result = await UserManager.CreateAsync(staff, model.Password);
+
+                    //if succesfully created
+                    if (result.Succeeded)
+                    {
+                        //Assign role to staff member
+                        await UserManager.AddToRoleAsync(staff.Id, "Booking Clerk");
+
+                        //success message and redirect
+                        //TempData["Success"] = "Staff member successfully created";
+                        return RedirectToAction("Index", "Users");
+                    }
+                    else
+                    {
+                        AddErrors(result);
+                    }
+
                 }
 
+                return View(model);
             }
-
-            return View(model);
+            catch (Exception ex)
+            {
+                //if exception occurs, return view
+                return View(model);
+            }
+            
         }
 
         /// <summary>
@@ -449,26 +494,35 @@ namespace ParkEasyV1.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> EditStaff(string id, [Bind(Include = "UserName, Email, FirstName, LastName, AddressLine1, AddressLine2, City, Postcode, EmailConfirmed, JobTitle, CurrentQualification, EmergencyContactName, EmergencyContactPhoneNo")] EditStaffViewModel model)
         {
-            //if model is valid
-            if (ModelState.IsValid)
+            try
             {
-                //find staff by id
-                Staff staff = (Staff)await UserManager.FindByIdAsync(id);
-                UpdateModel(staff); //update staff model
-
-                //get result for update staff
-                IdentityResult result = await UserManager.UpdateAsync(staff);
-
-                //if update is successful
-                if (result.Succeeded)
+                //if model is valid
+                if (ModelState.IsValid)
                 {
-                    //success message and redirect
-                    //TempData["Success"] = "Staff member successfully edited";
-                    return RedirectToAction("Index", "Users");
+                    //find staff by id
+                    Staff staff = (Staff)await UserManager.FindByIdAsync(id);
+                    UpdateModel(staff); //update staff model
+
+                    //get result for update staff
+                    IdentityResult result = await UserManager.UpdateAsync(staff);
+
+                    //if update is successful
+                    if (result.Succeeded)
+                    {
+                        //success message and redirect
+                        //TempData["Success"] = "Staff member successfully edited";
+                        return RedirectToAction("Index", "Users");
+                    }
+                    AddErrors(result);
                 }
-                AddErrors(result);
+                return View(model);
             }
-            return View(model);
+            catch (Exception ex)
+            {
+                //if exception occurs, return view
+                return View(model);
+            }
+            
         }
 
         /// <summary>
@@ -527,26 +581,35 @@ namespace ParkEasyV1.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> EditCustomer(string id, [Bind(Include = "UserName,Email,EmailConfirmed, FirstName, LastName, AddressLine1, AddressLine2, City, Postcode, Corporate")] EditCustomerViewModel model)
         {
-            //if model is valid
-            if (ModelState.IsValid)
+            try
             {
-                //find customer by id and update model
-                Customer customer = (Customer)await UserManager.FindByIdAsync(id);
-                UpdateModel(customer);
-
-                //get update result
-                IdentityResult result = await UserManager.UpdateAsync(customer);
-
-                //if update result is successful
-                if (result.Succeeded)
+                //if model is valid
+                if (ModelState.IsValid)
                 {
-                    //success message and redirect
-                    //TempData["Success"] = "Member successfully edited";
-                    return RedirectToAction("Index", "Users");
+                    //find customer by id and update model
+                    Customer customer = (Customer)await UserManager.FindByIdAsync(id);
+                    UpdateModel(customer);
+
+                    //get update result
+                    IdentityResult result = await UserManager.UpdateAsync(customer);
+
+                    //if update result is successful
+                    if (result.Succeeded)
+                    {
+                        //success message and redirect
+                        //TempData["Success"] = "Member successfully edited";
+                        return RedirectToAction("Index", "Users");
+                    }
+                    AddErrors(result);
                 }
-                AddErrors(result);
+                return View(model);
             }
-            return View(model);
+            catch (Exception ex)
+            {
+                //if exception occurs, throw view
+                return View(model);
+            }
+            
         }
 
         // GET: Users/Delete/5

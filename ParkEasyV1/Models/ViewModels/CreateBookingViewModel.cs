@@ -6,15 +6,7 @@ using System.Web;
 
 namespace ParkEasyV1.Models.ViewModels
 {
-    /// <summary>
-    /// class to hold all booking view models
-    /// </summary>
-    public class BookingViewModels
-    {
-        /// <summary>
-        /// View model to hold all data required to create a booking
-        /// </summary>
-        public class CreateBookingViewModel
+    public class CreateBookingViewModel
         {
             /// <summary>
             /// booking start date
@@ -389,5 +381,4 @@ namespace ParkEasyV1.Models.ViewModels
             [Display(Name = "Return Time")]
             public TimeSpan ReturnTime { get; set; }
         }
-    }   
-}
+}   

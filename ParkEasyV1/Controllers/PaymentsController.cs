@@ -110,59 +110,68 @@ namespace ParkEasyV1.Controllers
         [Authorize]
         public ActionResult Charge(string stripeEmail, string stripeToken)
         {
-            //find the booking via Booking ID stored in TempData
-            Booking booking = db.Bookings.Find(TempData["bID"]);
+            try
+            {
+                //find the booking via Booking ID stored in TempData
+                Booking booking = db.Bookings.Find(TempData["bID"]);
             
-            //create instances of Stripe customers and charges objects
-            var customers = new CustomerService();
-            var charges = new ChargeService();
+                //create instances of Stripe customers and charges objects
+                var customers = new CustomerService();
+                var charges = new ChargeService();
 
-            //create stripe customer
-            var customer = customers.Create(new CustomerCreateOptions
-            {
-                Email = stripeEmail,
-                SourceToken = stripeToken,
-            });
+                //create stripe customer
+                var customer = customers.Create(new CustomerCreateOptions
+                {
+                    Email = stripeEmail,
+                    SourceToken = stripeToken,
+                });
 
-            //create stripe charge
-            var charge = charges.Create(new ChargeCreateOptions
-            {
-                Amount = (int)Math.Ceiling(booking.Total * 100),
-                Description = "ParkEasy Airport Parking Charge",
-                Currency = "gbp",
-                CustomerId = customer.Id,
-                ReceiptEmail = customer.Email,
-            });
+                //create stripe charge
+                var charge = charges.Create(new ChargeCreateOptions
+                {
+                    Amount = (int)Math.Ceiling(booking.Total * 100),
+                    Description = "ParkEasy Airport Parking Charge",
+                    Currency = "gbp",
+                    CustomerId = customer.Id,
+                    ReceiptEmail = customer.Email,
+                });
 
-            //update booking status to confirmed
-            booking.BookingStatus = BookingStatus.Confirmed;            
+                //update booking status to confirmed
+                booking.BookingStatus = BookingStatus.Confirmed;            
 
-            //store the payment in the databse
-            db.Payments.Add(new ExternalPayment()
-            {
-                PaymentDate = DateTime.Now,
-                Amount = charge.Amount,
-                User = booking.User,
-                TransactionID = charge.ReceiptNumber
-            });
-            db.SaveChanges();
+                //store the payment in the databse
+                db.Payments.Add(new ExternalPayment()
+                {
+                    PaymentDate = DateTime.Now,
+                    Amount = charge.Amount,
+                    User = booking.User,
+                    TransactionID = charge.ReceiptNumber
+                });
+                db.SaveChanges();
 
-            //check if Invoice TempData is NOT null
-            //if this is NOT null then the payment is being made for an existing booking from an Invoice
-            if (TempData["Invoice"]!=null)
-            {
-                //update the invoice status on the booking to paid
-                booking.Invoice.Status = InvoiceStatus.Paid;
-                db.SaveChanges();   //save database changes
-                //return to Invoice confirmation
-                return RedirectToAction("Confirmation", "Invoice", new { id=booking.ID});
+                //check if Invoice TempData is NOT null
+                //if this is NOT null then the payment is being made for an existing booking from an Invoice
+                if (TempData["Invoice"]!=null)
+                {
+                    //update the invoice status on the booking to paid
+                    booking.Invoice.Status = InvoiceStatus.Paid;
+                    db.SaveChanges();   //save database changes
+                    //return to Invoice confirmation
+                    return RedirectToAction("Confirmation", "Invoice", new { id=booking.ID});
+                }
+            
+                //email booking confirmation
+                booking.EmailConfirmation();
+
+                //redirect to booking confirmation
+                return RedirectToAction("Confirmation", "Bookings", new { id=booking.ID});
             }
-            
-            //email booking confirmation
-            booking.EmailConfirmation();
-
-            //redirect to booking confirmation
-            return RedirectToAction("Confirmation", "Bookings", new { id=booking.ID});
+            catch (Exception ex)
+            {
+                //if exception occurs, redisplay form with error message
+                TempData["Error"] = "Error: Unable to process payment. Please contact us.";
+                return View();
+            }            
         }
 
         /// <summary>
@@ -494,17 +503,27 @@ namespace ParkEasyV1.Controllers
         [Authorize]
         public ActionResult InvoiceCharge()
         {
-            //find the booking via id stored in TempData
-            Booking booking = db.Bookings.Find(TempData["bID"]);
+            try
+            {
+                //find the booking via id stored in TempData
+                Booking booking = db.Bookings.Find(TempData["bID"]);
 
-            //as this booking is for a corporate customer
-            //confirm booking without payment instantly (they will be invoiced at later date)
-            //update booking status and save changes
-            booking.BookingStatus = BookingStatus.Confirmed;
-            db.SaveChanges();
+                //as this booking is for a corporate customer
+                //confirm booking without payment instantly (they will be invoiced at later date)
+                //update booking status and save changes
+                booking.BookingStatus = BookingStatus.Confirmed;
+                db.SaveChanges();
 
-            //return booking confirmation
-            return RedirectToAction("Confirmation", "Bookings", new { id = booking.ID });
+                //return booking confirmation
+                return RedirectToAction("Confirmation", "Bookings", new { id = booking.ID });
+            }
+            catch (Exception ex)
+            {
+                //if exception occurs, return User Index with error message
+                TempData["Error"] = "Error: Unable to confirm corporate booking. Please contact us";
+                return RedirectToAction("Index", "Users");
+            }
+            
         }
 
         /// <summary>

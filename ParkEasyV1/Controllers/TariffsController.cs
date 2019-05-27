@@ -133,13 +133,22 @@ namespace ParkEasyV1.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit([Bind(Include = "ID,Type,Amount")] Tariff tariff)
         {
-            if (ModelState.IsValid)
+            try
             {
-                db.Entry(tariff).State = EntityState.Modified;
-                db.SaveChanges();
-                return RedirectToAction("Manage");
+                if (ModelState.IsValid)
+                {
+                    db.Entry(tariff).State = EntityState.Modified;
+                    db.SaveChanges();
+                    return RedirectToAction("Manage");
+                }
+                return View(tariff);
             }
-            return View(tariff);
+            catch (Exception ex)
+            {
+                //if exception occurs, return manage view with error message
+                TempData["Error"] = "Error: An error occured while updating tariff.";
+                return RedirectToAction("Manage");
+            }            
         }
 
         /// <summary>
@@ -172,10 +181,20 @@ namespace ParkEasyV1.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            Tariff tariff = db.Tariffs.Find(id);
-            db.Tariffs.Remove(tariff);
-            db.SaveChanges();
-            return RedirectToAction("Manage");
+            try
+            {
+                Tariff tariff = db.Tariffs.Find(id);
+                db.Tariffs.Remove(tariff);
+                db.SaveChanges();
+                return RedirectToAction("Manage");
+            }
+            catch (Exception ex)
+            {
+                //if exception occurs, return manage view with error message
+                TempData["Error"] = "An error occured while deleting tariff";
+                return RedirectToAction("Manage");
+            }
+            
         }
 
         /// <summary>

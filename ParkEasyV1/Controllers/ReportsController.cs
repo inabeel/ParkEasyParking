@@ -48,11 +48,20 @@ namespace ParkEasyV1.Controllers
         /// <returns>Daily Bookings Report View</returns>
         public ActionResult DailyBookings()
         {
-            //get list of all bookings where the booking departure date is today
-            List<Booking> dailyBookings = db.Bookings.Where(b => b.Flight.DepartureDate.Equals(DateTime.Today)).ToList();
+            try
+            {
+                //get list of all bookings where the booking departure date is today
+                List<Booking> dailyBookings = db.Bookings.Where(b => b.Flight.DepartureDate.Equals(DateTime.Today)).ToList();
 
-            //return the Daily Bookings View with list of bookings
-            return View(dailyBookings);
+                //return the Daily Bookings View with list of bookings
+                return View(dailyBookings);
+            }
+            catch (Exception ex)
+            {
+                //if exception occurs, throw httpnotfound error
+                return HttpNotFound();
+            }
+            
         }
 
         /// <summary>
@@ -61,11 +70,20 @@ namespace ParkEasyV1.Controllers
         /// <returns>Daily Cars Release Report</returns>
         public ActionResult DailyCarsRelease()
         {
-            //get a list of all bookings that are due to return today
-            List<Booking> dailyCarsRelease = db.Bookings.Where(b => b.Flight.ReturnDate.Equals(DateTime.Today)).ToList();
+            try
+            {
+                //get a list of all bookings that are due to return today
+                List<Booking> dailyCarsRelease = db.Bookings.Where(b => b.Flight.ReturnDate.Equals(DateTime.Today)).ToList();
 
-            //return the daily cars release report view
-            return View(dailyCarsRelease);
+                //return the daily cars release report view
+                return View(dailyCarsRelease);
+            }
+            catch (Exception ex)
+            {
+                //if exception occurs, return httpnotfound
+                return HttpNotFound();
+            }
+            
         }
 
         /// <summary>
@@ -74,23 +92,32 @@ namespace ParkEasyV1.Controllers
         /// <returns>Daily Valeting Cars Report View</returns>
         public ActionResult DailyValetingCars()
         {
-            //initialize a list to store the bookings with cars due to be valeting
-            List<Booking> dailyValetingCars = new List<Booking>();
-
-            //loop through all bookings
-            foreach (var booking in db.Bookings.ToList())
+            try
             {
-                //if the booking has checked in
-                //has NOT checked out (meaning it is still currently parked)
-                //has booked with the valet service
-                if (booking.CheckedIn==true && booking.CheckedOut==false && booking.ValetService==true)
+                //initialize a list to store the bookings with cars due to be valeting
+                List<Booking> dailyValetingCars = new List<Booking>();
+
+                //loop through all bookings
+                foreach (var booking in db.Bookings.ToList())
                 {
-                    //add the booking to the daily valeting cars list
-                    dailyValetingCars.Add(booking);
+                    //if the booking has checked in
+                    //has NOT checked out (meaning it is still currently parked)
+                    //has booked with the valet service
+                    if (booking.CheckedIn==true && booking.CheckedOut==false && booking.ValetService==true)
+                    {
+                        //add the booking to the daily valeting cars list
+                        dailyValetingCars.Add(booking);
+                    }
                 }
+                //return the daily valeting cars report with the list of daily valeting cars
+                return View(dailyValetingCars);
             }
-            //return the daily valeting cars report with the list of daily valeting cars
-            return View(dailyValetingCars);
+            catch (Exception ex)
+            {
+                //if exception occurs, throw httpnotfound error
+                return HttpNotFound();
+            }
+            
         }
 
         /// <summary>
@@ -99,29 +126,38 @@ namespace ParkEasyV1.Controllers
         /// <returns>Monthly Bookings Report View</returns>
         public ActionResult Bookings()
         {
-            //initialize a list of bookings
-            List<Booking> monthlyBookings = new List<Booking>();
-
-            //initialize total income
-            double totalIncome = 0;
-
-            //loop through all bookings 
-            foreach (var booking in db.Bookings.ToList())
+            try
             {
-                //if the booking was booked during the current month
-                if (booking.DateBooked.Month.Equals(DateTime.Today.Month))
+                //initialize a list of bookings
+                List<Booking> monthlyBookings = new List<Booking>();
+
+                //initialize total income
+                double totalIncome = 0;
+
+                //loop through all bookings 
+                foreach (var booking in db.Bookings.ToList())
                 {
-                    //add the booking to the monthly booking list and increase the total income variable
-                    monthlyBookings.Add(booking);
-                    totalIncome += booking.Total;
+                    //if the booking was booked during the current month
+                    if (booking.DateBooked.Month.Equals(DateTime.Today.Month))
+                    {
+                        //add the booking to the monthly booking list and increase the total income variable
+                        monthlyBookings.Add(booking);
+                        totalIncome += booking.Total;
+                    }
                 }
+
+                //store the total income in a view bag to be displayed on the front-end
+                ViewBag.Total = totalIncome;
+
+                //return the monthly booking report with the list of bookings
+                return View(monthlyBookings);
             }
-
-            //store the total income in a view bag to be displayed on the front-end
-            ViewBag.Total = totalIncome;
-
-            //return the monthly booking report with the list of bookings
-            return View(monthlyBookings);
+            catch (Exception ex)
+            {
+                //if exception occurs, throw httpnotfound error
+                return HttpNotFound();
+            }
+            
         }
 
         /// <summary>
@@ -130,28 +166,37 @@ namespace ParkEasyV1.Controllers
         /// <returns>Turnover Report view</returns>
         public ActionResult Turnover()
         {
-            //initialize a list of bookings
-            List<Booking> turnoverBookings = new List<Booking>();
-
-            //initialize the total income variable
-            double totalIncome = 0;
-
-            //loop through bookings 
-            foreach (var booking in db.Bookings.ToList())
+            try
             {
-                //if the booking was booking this month
-                if (booking.DateBooked.Month.Equals(DateTime.Today.Month))
-                {
-                    //add the booking to the list of bookings and increase the total income
-                    turnoverBookings.Add(booking);
-                    totalIncome += booking.Total;
-                }
-            }
-            //store total income in a viewbag to be displayed on the front-end
-            ViewBag.Total = totalIncome;
+                //initialize a list of bookings
+                List<Booking> turnoverBookings = new List<Booking>();
 
-            //return the turnover bookings view with the list of bookings
-            return View(turnoverBookings);
+                //initialize the total income variable
+                double totalIncome = 0;
+
+                //loop through bookings 
+                foreach (var booking in db.Bookings.ToList())
+                {
+                    //if the booking was booking this month
+                    if (booking.DateBooked.Month.Equals(DateTime.Today.Month))
+                    {
+                        //add the booking to the list of bookings and increase the total income
+                        turnoverBookings.Add(booking);
+                        totalIncome += booking.Total;
+                    }
+                }
+                //store total income in a viewbag to be displayed on the front-end
+                ViewBag.Total = totalIncome;
+
+                //return the turnover bookings view with the list of bookings
+                return View(turnoverBookings);
+            }
+            catch (Exception ex)
+            {
+                //if exception occurs, throw httpnotfound error
+                return HttpNotFound();
+            }
+            
         }
 
     }
