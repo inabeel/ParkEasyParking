@@ -68,7 +68,7 @@
                                 <tr>
                                     <td>@Html.DisplayFor(modelItem => item.User.Email)</td>
                                     <td>
-                                        @Html.DisplayFor(modelItem => item.DateBooked)
+                                        @item.DateBooked.ToShortDateString()
                                     </td>
                                     <td>
                                         @item.Flight.DepartureDate.ToShortDateString()
@@ -88,24 +88,24 @@
                                     <td>
                                         @if (item.Invoice == null)
                                         {
-                                            <center><button class="btn btn-darkblue font-weight-bold" type="button" onclick="location.href='@Url.Action("Generate", "Invoice", new { id = item.ID})'">Generate Invoice</button></center>
+                                            @*<center><button class="btn btn-darkblue btn-sm font-weight-bold" type="button" onclick="location.href='@Url.Action("Generate", "Invoice", new { id = item.ID})'">Generate Invoice</button></center>*@
                                         }
                                         else if (item.Invoice.Status != null)
                                         {
-                                            <center><button class="btn btn-darkblue font-weight-bold" type="button" onclick="location.href='@Url.Action("View", "Invoice", new { id = item.ID})'">View Invoice</button></center>
+                                            <center><button class="btn btn-darkblue btn-sm font-weight-bold" type="button" onclick="location.href='@Url.Action("View", "Invoice", new { id = item.ID})'">Invoice</button></center>
                                         }
                                     </td>
                                     <td>
-                                        <center><button class="btn btn-darkblue font-weight-bold" type="button" onclick="location.href='@Url.Action("Edit", "Bookings", new { id = item.ID})'">View</button></center>
+                                        <center><button class="btn btn-darkblue btn-sm font-weight-bold" type="button" onclick="location.href='@Url.Action("Edit", "Bookings", new { id = item.ID})'">View</button></center>
                                     </td>
                                     <td>
-                                        <center><button class="btn btn-danger font-weight-bold" type="button" onclick="location.href='@Url.Action("Cancel", "Bookings", new { id = item.ID})'">Cancel</button></center>
+                                        <center><button class="btn btn-danger btn-sm font-weight-bold" type="button" onclick="location.href='@Url.Action("Cancel", "Bookings", new { id = item.ID})'">Cancel</button></center>
                                     </td>
                                 </tr>
                             }
                         </table>
                     </div>
-                    <button class="btn btn-darkblue font-weight-bold" type="button" onclick="location.href='@Url.Action("Manage", "Bookings")'">View All Bookings</button>
+                    <button class="btn btn-darkblue btn-sm font-weight-bold" type="button" onclick="location.href='@Url.Action("Manage", "Bookings")'">View All Bookings</button>
                 }
                 else
                 {
@@ -151,7 +151,7 @@
                                             @Html.DisplayFor(modelItem => item.BookingStatus)
                                         </td>
                                         <td>
-                                            <center><button class="btn btn-darkblue font-weight-bold" type="button" onclick="location.href='@Url.Action("Generate", "Invoice", new { id = item.ID })'">Generate Invoice</button></center>
+                                            <center><button class="btn btn-darkblue btn-sm font-weight-bold" type="button" onclick="location.href='@Url.Action("Generate", "Invoice", new { id = item.ID })'">Generate Invoice</button></center>
                                         </td>
                                     </tr>
                                 }
@@ -198,7 +198,7 @@
                                     </td>
                                     <td>@Html.DisplayFor(modelItem => item.Invoice.ExpiryDate)</td>
                                     <td>
-                                        <center><button class="btn btn-darkblue font-weight-bold" type="button" onclick="location.href='@Url.Action("View", "Invoice", new { id = item.ID })'">View Invoice</button></center>
+                                        <center><button class="btn btn-darkblue btn-sm font-weight-bold" type="button" onclick="location.href='@Url.Action("View", "Invoice", new { id = item.ID })'">View Invoice</button></center>
                                     </td>
                                 </tr>
                             }
@@ -245,16 +245,16 @@
                                     </td>
                                     <td>@Html.DisplayFor(modelItem => item.Invoice.ExpiryDate)</td>
                                     <td>
-                                        <center><button class="btn btn-darkblue font-weight-bold" type="button" onclick="location.href='@Url.Action("View", "Invoice", new { id = item.ID })'">View Invoice</button></center>
+                                        <center><button class="btn btn-darkblue btn-sm font-weight-bold" type="button" onclick="location.href='@Url.Action("View", "Invoice", new { id = item.ID })'">View Invoice</button></center>
                                     </td>
                                     <td>
                                         @if (item.BookingStatus != BookingStatus.Cancelled && item.Flight.DepartureDate >= DateTime.Now)
                                         {
-                                            <center><button class="btn btn-danger font-weight-bold" type="button" onclick="location.href='@Url.Action("Cancel", "Bookings", new { id = item.ID })'">Cancel Booking</button></center>
+                                            <center><button class="btn btn-danger btn-sm font-weight-bold" type="button" onclick="location.href='@Url.Action("Cancel", "Bookings", new { id = item.ID })'">Cancel Booking</button></center>
                                         }
                                     </td>
                                     <td>
-                                        <center><button class="btn btn-danger font-weight-bold" type="button" onclick="location.href='@Url.Action("WriteOff", "Invoice", new { id = item.ID })'">Write Off Invoice</button></center>
+                                        <center><button class="btn btn-danger btn-sm font-weight-bold" type="button" onclick="location.href='@Url.Action("WriteOff", "Invoice", new { id = item.ID })'">Write Off Invoice</button></center>
                                     </td>
                                 </tr>
                             }

@@ -195,12 +195,12 @@ namespace ParkEasyV1.Models
                 }
 
                 //Create Corporate Customer
-                if (userManager.FindByName("stevengerrard@rangersfootballclub.com") == null)
+                if (userManager.FindByName("stevengerrard@rangersrfc.com") == null)
                 {
                     var customer = new Customer
                     {
-                        UserName = "stevengerrard@rangersfootballclub.com",
-                        Email = "stevengerrard@rangersfootballclub.com",
+                        UserName = "stevengerrard@rangersrfc.com",
+                        Email = "stevengerrard@rangersrfc.com",
                         RegistrationDate = DateTime.Now,
                         EmailConfirmed = true,
                         FirstName = "Steven",
@@ -584,7 +584,7 @@ namespace ParkEasyV1.Models
             //create customer booking
             context.Bookings.Add(new Booking()
             {
-                User = userManager.FindByEmail("stevengerrard@rangersfootballclub.com"),
+                User = userManager.FindByEmail("stevengerrard@rangersrfc.com"),
                 Flight = context.Flights.Find(4),
                 ParkingSlot = context.ParkingSlots.Find(102),
                 Tariff = context.Tariffs.Find(1),
@@ -605,6 +605,173 @@ namespace ParkEasyV1.Models
             });
 
             
+            //save changes
+            context.SaveChanges();
+            BookingCheckInToday(context);
+        }
+
+        /// <summary>
+        /// Method to create and seed a booking that occurs at the current datetime and requires checked in
+        /// </summary>
+        /// <param name="context">ApplicationDbContext</param>
+        private void BookingCheckInToday(ApplicationDbContext context)
+        {
+            //create instance of user manager
+            UserManager<User> userManager = new UserManager<User>(new UserStore<User>(context));
+
+            //CREATE BOOKING TODAY
+
+            //create customer vehicle
+            context.Vehicles.Add(new Vehicle()
+            {
+                ID = 5,
+                RegistrationNumber = "GTR19A",
+                Make = "Audi",
+                Model = "TT",
+                Colour = "White",
+                NoOfPassengers = 2
+            });
+
+            //create customer flight
+            context.Flights.Add(new Flight()
+            {
+                ID = 5,
+                DepartureFlightNo = "LAX72",
+                DepartureTime = new TimeSpan(09, 00, 00),
+                ReturnFlightNo = "LAX71",
+                ReturnFlightTime = new TimeSpan(10, 00, 00),
+                DepartureDate = DateTime.Today,
+                ReturnDate = DateTime.Today.AddDays(7),
+                DestinationAirport = "LA X"
+            });
+
+            //get the previously inserted flight from database
+            Flight flight = context.Flights.Find(5);
+            //get the tariff from database
+            Tariff tariff = context.Tariffs.Find(1);
+            //calculate booking duration
+            TimeSpan duration = flight.ReturnDate - flight.DepartureDate;
+            //calculate the booking cost
+            double price = tariff.Amount * Convert.ToInt32(duration.TotalDays) + 20;
+
+            //create customer booking
+            context.Bookings.Add(new Booking()
+            {
+                User = userManager.FindByEmail("john@gmail.com"),
+                Flight = context.Flights.Find(5),
+                ParkingSlot = context.ParkingSlots.Find(2),
+                Tariff = context.Tariffs.Find(1),
+
+                DateBooked = DateTime.Now,
+                Duration = Convert.ToInt32(duration.TotalDays),
+                Total = price,
+                BookingStatus = BookingStatus.Confirmed,
+                ValetService = true,
+                CheckedIn = false,
+                CheckedOut = false,
+
+                //add booking lines
+                BookingLines = new List<BookingLine>()
+                {
+                    new BookingLine() {Booking = context.Bookings.Find(5), Vehicle = context.Vehicles.Find(5)},
+                },
+            });
+
+            //find the parking slot allocated to the booking
+            ParkingSlot slot = context.ParkingSlots.Find(2);
+
+            //create customer payment
+            context.Payments.Add(new Cash()
+            {
+                User = userManager.FindByEmail("john@gmail.com"),
+                PaymentDate = DateTime.Now,
+                Amount = price,
+            });
+
+            //save changes
+            context.SaveChanges();
+            BookingCheckOutToday(context);
+        }
+
+        /// <summary>
+        /// Method to create and seed a booking that is ending today and requires checked out
+        /// </summary>
+        /// <param name="context">ApplicationDbContext</param>
+        private void BookingCheckOutToday(ApplicationDbContext context)
+        {
+            //create instance of user manager
+            UserManager<User> userManager = new UserManager<User>(new UserStore<User>(context));
+
+            //CREATE BOOKING TODAY
+
+            //create customer vehicle
+            context.Vehicles.Add(new Vehicle()
+            {
+                ID = 6,
+                RegistrationNumber = "J0HN1",
+                Make = "Mercedes",
+                Model = "A-Class",
+                Colour = "Silver",
+                NoOfPassengers = 2
+            });
+
+            //create customer flight
+            context.Flights.Add(new Flight()
+            {
+                ID = 6,
+                DepartureFlightNo = "LON70",
+                DepartureTime = new TimeSpan(09, 00, 00),
+                ReturnFlightNo = "LON71",
+                ReturnFlightTime = new TimeSpan(10, 00, 00),
+                DepartureDate = DateTime.Today.AddDays(-7),
+                ReturnDate = DateTime.Today,
+                DestinationAirport = "London Heathrow"
+            });
+
+            //get the previously inserted flight from database
+            Flight flight = context.Flights.Find(6);
+            //get the tariff from database
+            Tariff tariff = context.Tariffs.Find(1);
+            //calculate booking duration
+            TimeSpan duration = flight.ReturnDate - flight.DepartureDate;
+            //calculate the booking cost
+            double price = tariff.Amount * Convert.ToInt32(duration.TotalDays) + 20;
+
+            //create customer booking
+            context.Bookings.Add(new Booking()
+            {
+                User = userManager.FindByEmail("john@gmail.com"),
+                Flight = context.Flights.Find(6),
+                ParkingSlot = context.ParkingSlots.Find(3),
+                Tariff = context.Tariffs.Find(1),
+
+                DateBooked = DateTime.Now,
+                Duration = Convert.ToInt32(duration.TotalDays),
+                Total = price,
+                BookingStatus = BookingStatus.Confirmed,
+                ValetService = true,
+                CheckedIn = true,
+                CheckedOut = false,
+
+                //add booking lines
+                BookingLines = new List<BookingLine>()
+                {
+                    new BookingLine() {Booking = context.Bookings.Find(6), Vehicle = context.Vehicles.Find(6)},
+                },
+            });
+
+            //find the parking slot allocated to the booking
+            ParkingSlot slot = context.ParkingSlots.Find(3);
+            slot.Status = Status.Occupied;
+
+            //create customer payment
+            context.Payments.Add(new Cash()
+            {
+                User = userManager.FindByEmail("john@gmail.com"),
+                PaymentDate = DateTime.Now,
+                Amount = price,
+            });
+
             //save changes
             context.SaveChanges();
         }

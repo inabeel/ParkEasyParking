@@ -365,6 +365,13 @@ namespace ParkEasyV1.Models
         /// <returns></returns>
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
+            //check if attribute value is null
+            if (value == null)
+            {
+                //return validation result error
+                return new ValidationResult(FormatErrorMessage("Error"));
+            }
+
             DateTime earlierDate = (DateTime)value;
 
             DateTime laterDate = (DateTime)validationContext.ObjectType.GetProperty(DateToCompareToFieldName).GetValue(validationContext.ObjectInstance, null);
@@ -405,6 +412,13 @@ namespace ParkEasyV1.Models
         protected override ValidationResult IsValid(object objValue,
                                                        ValidationContext validationContext)
         {
+            //check if attribute value is null
+            if (objValue==null)
+            {
+                //return validation error
+                return new ValidationResult(FormatErrorMessage("Error"));
+            }
+
             var dateValue = objValue as DateTime? ?? new DateTime();
 
             //alter this as needed. I am doing the date comparison if the value is not null

@@ -370,23 +370,29 @@ namespace ParkEasyV1.Controllers
                 return HttpNotFound();
             }
 
-            //create a variable to hold the result of the date comparison between the booking departure date and the current date
-            int dateCompareResult = DateTime.Compare(booking.Flight.DepartureDate.AddHours(-24), DateTime.Now);
+            //if booking start date is later than or equal to the current date
+            //run datecomparison code to check if booking can be amended for free or not
+            if (booking.Flight.DepartureDate > DateTime.Now || booking.Flight.DepartureDate.Day == DateTime.Now.Day)
+            {
+                //create a variable to hold the result of the date comparison between the booking departure date and the current date
+                int dateCompareResult = DateTime.Compare(booking.Flight.DepartureDate.AddHours(-24), DateTime.Now);
 
-            //if the date compare result is more than 0
-            if (dateCompareResult > 0)
-            {
-                //the booking is outside the 24 hour booking amendment period
-                //store message in ViewBag to be displayed on the front-end
-                ViewBag.Message = "You will not be charged for any amendments to this booking.";
+                //if the date compare result is more than 0
+                if (dateCompareResult > 0)
+                {
+                    //the booking is outside the 24 hour booking amendment period
+                    //store message in ViewBag to be displayed on the front-end
+                    ViewBag.Message = "You will not be charged for any amendments to this booking.";
+                }
+                //if the date compare result is less than or equal to 0
+                else if (dateCompareResult <= 0)
+                {
+                    //the booking is inside the 24 hour booking amendment period
+                    //store message in ViewBag to be displayed on the front-end
+                    ViewBag.Message = "Any amendmends made to this booking will result in an admin charge to be paid on arrival.";
+                }
             }
-            //if the date compare result is less than or equal to 0
-            else if (dateCompareResult <= 0)
-            {
-                //the booking is inside the 24 hour booking amendment period
-                //store message in ViewBag to be displayed on the front-end
-                ViewBag.Message = "Any amendmends made to this booking will result in an admin charge to be paid on arrival.";
-            }
+            
 
             //find the vehicle attached to the booking via bookingline
            Vehicle vehicle = db.Vehicles.Find(booking.BookingLines.First().VehicleID);
@@ -771,6 +777,15 @@ namespace ParkEasyV1.Controllers
             {
                 try
                 {
+                    //VALIDATION TO CHECK BOOKINGS TODAY ARE BOOKED AT LEAST 1 HOUR IN ADVANCE
+                    //check if booking departure date is today and departure time is at least 1 hour ahead of the current time
+                    //if (model.DepartureDate.Equals(DateTime.Today) && model.DepartureTime < new TimeSpan(DateTime.Today.Hour, DateTime.Today.Minute, 0).Add(new TimeSpan(1, 0, 0)))
+                    //{
+                    //    //set error message and return view
+                    //    TempData["UnAvailable"] = "Error: The departure time for booking today must be at least 1 hour in advance minimum.";
+                    //    return View(model);
+                    //}
+
                     //create a TimeRange from the selected departure/return date and time in model
                     TimeRange selectedTimeRange = new TimeRange(
                     new DateTime(model.DepartureDate.Year, model.DepartureDate.Month, model.DepartureDate.Day, model.DepartureTime.Hours, model.DepartureTime.Minutes, 0),
@@ -782,7 +797,7 @@ namespace ParkEasyV1.Controllers
                     //if the number of unavailable parking slots DOES NOT equal 150 (150 is the total number of parking spaces)
                     //then a parking slot is available during this time period
                     //!=1 for testing
-                    if (unavailableSlots != 1)
+                    if (unavailableSlots != 150)
                     {
                         //update availability message, store the model and return the availability view
                         TempData["Available"] = "Booking Available!";
@@ -824,7 +839,8 @@ namespace ParkEasyV1.Controllers
 
                 //loop through all parking slots
                 //remove where clause for live version
-                foreach (var slot in db.ParkingSlots.Where(s => s.ID == 102).ToList())
+                //foreach (var slot in db.ParkingSlots.Where(s => s.ID == 102).ToList())
+                foreach(var slot in db.ParkingSlots.ToList())
                 {
                     //loop through all bookings associated with parking slot
                     foreach (var booking in slot.Bookings.ToList())

@@ -76,23 +76,23 @@
                                         </td>
                                         <td>@Html.DisplayFor(modelItem => item.Flight.ReturnFlightTime)</td>
                                         <td>
-                                            <center><button class="btn btn-darkblue font-weight-bold" type="button" onclick="location.href='@Url.Action("Edit", "Bookings", new { id = item.ID})'">View</button></center>
+                                            <center><button class="btn btn-darkblue btn-sm font-weight-bold" type="button" onclick="location.href='@Url.Action("Edit", "Bookings", new { id = item.ID})'">View</button></center>
                                         </td>
                                         <td>
-                                            <center><button class="btn btn-darkblue font-weight-bold" type="button" onclick="location.href='@Url.Action("CheckOut", "Bookings", new { id = item.ID})'">Check Out</button></center>
+                                            <center><button class="btn btn-darkblue btn-sm font-weight-bold" type="button" onclick="location.href='@Url.Action("CheckOut", "Bookings", new { id = item.ID})'">Check Out</button></center>
                                         </td>
                                         <td>
-                                            <center><button class="btn btn-danger font-weight-bold" type="button" onclick="location.href='@Url.Action("Cancel", "Bookings", new { id = item.ID})'">Cancel</button></center>
+                                            <center><button class="btn btn-danger btn-sm font-weight-bold" type="button" onclick="location.href='@Url.Action("Cancel", "Bookings", new { id = item.ID})'">Cancel</button></center>
                                         </td>
                                         <td>
-                                            <center><button class="btn btn-darkblue font-weight-bold" type="button" onclick="location.href='@Url.Action("Delay", "Bookings", new { id = item.ID})'">Delayed</button></center>
+                                            <center><button class="btn btn-darkblue btn-sm font-weight-bold" type="button" onclick="location.href='@Url.Action("Delay", "Bookings", new { id = item.ID})'">Delayed</button></center>
                                         </td>
                                     </tr>
                                 }
                             }
                         </table>
                     </div>
-                    <button class="btn btn-darkblue font-weight-bold" type="button" onclick="location.href='@Url.Action("Manage", "Bookings")'">View All Bookings</button>
+                    <button class="btn btn-darkblue btn-sm font-weight-bold" type="button" onclick="location.href='@Url.Action("Manage", "Bookings")'">View All Bookings</button>
                 }
                 else
                 {

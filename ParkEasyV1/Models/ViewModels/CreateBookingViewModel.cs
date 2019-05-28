@@ -164,6 +164,7 @@ namespace ParkEasyV1.Models.ViewModels
             /// number of passengers travelling
             /// </summary>
             [Required]
+            [RegularExpression("(.*[1-9].*)|(.*[.].*[1-9].*)", ErrorMessage ="Number of passengers cannot be 0")]
             [Display(Name ="Number of Passengers")]
             public int NoOfPassengers { get; set; }
 
