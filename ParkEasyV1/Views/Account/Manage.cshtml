@@ -7,7 +7,7 @@
 <div class="container body-content">
     <h2 class="col-md-10 my-3">My Details</h2>
 
-    @using (Html.BeginForm())
+    @using (Html.BeginForm("ManageDetails", "Account", new { id=Model.Id},FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
     {
         @Html.AntiForgeryToken()
 

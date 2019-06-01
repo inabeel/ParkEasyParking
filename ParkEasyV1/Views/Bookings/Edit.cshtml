@@ -29,6 +29,13 @@
     {
         @Html.AntiForgeryToken()
         @Html.HiddenFor(model => model.BookingID)
+        @Html.HiddenFor(model=> model.DepartureDate)
+        @Html.HiddenFor(model => model.DepartureTime)
+        @Html.HiddenFor(model => model.ReturnDate)
+        @Html.HiddenFor(model => model.ReturnTime)
+        @Html.HiddenFor(model => model.Duration)
+        @Html.HiddenFor(model => model.Total)
+        @Html.HiddenFor(model => model.Valet)
 
         <div class="row" style="padding-bottom: 20px;">
             <div class="col-md-3">

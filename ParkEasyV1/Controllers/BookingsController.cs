@@ -277,8 +277,8 @@ namespace ParkEasyV1.Controllers
                     //set the overlap counter to 0
                     int overlapCounter = 0;
 
-                    //loop through all bookings associated with parking slot
-                    foreach (var slotBooking in slot.Bookings.ToList())
+                    //loop through all bookings associated with parking slot (excluding cancelled bookings)
+                    foreach (var slotBooking in slot.Bookings.Where(b=>b.BookingStatus!=BookingStatus.Cancelled).ToList())
                     {
                         //create a TimeRange variable to hold the range of dates of the booking
                         TimeRange bookingRange = new TimeRange(
@@ -437,7 +437,7 @@ namespace ParkEasyV1.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
-        public ActionResult Edit(ViewBookingViewModel model)
+        public ActionResult Edit([Bind(Include = "BookingID, DepartureDate, DepartureTime, ReturnDate, ReturnTime, Duration, Total, Valet, FirstName, Surname, AddressLine1, AddressLine2, City, Postcode, Email, PhoneNo, VehicleMake, VehicleModel, VehicleColour, VehicleRegistration, NoOfPassengers, Status")]ViewBookingViewModel model)
         {
             //check if model state is valid
             if (ModelState.IsValid)
@@ -451,9 +451,9 @@ namespace ParkEasyV1.Controllers
                     Vehicle vehicle = db.Vehicles.Find(booking.BookingLines.First().VehicleID);
 
                     //check if the booking departure date is later than the current date - 24hours and departure date is earlier than the current date
-                    if (booking.Flight.DepartureDate > DateTime.Now.AddHours(-24) && booking.Flight.DepartureDate <= DateTime.Now)
+                    if (DateTime.Now <= booking.Flight.DepartureDate.AddHours(-24))
                     {
-                        //update booking
+                        ////update booking
                         booking.User.FirstName = model.FirstName;
                         booking.User.LastName = model.Surname;
                         booking.User.AddressLine1 = model.AddressLine1;
@@ -467,8 +467,9 @@ namespace ParkEasyV1.Controllers
                         vehicle.RegistrationNumber = model.VehicleRegistration;
                         vehicle.NoOfPassengers = model.NoOfPassengers;
 
-                        //save changes
+                        ////save changes
                         db.SaveChanges();
+
 
                         //store success message in tempdata
                         TempData["Success"] = "Booking Successfully Updated";
@@ -842,8 +843,8 @@ namespace ParkEasyV1.Controllers
                 //foreach (var slot in db.ParkingSlots.Where(s => s.ID == 102).ToList())
                 foreach(var slot in db.ParkingSlots.ToList())
                 {
-                    //loop through all bookings associated with parking slot
-                    foreach (var booking in slot.Bookings.ToList())
+                    //loop through all bookings associated with parking slot (excluding cancelled bookings)
+                    foreach (var booking in slot.Bookings.Where(b=>b.BookingStatus!=BookingStatus.Cancelled).ToList())
                     {
                         //create a TimeRange variable to hold the range of dates of the booking
                         TimeRange bookingRange = new TimeRange(
@@ -1000,9 +1001,30 @@ namespace ParkEasyV1.Controllers
                 //save database changes
                 db.SaveChanges();
 
-                //update success message and return to manage bookings view
-                TempData["Success"] = "Booking Delay Successfully Updated";
-                return RedirectToAction("Manage");
+                //get the new TimeRange for the booking
+                TimeRange selectedTimeRange = new TimeRange(
+                new DateTime(booking.Flight.DepartureDate.Year, booking.Flight.DepartureDate.Month, booking.Flight.DepartureDate.Day, booking.Flight.DepartureTime.Hours, booking.Flight.DepartureTime.Minutes, 0),
+                new DateTime(booking.Flight.ReturnDate.Year, booking.Flight.ReturnDate.Month, booking.Flight.ReturnDate.Day, booking.Flight.ReturnFlightTime.Hours, booking.Flight.ReturnFlightTime.Minutes, 0));
+
+                //if the next available slot does not equal 0 (if next available slot = 0 then no slot is available)
+                if (FindAvailableParkingSlot(selectedTimeRange)!=0)
+                {
+                    //assign the booking a new parking slot
+                    booking.ParkingSlot = db.ParkingSlots.Find(FindAvailableParkingSlot(selectedTimeRange));
+                    db.SaveChanges();
+
+                    //update success message and return to manage bookings view
+                    TempData["Success"] = "Booking Delay Successfully Updated";
+                    return RedirectToAction("Manage");
+                }
+                else
+                {
+                    //display error message
+                    TempData["Error"] = "Booking could not be delayed as no parking slots are available";
+                    return RedirectToAction("Manage");
+                }
+
+                
             }
             catch (Exception ex)
             {

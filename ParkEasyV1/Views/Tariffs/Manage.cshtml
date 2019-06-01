@@ -50,7 +50,6 @@
                             <th>Tariff Type</th>
                             <th>Charge</th>
                             <th></th>
-                            <th></th>
                         </tr>
 
                         @foreach (var item in Model)
@@ -63,14 +62,10 @@
                                 <td>
                                     <center><button class="btn btn-darkblue font-weight-bold" type="button" onclick="location.href='@Url.Action("Edit", "Tariffs", new { id = item.ID})'">Update</button></center>
                                 </td>
-                                <td>
-                                    <center><button class="btn btn-danger font-weight-bold" type="button" onclick="location.href='@Url.Action("Delete", "Tariffs", new { id = item.ID})'">Delete</button></center>
-                                </td>
                             </tr>
                         }
                     </table>
-                </div>
-                <button class="btn btn-darkblue font-weight-bold" type="button" onclick="location.href='@Url.Action("Create", "Tariffs")'">Add New Tariff</button>
+                </div>                
             </div>
             <!-- /.col-lg-9 -->
         </div>

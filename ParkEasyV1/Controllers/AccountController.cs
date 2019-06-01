@@ -543,6 +543,7 @@ namespace ParkEasyV1.Controllers
             //return view with new view model and user details
             return View("Manage", (new ManageDetailsViewModel
             {
+                Id = user.Id,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 AddressLine1 = user.AddressLine1,
@@ -564,14 +565,14 @@ namespace ParkEasyV1.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
-        public async Task<ActionResult> Manage(string id, [Bind(Include = "Email, FirstName, LastName, AddressLine1, AddressLine2, City, Postcode, PhoneNo")] ManageDetailsViewModel model)
+        public async Task<ActionResult> ManageDetails(string id, [Bind(Include = "Email, FirstName, LastName, AddressLine1, AddressLine2, City, Postcode, PhoneNo")] ManageDetailsViewModel model)
         {
             //if model is valid
             if (ModelState.IsValid)
             {
                 //find staff by id
                 User user = await UserManager.FindByIdAsync(id);
-                UpdateModel(user); //update staff model
+                UpdateModel(user); //update user model
 
                 //get result for update staff
                 IdentityResult result = await UserManager.UpdateAsync(user);
@@ -580,7 +581,7 @@ namespace ParkEasyV1.Controllers
                 if (result.Succeeded)
                 {
                     //success message and redirect
-                    TempData["Success"] = "Staff member Successfully Edited";
+                    TempData["Success"] = "Details successfully updated";
                     return RedirectToAction("Index", "Users");
                 }
                 AddErrors(result);

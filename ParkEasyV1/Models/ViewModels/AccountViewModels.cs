@@ -437,6 +437,11 @@ namespace ParkEasyV1.Models
     public class ManageDetailsViewModel
     {
         /// <summary>
+        /// user id
+        /// </summary>
+        public string Id { get; set; }
+
+        /// <summary>
         /// user first name
         /// </summary>
         [Required]
