@@ -14,6 +14,8 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Twilio.Clients;
 using Twilio;
+using Twilio.Rest.Api.V2010.Account;
+using Twilio.Types;
 
 namespace ParkEasyV1.Models
 {
@@ -138,6 +140,31 @@ namespace ParkEasyV1.Models
             //send the message
             msg.AddTo(new EmailAddress(User.Email));
             var response = client.SendEmailAsync(msg);
+        }
+
+        /// <summary>
+        /// Method to send an SMS verification - CURRENTLY DISABLED SEE ERROR LOG   
+        /// </summary>
+        public void SMSConfirmation()
+        {
+            //check if user phone number is null
+            if (User.PhoneNumber!=null)
+            {
+                 // Twilio Begin
+                var accountSid = ConfigurationManager.AppSettings["SMSAccountIdentification"];
+                var authToken = ConfigurationManager.AppSettings["SMSAccountPassword"];
+                var fromNumber = ConfigurationManager.AppSettings["SMSAccountFrom"];
+
+                //initialize twilio
+                TwilioClient.Init(accountSid, authToken);
+
+                //create and send sms message
+                MessageResource result = MessageResource.Create(
+                new PhoneNumber(User.PhoneNumber),
+                from: new PhoneNumber(fromNumber),
+                body: "Your booking with ParkEasy Airport Parking has been confirmed. Your booking number is " + ID + "."
+                );
+            }            
         }
     }
 

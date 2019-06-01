@@ -163,6 +163,10 @@ namespace ParkEasyV1.Controllers
                 //email booking confirmation
                 booking.EmailConfirmation();
 
+                //send sms confirmation
+                //SMS CONFIRMATION CURRENTLY DISABLED - SEE ERROR LOG DOCUMENTATION FOR MORE DETAILS
+                //booking.SMSConfirmation();
+
                 //redirect to booking confirmation
                 return RedirectToAction("Confirmation", "Bookings", new { id=booking.ID});
             }
