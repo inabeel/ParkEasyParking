@@ -4,6 +4,36 @@
     ViewBag.Title = "Check Availability";
 }
 
+<link href="~/Content/themes/base/jquery-ui.min.css" rel="stylesheet" />
+@section scripts{
+
+    <script src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
+
+    <script>
+        $(function () {
+            $("#DepartureDate").datepicker({
+                dateFormat: "dd/mm/yy",
+                changeMonth: true,
+                changeYear: true,
+                minDate: -0,
+                maxDate: "+12M +0D",
+            });
+        });
+    </script>
+    <script>
+        $(function () {
+            $("#ReturnDate").datepicker({
+                dateFormat: "dd/mm/yy",
+                changeMonth: true,
+                changeYear: true,
+                minDate: -0,
+                maxDate: "+12M +0D"
+
+            });
+        });
+    </script>
+}
+
 <div class="container body-content" style="padding-bottom: 400px;">
     <h3 class="text-center my-3">Check Availability</h3>
 
@@ -16,7 +46,7 @@
                 <div class="form-group">
                     @Html.LabelFor(model => model.DepartureDate, htmlAttributes: new { @class = "control-label col-md-8" })
                     <div class="col-md-10">
-                        @Html.EditorFor(model => model.DepartureDate, new { htmlAttributes = new { @class = "form-control", @id = "departure_date" } })
+                        @Html.TextBoxFor(model => model.DepartureDate, new { @class = "form-control", @placeholder = "dd/mm/yyyy" } )
                         @Html.ValidationMessageFor(model => model.DepartureDate, "", new { @class = "text-danger" })
                     </div>
                 </div>
@@ -34,7 +64,7 @@
                 <div class="form-group">
                     @Html.LabelFor(model => model.ReturnDate, htmlAttributes: new { @class = "control-label col-md-6" })
                     <div class="col-md-10">
-                        @Html.EditorFor(model => model.ReturnDate, new { htmlAttributes = new { @class = "form-control", @id = "return_date" } })
+                        @Html.TextBoxFor(model => model.ReturnDate, new { @class = "form-control", @placeholder="dd/mm/yyyy" } )
                         @Html.ValidationMessageFor(model => model.ReturnDate, "", new { @class = "text-danger" })
                     </div>
                 </div>
@@ -60,8 +90,8 @@
 
     @if (TempData["Available"] != null)
     {
-        
-        
+
+
         <center>
             <div class="alert alert-success col-md-6 my-4" role="alert">
                 <i class="far fa-calendar-check"></i> @TempData["Available"] <br>
@@ -79,4 +109,6 @@
         </center>
     }
 </div>
+
+
 

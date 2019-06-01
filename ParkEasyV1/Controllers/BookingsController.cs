@@ -175,7 +175,7 @@ namespace ParkEasyV1.Controllers
                             RegistrationNumber = model.VehicleRegistration,
                             Make = model.VehicleMake,
                             Model = model.VehicleModel,
-                            Colour = model.VehicleModel,
+                            Colour = model.VehicleColour,
                             NoOfPassengers = model.NoOfPassengers
                         });
 

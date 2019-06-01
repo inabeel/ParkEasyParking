@@ -6,6 +6,36 @@
     ViewBag.Title = "Make a Booking";
 }
 
+<link href="~/Content/themes/base/jquery-ui.min.css" rel="stylesheet" />
+@section scripts{
+
+    <script src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
+
+    <script>
+        $(function () {
+            $("#DepartureDate").datepicker({
+                dateFormat: "dd/mm/yy",
+                changeMonth: true,
+                changeYear: true,
+                minDate: -0,
+                maxDate: "+12M +0D",
+            });
+        });
+    </script>
+    <script>
+        $(function () {
+            $("#ReturnDate").datepicker({
+                dateFormat: "dd/mm/yy",
+                changeMonth: true,
+                changeYear: true,
+                minDate: -0,
+                maxDate: "+12M +0D"
+
+            });
+        });
+    </script>
+}
+
 <div class="container body-content">
     <h2 class="text-center" style="margin-top: 20px; margin-bottom: 30px;">Make a Booking</h2>
 
@@ -27,7 +57,7 @@
                 <div class="form-group">
                     @Html.LabelFor(model => model.DepartureDate, htmlAttributes: new { @class = "control-label col-md-8" })
                     <div class="col-md-10">
-                        @Html.EditorFor(model => model.DepartureDate, new { htmlAttributes = new { @class = "form-control", @id = "departure_date" } })
+                        @Html.TextBoxFor(model => model.DepartureDate, "{0:dd/MM/yyyy}", new { @class = "form-control", @placeholder="dd/mm/yyyy" } )
                         @Html.ValidationMessageFor(model => model.DepartureDate, "", new { @class = "text-danger" })
                     </div>
                 </div>
@@ -45,7 +75,7 @@
                 <div class="form-group">
                     @Html.LabelFor(model => model.ReturnDate, htmlAttributes: new { @class = "control-label col-md-6" })
                     <div class="col-md-10">
-                        @Html.EditorFor(model => model.ReturnDate, new { htmlAttributes = new { @class = "form-control", @id = "return_date" } })
+                        @Html.TextBoxFor(model => model.ReturnDate, "{0:dd/MM/yyyy}", new { @class = "form-control", @placeholder="dd/mm/yyyy" } )
                         @Html.ValidationMessageFor(model => model.ReturnDate, "", new { @class = "text-danger" })
                     </div>
                 </div>
@@ -194,8 +224,8 @@
         </div>
 
         @*<div class="row col-md-6">
-            &nbsp;<h4>Total: </h4>&nbsp;<h4 class="text-darkblue font-weight-bold" id="total">£0.00</h4>
-        </div>*@
+                &nbsp;<h4>Total: </h4>&nbsp;<h4 class="text-darkblue font-weight-bold" id="total">£0.00</h4>
+            </div>*@
         <div class="row col-md-6">
             <div class="checkbox" style="padding-bottom: 10px;">
                 <div class="col-md-4" style="display: inline;">

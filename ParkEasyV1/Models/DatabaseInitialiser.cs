@@ -742,7 +742,7 @@ namespace ParkEasyV1.Models
             {
                 User = userManager.FindByEmail("john@gmail.com"),
                 Flight = context.Flights.Find(6),
-                ParkingSlot = context.ParkingSlots.Find(6),
+                ParkingSlot = context.ParkingSlots.Find(13),
                 Tariff = context.Tariffs.Find(1),
 
                 DateBooked = DateTime.Now,
@@ -761,7 +761,7 @@ namespace ParkEasyV1.Models
             });
 
             //find the parking slot allocated to the booking
-            ParkingSlot slot = context.ParkingSlots.Find(6);
+            ParkingSlot slot = context.ParkingSlots.Find(13);
             slot.Status = Status.Occupied;
 
             //create customer payment
