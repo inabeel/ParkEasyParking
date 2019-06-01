@@ -7,9 +7,11 @@
 }
 
 <link href="~/Content/themes/base/jquery-ui.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.css">
 @section scripts{
 
     <script src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.js"></script>
 
     <script>
         $(function () {
@@ -32,6 +34,32 @@
                 maxDate: "+12M +0D"
 
             });
+        });
+    </script>
+
+    <script>
+        $("#DepartureTime").timepicker({
+            timeFormat: 'HH:mm',
+            interval: 60,
+            minTime: '00:00',
+            maxTime: '23:00',
+            startTime: '00:00',
+            dynamic: false,
+            dropdown: true,
+            scrollbar: true
+        });
+    </script>
+
+    <script>
+        $("#ReturnTime").timepicker({
+            timeFormat: 'HH:mm',
+            interval: 60,
+            minTime: '00:00',
+            maxTime: '23:00',
+            startTime: '00:00',
+            dynamic: false,
+            dropdown: true,
+            scrollbar: true
         });
     </script>
 }
@@ -57,7 +85,7 @@
                 <div class="form-group">
                     @Html.LabelFor(model => model.DepartureDate, htmlAttributes: new { @class = "control-label col-md-8" })
                     <div class="col-md-10">
-                        @Html.TextBoxFor(model => model.DepartureDate, "{0:dd/MM/yyyy}", new { @class = "form-control", @placeholder="dd/mm/yyyy" } )
+                        @Html.TextBoxFor(model => model.DepartureDate, "{0:dd/MM/yyyy}", new { @class = "form-control", @placeholder = "dd/mm/yyyy" })
                         @Html.ValidationMessageFor(model => model.DepartureDate, "", new { @class = "text-danger" })
                     </div>
                 </div>
@@ -66,7 +94,7 @@
                 <div class="form-group">
                     @Html.LabelFor(model => model.DepartureTime, htmlAttributes: new { @class = "control-label col-md-8" })
                     <div class="col-md-10">
-                        @Html.EditorFor(model => model.DepartureTime, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.TextBoxFor(model => model.DepartureTime, new { @class = "form-control" } )
                         @Html.ValidationMessageFor(model => model.DepartureTime, "", new { @class = "text-danger" })
                     </div>
                 </div>
@@ -75,7 +103,7 @@
                 <div class="form-group">
                     @Html.LabelFor(model => model.ReturnDate, htmlAttributes: new { @class = "control-label col-md-6" })
                     <div class="col-md-10">
-                        @Html.TextBoxFor(model => model.ReturnDate, "{0:dd/MM/yyyy}", new { @class = "form-control", @placeholder="dd/mm/yyyy" } )
+                        @Html.TextBoxFor(model => model.ReturnDate, "{0:dd/MM/yyyy}", new { @class = "form-control", @placeholder = "dd/mm/yyyy" })
                         @Html.ValidationMessageFor(model => model.ReturnDate, "", new { @class = "text-danger" })
                     </div>
                 </div>
@@ -84,7 +112,7 @@
                 <div class="form-group">
                     @Html.LabelFor(model => model.ReturnTime, htmlAttributes: new { @class = "control-label col-md-6" })
                     <div class="col-md-10">
-                        @Html.EditorFor(model => model.ReturnTime, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.TextBoxFor(model => model.ReturnTime, new { @class = "form-control" } )
                         @Html.ValidationMessageFor(model => model.ReturnTime, "", new { @class = "text-danger" })
                     </div>
                 </div>
