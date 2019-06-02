@@ -1,0 +1,42 @@
+﻿
+@{
+    ViewBag.Title = "Sitemap";
+}
+
+<div class="container body-content" style="padding-bottom: 400px;">
+    <h2 class="text-center">Sitemap</h2>
+
+    <div class="row my-3">
+        <div class="col-md-4">
+        <center><i class="fas fa-redo-alt my-2"></i></center>
+            <div class="thinborder text-center">
+                <h5 class="text-center">Homepage</h5>
+                @Html.ActionLink("ParkEasy Airport Parking Homepage", "Index")
+            </div>
+        </div>
+        <div class="col-md-4">
+            <center><i class="fas fa-calendar-alt my-2"></i></center>
+            <div class="thinborder text-center">
+                <h5 class="text-center">Booking</h5>
+                @Html.ActionLink("Check Availability", "Availability", "Bookings") <br />
+                @Html.ActionLink("Place Booking", "Create", "Bookings") <br />
+                @Html.ActionLink("Manage Booking", "MyBookings", "Users")
+            </div>
+        </div>
+        <div class="col-md-4">
+            <center><i class="fas fa-info-circle my-2"></i></center>
+            <div class="thinborder text-center">
+                <h5 class="text-center">Information</h5>
+                @Html.ActionLink("About Us", "About") <br />
+                @Html.ActionLink("Accessibility", "Accessibility") <br />
+                @Html.ActionLink("Contact Us", "Contact") <br />
+                @Html.ActionLink("FAQs", "FAQs") <br />
+                @Html.ActionLink("Prices", "Prices") <br />
+                @Html.ActionLink("Services", "Services") <br />
+                @Html.ActionLink("Sitemap", "Sitemap") <br />
+                @Html.ActionLink("Terms of Service", "ToS")
+            </div>
+        </div>
+    </div>
+</div>
+
