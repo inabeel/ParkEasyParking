@@ -10,8 +10,9 @@ namespace ParkEasyV1.Models
 {
     /// <summary>
     /// Class used to initialize the database and seed data using the DropCreateDatabaseAlways method for testing
+    /// Updated: Using DropCreatDatabaseIfModelChanges for live version
     /// </summary>
-    public class DatabaseInitialiser : DropCreateDatabaseAlways<ApplicationDbContext>
+    public class DatabaseInitialiser : DropCreateDatabaseIfModelChanges<ApplicationDbContext>
     {
         /// <summary>
         /// Override Seed method to seed the database with values
