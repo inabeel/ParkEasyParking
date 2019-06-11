@@ -47,21 +47,21 @@ namespace ParkEasyV1
 
             // Uncomment the following lines to enable logging in with third party login providers
             app.UseMicrosoftAccountAuthentication(
-                clientId: "***REMOVED***",
-                clientSecret: "***REMOVED***");
+                clientId: "**REMOVED**",
+                clientSecret: "**REMOVED**");
 
             //app.UseTwitterAuthentication(
             //   consumerKey: "",
             //   consumerSecret: "");
 
             app.UseFacebookAuthentication(
-               appId: "***REMOVED***",
-               appSecret: "***REMOVED***");
+               appId: "**REMOVED**",
+               appSecret: "**REMOVED**");
 
             app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions()
             {
-                ClientId = "***REMOVED***",
-                ClientSecret = "***REMOVED***"
+                ClientId = "**REMOVED**",
+                ClientSecret = "**REMOVED**"
             });
         }
     }
