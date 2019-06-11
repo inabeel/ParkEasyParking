@@ -9,3 +9,12 @@ ParkEasy is situated four miles from Glasgow Airport. Air travellers leave their
 The bookings system was computerised three years ago. Last year there was a major expansion of the parking area and the company now need to upgrade the single PC into a small network which will incorporate the allocation of a parking slot. Currently all parking data is stored on a wall chart.
 
 The new system must incorporate a visual interface which provides fast access to bookings and availability of car slots. New services to be offered will include car valeting and car servicing.
+
+## How To Run
+
+- Download a copy of the project and extract it from the ZIP folder
+- Launch the `ParkEasyV1.sln` file in Visual Studio
+- In Visual Studio, go to Build>Clean ParkEasyV1 and then Build>Rebuild ParkEasyV1
+- Launch the solution using the green play button
+
+**Note:** All external API keys have been removed from this project for security purposes, and for that reason some features of the project will not function correctly. 
