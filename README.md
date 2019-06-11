@@ -18,3 +18,30 @@ The new system must incorporate a visual interface which provides fast access to
 - Launch the solution using the green play button
 
 **Note:** All external API keys have been removed from this project for security purposes, and for that reason some features of the project will not function correctly. 
+
+### Test Logins
+
+#### Admin
+
+Username: admin@parkeasy.co.uk <br>
+Password: admin123
+
+#### Manager
+
+Username: manager@parkeasy.co.uk <br>
+Password: manager
+
+#### Invoice Clerk
+
+Username: invoiceclerk@parkeasy.co.uk <br>
+Password: invoiceclerk
+
+#### Booking Clerk
+
+Username: bookingclerk@parkeasy.co.uk <br>
+Password: bookingclerk
+
+#### Customer
+
+Username: john@gmail.com <br>
+Password: john
