@@ -300,7 +300,7 @@ namespace ParkEasyV1.Controllers
                  string code = await UserManager.GeneratePasswordResetTokenAsync(user.Id);
                  var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);		
                  await UserManager.SendEmailAsync(user.Id, "Reset Password", 
-                     "Hello, " + model.Email + "<br>We recieved a request to reset your password from ParkEasy Airport Parking. " +
+                     "Hello, " + model.Email + "<br>We recieved a request to reset your password from ParkEasy Parking. " +
                      "<br>Please reset your password by clicking <a href=\"" + callbackUrl + "\">here</a>" +
                      "<br>If you did not request a new password, please let us know.");
                  return RedirectToAction("ForgotPasswordConfirmation", "Account");

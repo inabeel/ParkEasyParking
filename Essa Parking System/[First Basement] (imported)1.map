@@ -1,0 +1,17 @@
+<img src="[First Basement] (imported)" width="1600" height="1440" border="0" usemap="#map" />
+
+<map name="map">
+<!-- #$-:Image map file created by GIMP Image Map plug-in -->
+<!-- #$-:GIMP Image Map plug-in by Maurits Rijk -->
+<!-- #$-:Please do not edit lines starting with "#$" -->
+<!-- #$VERSION:2.3 -->
+<!-- #$AUTHOR:Nabeel -->
+<area shape="rect" coords="441,194,481,274" target="B1-001"  nohref="nohref" />
+<area shape="rect" coords="398,193,441,274" target="B1-002"  nohref="nohref" />
+<area shape="rect" coords="180,247,210,335" target="B1-003"  nohref="nohref" />
+<area shape="rect" coords="177,337,209,425" target="B1-004"  nohref="nohref" />
+<area shape="rect" coords="176,428,206,517" target="B1-005"  nohref="nohref" />
+<area shape="rect" coords="175,517,205,608" target="B1-006"  nohref="nohref" />
+<area shape="rect" coords="172,609,204,700" target="B1-007"  nohref="nohref" />
+<area shape="rect" coords="173,701,201,789" target="B1-008"  nohref="nohref" />
+</map>

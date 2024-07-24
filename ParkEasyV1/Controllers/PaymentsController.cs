@@ -130,7 +130,7 @@ namespace ParkEasyV1.Controllers
                 var charge = charges.Create(new ChargeCreateOptions
                 {
                     Amount = (int)Math.Ceiling(booking.Total * 100),
-                    Description = "ParkEasy Airport Parking Charge",
+                    Description = "ParkEasy Parking Charge",
                     Currency = "gbp",
                     CustomerId = customer.Id,
                     ReceiptEmail = customer.Email,
@@ -481,7 +481,7 @@ namespace ParkEasyV1.Controllers
             // Adding description about the transaction  
             transactionList.Add(new Transaction()
             {
-                description = "ParkEasy Airport Parking Booking",
+                description = "ParkEasy Parking Booking",
                 //invoice_number = "your generated invoice number", //Generate an Invoice No  
                 amount = amount,
                 item_list = itemList

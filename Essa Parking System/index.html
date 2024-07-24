@@ -1,0 +1,76 @@
+<html>
+<head>
+    <script src="https://code.highcharts.com/maps/highmaps.js"></script>
+    <script src="https://code.highcharts.com/highcharts-more.js"></script>
+    <script src="https://code.highcharts.com/modules/pictorial.js"></script>
+    <script src="https://code.highcharts.com/highcharts-3d.js"></script>
+    <script src="https://code.highcharts.com/maps/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/maps/modules/offline-exporting.js"></script>
+    <script src="https://code.highcharts.com/maps/modules/accessibility.js"></script>
+</head>
+
+
+
+
+<body>
+
+    <figure class="highcharts-figure">
+        <div class="controls">
+            <small class="label">Selected seats: </small>
+            <span id="selected-list">None</span>
+            <br />
+            <button id="deselect" disabled>Clear selection</button>
+        </div>
+        <div id="container"></div>
+
+    </figure>
+
+    <script>
+
+        Highcharts.chart('container', {
+            chart: {
+                type: 'pictorial'
+                plotBackgroundImage: 'First Basement.jpeg' // URL of the image
+            },
+            title: {
+                text: 'Parking Slot Booking'
+            },
+            xAxis: {
+                min: 0,
+                max: 100
+            },
+            yAxis: {
+                min: 0,
+                max: 100
+            },
+            series: [{
+                type: 'image',
+                name: 'Parking Slots',
+                data: [{
+                    x: 10,
+                    y: 10,
+                    width: 20,
+                    height: 20,
+                    value: 1, // Slot number or any other identifier
+                    href: 'book_slot.php?id=1' // Link to book the slot
+                }, {
+                    x: 40,
+                    y: 10,
+                    width: 20,
+                    height: 20,
+                    value: 2,
+                    href: 'book_slot.php?id=2'
+                },
+                    // Add more slots as needed
+                ],
+                dataLabels: {
+                    enabled: true,
+                    format: '{point.value}'
+                }
+            }]
+        });
+
+    </script>
+</body>
+
+</html>

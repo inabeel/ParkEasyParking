@@ -33,7 +33,7 @@ namespace ParkEasyV1
             var client = new SendGridClient(apiKey);
             var msg = new SendGridMessage()
             {
-                From = new EmailAddress("noreply@parkeasy.co.uk", "ParkEasy Airport Parking"),
+                From = new EmailAddress("parkeasy@relliks.com", "ParkEasy Parking"),
                 Subject = subject,
                 PlainTextContent = message,
                 HtmlContent = message

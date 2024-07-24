@@ -1,0 +1,14 @@
+Create proper SVG from image
+
+Use their documentation page https://www.highcharts.com/docs/maps/create-custom-maps
+
+As there described - download and install Inkscape (vector editor) https://inkscape.org/ (it is free to use)
+
+	- align images
+	- every shape that you draw in Inkscape must be closed (f.e. rect or path) - everything else can cause unexpected behavior.
+	- set object properties for slots in Inkscape
+	- Convert strokes(if you used it) to paths (it can create some groups - need to ungroup it)
+	- Union the walls objects to create a single path for walls
+	- Ungroup (if it was grouped) slots objects otherwise it will looks like a single object
+	- use this tool (https://highcharts.github.io/map-from-svg/) to convert svg to a data array that chart can use.
+	- better use the github convertor from time to time and check if everything is ok.

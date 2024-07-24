@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="index.css">
+    <script src="https://code.highcharts.com/maps/highmaps.js"></script>
+</head>
+<body>
+    <div id="selected-list">
+        First floor: None<br>
+        Second floor: None<br>
+        Third floor: None
+    </div>
+    <div>
+        <button id="clear-btn">Clear Selection</button>
+    </div>
+    <br>
+    <br>
+    <div>
+        <label>
+            Select floor:
+            <select id="floor-select">
+                <option value="1">first</option>
+                <option value="2">Second</option>
+                <option value="3">Third</option>
+            </select>
+        </label>
+    </div>
+    <div id="container"></div>
+    <script src="index.js"></script>
+</body>
+</html>
