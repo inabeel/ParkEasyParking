@@ -45,7 +45,7 @@ namespace ParkEasyV1.Models
         /// </summary>
         public string EmployeeID { get; set; }
 
-        public ReservationType ReservationType {  get; set; }
+        public ReservationType ReservationType { get; set; }
 
         /// <summary>
         /// Date the booking was created
@@ -87,7 +87,7 @@ namespace ParkEasyV1.Models
         /// </summary>
         public bool CheckedOut { get; set; }
 
-        
+
         //Navigational Properties
 
         /// <summary>
@@ -124,7 +124,7 @@ namespace ParkEasyV1.Models
         /// </summary>
         [ForeignKey("ParkingSlot")]
         [Display(Name = "ParkingSlot")]
-        public int ParkingSlotID { get; set; }
+        public int? ParkingSlotID { get; set; }
         public virtual ParkingSlot ParkingSlot { get; set; }
 
         /// <summary>
@@ -135,6 +135,11 @@ namespace ParkEasyV1.Models
         [Display(Name = "Tariff")]
         public int TariffID { get; set; }
         public virtual Tariff Tariff { get; set; }
+
+        public bool GetIsActive()
+        {
+            return DateBooked < DateTime.Now && DateTime.Now < DateBookingEnd;
+        }
 
         /// <summary>
         /// Method to create a Booking confirmation message and use the SendGrid API to email it to User

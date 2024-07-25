@@ -204,62 +204,46 @@ namespace ParkEasyV1.Models.ViewModels
         /// booking id - hidden from user on front-end
         /// </summary>
         public int BookingID { get; set; }
-    
         /// <summary>
         /// booking start date
         /// </summary>
         [Required]
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
-        [Display(Name = "Departure Date")]
-        public DateTime DepartureDate { get; set; }
-    
+        [Display(Name = "Start Date")]
+        public DateTime DepartureDate1 { get; set; }
+
+
+        [Required]
+        [StringLength(10, ErrorMessage = "The {0} must be {2} characters long.", MinimumLength = 10)]
+        [Display(Name = "Employee ID")]
+        public string EmployeeID { get; set; }
+
         /// <summary>
         /// booking start time
         /// </summary>
         [Required]
         [DataType(DataType.Time)]
-        [Display(Name = "Departure Time")]
+        [Display(Name = "Start Time")]
         public TimeSpan DepartureTime { get; set; }
-    
+
         /// <summary>
         /// booking end date
         /// </summary>
         [Required]
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
-        [Display(Name = "Return Date")]
+        [Display(Name = "End Date")]
         public DateTime ReturnDate { get; set; }
-    
+
         /// <summary>
         /// booking end time
         /// </summary>
         [Required]
         [DataType(DataType.Time)]
-        [Display(Name = "Return Time")]
+        [Display(Name = "End Time")]
         public TimeSpan ReturnTime { get; set; }
-    
-        /// <summary>
-        /// length of booking
-        /// </summary>
-        [Display(Name ="Booking Length")]
-        public int Duration { get; set; }
-    
-        /// <summary>
-        /// total cost of booking
-        /// </summary>
-        public double Total { get; set; }
-    
-        /// <summary>
-        /// boolean to hold if valet service is selected
-        /// </summary>
-        public bool Valet { get; set; }
-    
-        /// <summary>
-        /// enumeration selected booking status
-        /// </summary>
-        public BookingStatus Status { get; set; }
-    
+
         /// <summary>
         /// user first name
         /// </summary>
@@ -267,59 +251,15 @@ namespace ParkEasyV1.Models.ViewModels
         [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 1)]
         [Display(Name = "First Name")]
         public string FirstName { get; set; }
-    
+
         /// <summary>
         /// user last name
         /// </summary>
         [Required]
         [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 1)]
+        [Display(Name = "Last Name")]
         public string Surname { get; set; }
-    
-        /// <summary>
-        /// user address line 1
-        /// </summary>
-        [Required]
-        [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 1)]
-        [Display(Name = "Address")]
-        public string AddressLine1 { get; set; }
-    
-        /// <summary>
-        /// user address line 2 - not required
-        /// </summary>
-        [Display(Name = "")]
-        public string AddressLine2 { get; set; }
-    
-        /// <summary>
-        /// user city
-        /// </summary>
-        [Required]
-        [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 1)]
-        public string City { get; set; }
-    
-        /// <summary>
-        /// user postcode
-        /// </summary>
-        [Required]
-        [StringLength(7, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 7)]
-        [DataType(DataType.PostalCode)]
-        public string Postcode { get; set; }
-    
-        /// <summary>
-        /// user email
-        /// </summary>
-        [Required]
-        [EmailAddress]
-        [Display(Name = "Email")]
-        public string Email { get; set; }
-    
-        /// <summary>
-        /// user phone number
-        /// </summary>
-        [Required]
-        [Phone]
-        [Display(Name = "Contact Phone Number")]
-        public string PhoneNo { get; set; }
-    
+
         /// <summary>
         /// vehicle make
         /// </summary>
@@ -327,7 +267,7 @@ namespace ParkEasyV1.Models.ViewModels
         [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 1)]
         [Display(Name = "Vehicle Make")]
         public string VehicleMake { get; set; }
-    
+
         /// <summary>
         /// vehicle model
         /// </summary>
@@ -335,7 +275,7 @@ namespace ParkEasyV1.Models.ViewModels
         [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 1)]
         [Display(Name = "Vehicle Model")]
         public string VehicleModel { get; set; }
-    
+
         /// <summary>
         /// vehicle colour
         /// </summary>
@@ -343,7 +283,7 @@ namespace ParkEasyV1.Models.ViewModels
         [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 1)]
         [Display(Name = "Vehicle Colour")]
         public string VehicleColour { get; set; }
-    
+
         /// <summary>
         /// vehicle registration number
         /// </summary>
@@ -351,15 +291,106 @@ namespace ParkEasyV1.Models.ViewModels
         [StringLength(16, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 1)]
         [Display(Name = "Vehicle Registration")]
         public string VehicleRegistration { get; set; }
-    
+
+        [Required]
+        [RegularExpression("(.*[1-9].*)|(.*[.].*[1-9].*)", ErrorMessage = "Invalid Slot Number.")]
+        [Range(1, int.MaxValue, ErrorMessage = "Invalid Floor Number.")]
+        [Display(Name = "Selected Parking Slot Number")]
+        public int ParkingSlotNumber { get; set; }
+
+        [Required]
+        [RegularExpression("(.*[1-9].*)|(.*[.].*[1-9].*)", ErrorMessage = "Invalid Floor Number.")]
+        [Range(1, int.MaxValue, ErrorMessage = "Invalid Floor Number.")]
+        [Display(Name = "Selected Parking Slot Floor")]
+        public int ParkingSlotFloor { get; set; }
+
+        #region Hidden
+        /// <summary>
+        /// booking departure flight number
+        /// </summary>
+        //[Required]
+        //[StringLength(16, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 1)]
+        //[Display(Name = "Departure Flight Number")]
+        public string DepartureFlightNo { get; set; } = "A";
+
+        /// <summary>
+        /// booking return flight number
+        /// </summary>
+        //[Required]
+        //[StringLength(16, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 1)]
+        //[Display(Name = "Return Flight Number")]
+        public string ReturnFlightNo { get; set; } = "A";
+
+        /// <summary>
+        /// trip destination
+        /// </summary>
+        //[Required]
+        //[StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 1)]
+        //[Display(Name = "Destination Airport")]
+        public string DestinationAirport { get; set; } = "A";
+
+        /// <summary>
+        /// user address line 1
+        /// </summary>
+        //[Required]
+        //[StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 1)]
+        //[Display(Name = "Address")]
+        public string AddressLine1 { get; set; } = "A";
+
+        /// <summary>
+        /// user address line 2 - not required
+        /// </summary>
+        //[Display(Name = "")]
+        public string AddressLine2 { get; set; }
+
+        /// <summary>
+        /// user city
+        /// </summary>
+        //[Required]
+        //[StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 1)]
+        public string City { get; set; } = "A";
+
+        /// <summary>
+        /// user postcode
+        /// </summary>
+        //[Required]
+        //[StringLength(7, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 7)]
+        //[DataType(DataType.PostalCode)]
+        public string Postcode { get; set; } = "AAAAAAA";
+
+        /// <summary>
+        /// user phone number
+        /// </summary>
+        //[Required]
+        //[Phone]
+        //[Display(Name = "Contact Phone Number")]
+        public string PhoneNo { get; set; } = "A";
+
+        /// <summary>
+        /// user email
+        /// </summary>
+        //[Required]
+        //[EmailAddress]
+        //[Display(Name = "Email")]
+        public string Email { get; set; } = "john@gmail.com";
+
         /// <summary>
         /// number of passengers travelling
         /// </summary>
-        [Required]
-        [Display(Name = "Number of Passengers")]
-        public int NoOfPassengers { get; set; }
+        //[Required]
+        //[RegularExpression("(.*[1-9].*)|(.*[.].*[1-9].*)", ErrorMessage = "Number of passengers cannot be 0")]
+        //[Display(Name = "Number of Passengers")]
+        public int NoOfPassengers { get; set; } = 1;
+
+        /// <summary>
+        /// terms of service acceptance boolean
+        /// </summary>
+        //[Required]
+        //[MustBeTrue(ErrorMessage = "You must agree to the ParkEasy Terms & Conditions")]
+        public bool TOS { get; set; } = true;
+        #endregion
     }
-    
+
     /// <summary>
     /// view model for checking availability of a booking
     /// </summary>

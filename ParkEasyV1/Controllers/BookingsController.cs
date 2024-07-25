@@ -53,7 +53,7 @@ namespace ParkEasyV1.Controllers
             ViewBag.UserID = userManager.FindByEmail(User.Identity.GetUserName()).Id;
 
             //return view with collection of bookings ordered by date booked
-            return View(db.Bookings.OrderBy(b => b.DateBooked).ToList());
+            return View(db.Bookings.OrderByDescending(b => b.DateBooked).ToList());
         }
 
         /// <summary>
@@ -146,9 +146,6 @@ namespace ParkEasyV1.Controllers
                 //declare instance of usermanager
                 UserManager<User> userManager = new UserManager<User>(new UserStore<User>(db));
 
-                //get Google reCaptcha API response
-                CaptchaResponse response = ValidateCaptcha(Request["g-recaptcha-response"]);
-
                 if(!ModelState.IsValid)
                 {
                     return View(model);
@@ -220,7 +217,6 @@ namespace ParkEasyV1.Controllers
                     return View(model);
                 }
                 
-                var existingBookings = parkingSlot.Bookings.ToList();
                 var isAvailable = IsParkingSlotAvailableByDateRange(parkingSlot, selectedTimeRange);
                 
                 if(!isAvailable)
@@ -264,7 +260,8 @@ namespace ParkEasyV1.Controllers
                 db.SaveChanges();                
                 //set error message and return view
                 TempData["Success"] = "Success: Booking is created successfully.";
-                return View(model);
+                //return staff to manage bookings
+                return RedirectToAction("Manage", "Bookings");
             }
             catch (Exception ex)
             {
@@ -391,47 +388,20 @@ namespace ParkEasyV1.Controllers
                 //return httpnotfound if booking is null
                 return HttpNotFound();
             }
-
-            //if booking start date is later than or equal to the current date
-            //run datecomparison code to check if booking can be amended for free or not
-            if (booking.Flight.DepartureDate > DateTime.Now || booking.Flight.DepartureDate.Day == DateTime.Now.Day)
-            {
-                //create a variable to hold the result of the date comparison between the booking departure date and the current date
-                int dateCompareResult = DateTime.Compare(booking.Flight.DepartureDate.AddHours(-24), DateTime.Now);
-
-                //if the date compare result is more than 0
-                if (dateCompareResult > 0)
-                {
-                    //the booking is outside the 24 hour booking amendment period
-                    //store message in ViewBag to be displayed on the front-end
-                    ViewBag.Message = "You will not be charged for any amendments to this booking.";
-                }
-                //if the date compare result is less than or equal to 0
-                else if (dateCompareResult <= 0)
-                {
-                    //the booking is inside the 24 hour booking amendment period
-                    //store message in ViewBag to be displayed on the front-end
-                    ViewBag.Message = "Any amendmends made to this booking will result in an admin charge to be paid on arrival.";
-                }
-            }
             
 
             //find the vehicle attached to the booking via bookingline
-           Vehicle vehicle = db.Vehicles.Find(booking.BookingLines.First().VehicleID);
+            Vehicle vehicle = db.Vehicles.Find(booking.BookingLines.First().VehicleID);
 
-            //create a new viewbooking view model and input all booking/flight/vehicle data
             ViewBookingViewModel model = new ViewBookingViewModel
             {
                 BookingID = booking.ID,
-                DepartureDate = booking.Flight.DepartureDate,
-                DepartureTime = booking.Flight.DepartureTime,
-                ReturnDate = booking.Flight.ReturnDate,
-                ReturnTime = booking.Flight.ReturnFlightTime,
-                Duration = booking.Duration,
-                Total = booking.Total,
-                Valet = booking.ValetService,
-                FirstName = booking.User.FirstName,
-                Surname = booking.User.LastName,
+                DepartureDate1 = booking.DateBooked,
+                DepartureTime = booking.DateBooked.TimeOfDay,
+                ReturnDate = booking.DateBookingEnd,
+                ReturnTime = booking.DateBookingEnd.TimeOfDay,
+                FirstName = booking.FirstName,
+                Surname = booking.LastName,
                 AddressLine1 = booking.User.AddressLine1,
                 AddressLine2 = booking.User.AddressLine2,
                 City = booking.User.City,
@@ -443,8 +413,24 @@ namespace ParkEasyV1.Controllers
                 VehicleColour = vehicle.Colour,
                 VehicleRegistration = vehicle.RegistrationNumber,
                 NoOfPassengers = vehicle.NoOfPassengers,
-                Status = booking.BookingStatus
+                EmployeeID = booking.EmployeeID,
             };
+
+            if (booking.ParkingSlot != null && booking.GetIsActive())
+            {
+                model.ParkingSlotFloor = booking.ParkingSlot.FloorNu;
+                model.ParkingSlotNumber = booking.ParkingSlot.ParkingSlotNumber;
+            }
+
+            if(booking.ParkingSlot == null || !booking.GetIsActive())
+            {
+                var startDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, 0, 0);
+                var endDate = startDate.AddMinutes(60);
+                model.DepartureDate1 = startDate;
+                model.DepartureTime = startDate.TimeOfDay;
+                model.ReturnDate = endDate;
+                model.ReturnTime = endDate.TimeOfDay;
+            }
 
             //return the edit view with model 
             return View(model);
@@ -459,8 +445,90 @@ namespace ParkEasyV1.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
-        public ActionResult Edit([Bind(Include = "BookingID, DepartureDate, DepartureTime, ReturnDate, ReturnTime, Duration, Total, Valet, FirstName, Surname, AddressLine1, AddressLine2, City, Postcode, Email, PhoneNo, VehicleMake, VehicleModel, VehicleColour, VehicleRegistration, NoOfPassengers, Status")]ViewBookingViewModel model)
+        public ActionResult Edit(ViewBookingViewModel model)
         {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return View(model);
+                }
+
+                //get the booking via id
+                Booking booking = db.Bookings.Find(model.BookingID);
+
+                //get the vehicle linked to booking via bookingline
+                Vehicle vehicle = db.Vehicles.Find(booking.BookingLines.First().VehicleID);
+
+                var startDate = new DateTime(model.DepartureDate1.Year, model.DepartureDate1.Month, model.DepartureDate1.Day, model.DepartureTime.Hours, model.DepartureTime.Minutes, 0);
+                var endDate = new DateTime(model.ReturnDate.Year, model.ReturnDate.Month, model.ReturnDate.Day, model.ReturnTime.Hours, model.ReturnTime.Minutes, 0);
+
+                if (startDate > endDate)
+                {
+                    TempData["Error_Booking_EDIT"] = "Error: Invalid date range selected.";
+                    return View(model);
+                }
+
+                //get the TimeRange for the selected dates
+                TimeRange selectedTimeRange = new TimeRange(startDate, endDate);
+
+                //update vehicle
+                vehicle.RegistrationNumber = model.VehicleRegistration;
+                vehicle.Make = model.VehicleMake;
+                vehicle.Model = model.VehicleModel;
+                vehicle.Colour = model.VehicleColour;
+
+                var parkingSlot = db.ParkingSlots.Include(p => p.Bookings)
+                    .FirstOrDefault((ps) => ps.ParkingSlotNumber == model.ParkingSlotNumber && ps.FloorNu == model.ParkingSlotFloor);
+
+                if (parkingSlot == null)
+                {
+                    //set error message and return view
+                    TempData["Error_Booking_EDIT"] = "Error: Selected Parking Slot is not found.";
+                    return View(model);
+                }
+
+                if (parkingSlot.Status != Status.Available)
+                {
+                    //set error message and return view
+                    TempData["Error_Booking_EDIT"] = "Error: Selected Parking Slot is not available.";
+                    return View(model);
+                }
+
+                var isAvailable = IsParkingSlotAvailableByDateRange(parkingSlot, selectedTimeRange);
+
+                if (!isAvailable)
+                {
+                    if(!(booking.ParkingSlot != null && booking.ParkingSlot.ParkingSlotNumber == model.ParkingSlotNumber && booking.ParkingSlot.FloorNu == model.ParkingSlotFloor)) {
+                        //set error message and return view
+                        TempData["Error_Booking_EDIT"] = "Error: Selected Parking Slot is not available for selected dates.";
+                        return View(model);
+                    }
+                }
+
+                //update booking
+                booking.ParkingSlot = parkingSlot;
+                booking.DateBooked = selectedTimeRange.Start;
+                booking.DateBookingEnd = selectedTimeRange.End;
+                booking.FirstName = model.FirstName;
+                booking.LastName = model.Surname;
+                booking.EmployeeID = model.EmployeeID;
+                booking.ReservationType = ReservationType.DateRange;
+
+                //save database changes
+                db.SaveChanges();
+                //set error message and return view
+                TempData["Success_Booking_EDIT"] = "Success: Booking is updated successfully.";
+                //return staff to manage bookings
+                return RedirectToAction("Manage", "Bookings");
+            }
+            catch (Exception ex)
+            {
+                // If exception occurs, redisplay form
+                TempData["Error_Booking_EDIT"] = "Error: Something went wrong please try again.";
+                return View(model);
+            }
+
             //check if model state is valid
             if (ModelState.IsValid)
             {
@@ -496,17 +564,8 @@ namespace ParkEasyV1.Controllers
                         //store success message in tempdata
                         TempData["Success"] = "Booking Successfully Updated";
 
-                        //check if user is in customer role
-                        if (User.IsInRole("Customer"))
-                        {
-                            //return customer to my bookings
-                            return RedirectToAction("MyBookings", "Users");
-                        }
-                        else
-                        {
-                            //return staff to manage bookings
-                            return RedirectToAction("Manage", "Bookings");
-                        }
+                        //return staff to manage bookings
+                        return RedirectToAction("Manage", "Bookings");
                     }
                 }
                 catch (Exception ex)
@@ -537,19 +596,15 @@ namespace ParkEasyV1.Controllers
             //get the vehicle associated with the booking via booking line
             Vehicle vehicle = booking.BookingLines.First().Vehicle;
 
-            //create a new viewbookingviewmodel and populate with booking/flight/vehicle data
             ViewBookingViewModel model = new ViewBookingViewModel
             {
                 BookingID = booking.ID,
-                DepartureDate = booking.Flight.DepartureDate,
-                DepartureTime = booking.Flight.DepartureTime,
-                ReturnDate = booking.Flight.ReturnDate,
-                ReturnTime = booking.Flight.ReturnFlightTime,
-                Duration = booking.Duration,
-                Total = booking.Total,
-                Valet = booking.ValetService,
-                FirstName = booking.User.FirstName,
-                Surname = booking.User.LastName,
+                DepartureDate1 = booking.DateBooked,
+                DepartureTime = booking.DateBooked.TimeOfDay,
+                ReturnDate = booking.DateBookingEnd,
+                ReturnTime = booking.DateBookingEnd.TimeOfDay,
+                FirstName = booking.FirstName,
+                Surname = booking.LastName,
                 AddressLine1 = booking.User.AddressLine1,
                 AddressLine2 = booking.User.AddressLine2,
                 City = booking.User.City,
@@ -560,8 +615,16 @@ namespace ParkEasyV1.Controllers
                 VehicleModel = vehicle.Model,
                 VehicleColour = vehicle.Colour,
                 VehicleRegistration = vehicle.RegistrationNumber,
-                NoOfPassengers = vehicle.NoOfPassengers
+                NoOfPassengers = vehicle.NoOfPassengers,
+                EmployeeID = booking.EmployeeID,
             };
+
+            if (booking.ParkingSlot != null && booking.GetIsActive())
+            {
+                model.ParkingSlotFloor = booking.ParkingSlot.FloorNu;
+                model.ParkingSlotNumber = booking.ParkingSlot.ParkingSlotNumber;
+            }
+
 
             //return the view with model
             return View(model);

@@ -128,45 +128,45 @@ namespace ParkEasyV1.Controllers
             try
             {
                 //find booking via id
-                Booking booking = db.Bookings.Find(id);
-                //if booking is null
-                if (booking == null)
-                {
-                    //return httpnotfound eror
-                    return HttpNotFound();
-                }
+                //Booking booking = db.Bookings.Find(id);
+                ////if booking is null
+                //if (booking == null)
+                //{
+                //    //return httpnotfound eror
+                //    return HttpNotFound();
+                //}
 
-                //get the vehicle associated with booking via booking line
-                Vehicle vehicle = db.Vehicles.Find(booking.BookingLines.First().VehicleID);
+                ////get the vehicle associated with booking via booking line
+                //Vehicle vehicle = db.Vehicles.Find(booking.BookingLines.First().VehicleID);
 
-                //create new view booking view model and populate with flight/booking/vehicle data
-                ViewBookingViewModel model = new ViewBookingViewModel
-                {
-                    BookingID = booking.ID,
-                    DepartureDate = booking.Flight.DepartureDate,
-                    DepartureTime = booking.Flight.DepartureTime,
-                    ReturnDate = booking.Flight.ReturnDate,
-                    ReturnTime = booking.Flight.ReturnFlightTime,
-                    Duration = booking.Duration,
-                    Total = booking.Total,
-                    Valet = booking.ValetService,
-                    FirstName = booking.User.FirstName,
-                    Surname = booking.User.LastName,
-                    AddressLine1 = booking.User.AddressLine1,
-                    AddressLine2 = booking.User.AddressLine2,
-                    City = booking.User.City,
-                    Postcode = booking.User.Postcode,
-                    Email = booking.User.Email,
-                    PhoneNo = booking.User.PhoneNumber,
-                    VehicleMake = vehicle.Make,
-                    VehicleModel = vehicle.Model,
-                    VehicleColour = vehicle.Colour,
-                    VehicleRegistration = vehicle.RegistrationNumber,
-                    NoOfPassengers = vehicle.NoOfPassengers
-                };
+                ////create new view booking view model and populate with flight/booking/vehicle data
+                //ViewBookingViewModel model = new ViewBookingViewModel
+                //{
+                //    BookingID = booking.ID,
+                //    DepartureDate = booking.Flight.DepartureDate,
+                //    DepartureTime = booking.Flight.DepartureTime,
+                //    ReturnDate = booking.Flight.ReturnDate,
+                //    ReturnTime = booking.Flight.ReturnFlightTime,
+                //    Duration = booking.Duration,
+                //    Total = booking.Total,
+                //    Valet = booking.ValetService,
+                //    FirstName = booking.User.FirstName,
+                //    Surname = booking.User.LastName,
+                //    AddressLine1 = booking.User.AddressLine1,
+                //    AddressLine2 = booking.User.AddressLine2,
+                //    City = booking.User.City,
+                //    Postcode = booking.User.Postcode,
+                //    Email = booking.User.Email,
+                //    PhoneNo = booking.User.PhoneNumber,
+                //    VehicleMake = vehicle.Make,
+                //    VehicleModel = vehicle.Model,
+                //    VehicleColour = vehicle.Colour,
+                //    VehicleRegistration = vehicle.RegistrationNumber,
+                //    NoOfPassengers = vehicle.NoOfPassengers
+                //};
 
                 //return confirmation view with model
-                return View(model);
+                return View();
             }
             catch (Exception ex)
             {
