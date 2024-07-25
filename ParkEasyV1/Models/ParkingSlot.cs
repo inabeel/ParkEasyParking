@@ -18,6 +18,18 @@ namespace ParkEasyV1.Models
         public int ID { get; set; }
 
         /// <summary>
+        /// Parking Slot floor number (1, 2 or 3).
+        /// </summary>
+        public int FloorNu {  get; set; }
+
+        /// <summary>
+        /// Not-unique value for parking slot.
+        /// </summary>
+        public int ParkingSlotNumber { get; set; }
+
+        public int TestChange { get; set; }
+
+        /// <summary>
         /// Enum for ParkingSlot status
         /// </summary>
         public Status Status { get; set; }

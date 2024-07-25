@@ -31,9 +31,31 @@ namespace ParkEasyV1.Models
         public int ID { get; set; }
 
         /// <summary>
+        /// Employee First Name
+        /// </summary>
+        public string FirstName { get; set; }
+
+        /// <summary>
+        /// Employee Last Name
+        /// </summary>
+        public string LastName { get; set; }
+
+        /// <summary>
+        /// CF 10 Staff Number: A unique identifier for employee
+        /// </summary>
+        public string EmployeeID { get; set; }
+
+        public ReservationType ReservationType {  get; set; }
+
+        /// <summary>
         /// Date the booking was created
         /// </summary>
         public DateTime DateBooked { get; set; }
+
+        /// <summary>
+        /// Date the booking end
+        /// </summary>
+        public DateTime DateBookingEnd { get; set; }
 
         /// <summary>
         /// Length of booking
@@ -174,6 +196,12 @@ namespace ParkEasyV1.Models
     public enum BookingStatus
     {
         Confirmed, Unpaid, Cancelled, NoShow, Void, Delayed
+    }
+
+    public enum ReservationType
+    {
+        Permanent,
+        DateRange
     }
 
     /// <summary>

@@ -6,12 +6,95 @@ using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
+using DocumentFormat.OpenXml.EMMA;
+using Itenso.TimePeriod;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using ParkEasyV1.Models;
 
 namespace ParkEasyV1.Controllers
 {
+
+    public class VehicleDataModel
+    {
+        public int ID { get; set; }
+
+        /// <summary>
+        /// vehicle registration number
+        /// </summary>
+        public string RegistrationNumber { get; set; }
+
+        /// <summary>
+        /// vehicle make
+        /// </summary>
+        public string Make { get; set; }
+
+        /// <summary>
+        /// vehicle model
+        /// </summary>
+        public string Model { get; set; }
+
+        /// <summary>
+        /// vehicle colour
+        /// </summary>
+        public string Colour { get; set; }
+
+        /// <summary>
+        /// number of passengers travelling
+        /// </summary>
+        public int NoOfPassengers { get; set; }
+    }
+
+    public class BookingDataModel
+    {
+        public int ID { get; set; }
+
+        /// <summary>
+        /// Date the booking was created
+        /// </summary>
+        public DateTime DateBooked { get; set; }
+
+        /// <summary>
+        /// Length of booking
+        /// </summary>
+        public int Duration { get; set; }
+
+        /// <summary>
+        /// Total cost of booking
+        /// </summary>
+        public double Total { get; set; }
+
+        /// <summary>
+        /// Enum status of booking
+        /// </summary>
+        public BookingStatus BookingStatus { get; set; }
+
+        /// <summary>
+        /// Valet service selected boolean
+        /// </summary>
+        public bool ValetService { get; set; }
+
+        /// <summary>
+        /// Attribute to determine if the booking has checked in
+        /// </summary>
+        public bool CheckedIn { get; set; }
+
+        /// <summary>
+        /// Attribute to determine if the booking has checked out
+        /// </summary>
+        public bool CheckedOut { get; set; }
+    }
+
+    public class ParkingSlotDataModel
+    {
+        public int ID { get; set; }
+        public int FloorNu {  get; set; }
+        public int ParkingSlotNumber { get; set; }
+        public Status Status { get; set; }
+        public BookingDataModel BookingData { get; set; }
+        public VehicleDataModel VehicleData {  get; set; }
+    }
+
     /// <summary>
     /// Controller to handle all Parking Slot actions and events
     /// </summary>
@@ -21,6 +104,62 @@ namespace ParkEasyV1.Controllers
         /// Global instance of the ApplicationDbContext
         /// </summary>
         private ApplicationDbContext db = new ApplicationDbContext();
+
+        public JsonResult GetParkingSlotsData(int floorNumber, DateTime dateStart, DateTime dateEnd, TimeSpan timeStart, TimeSpan timeEnd)
+        {
+
+            TimeRange selectedTimeRange = new TimeRange(
+            new DateTime(dateStart.Year, dateStart.Month, dateStart.Day, timeStart.Hours, timeStart.Minutes, 0),
+            new DateTime(dateEnd.Year, dateEnd.Month, dateEnd.Day, timeEnd.Hours, timeEnd.Minutes, 0));
+
+            var data = db.ParkingSlots
+            .Where(ps => ps.FloorNu == floorNumber)
+            .ToList()
+            .Select((slot) =>
+            {
+                var lastActiveBooking = slot.Bookings.Where(b =>
+                {
+                    return (new TimeRange(b.DateBooked, b.DateBookingEnd).OverlapsWith(selectedTimeRange));
+                }).OrderByDescending(b => b.ID)
+                .FirstOrDefault();
+                VehicleDataModel vehicleDataModel = null;
+                if (lastActiveBooking != null)
+                {
+                        var vehicle = lastActiveBooking.BookingLines.First().Vehicle;
+                        vehicleDataModel = new VehicleDataModel()
+                        {
+                            ID = vehicle.ID,
+                            Colour = vehicle.Colour,
+                            Make = vehicle.Make,
+                            Model = vehicle.Model,
+                            NoOfPassengers = vehicle.NoOfPassengers,
+                            RegistrationNumber = vehicle.RegistrationNumber
+                        };
+                    }
+
+                    return new ParkingSlotDataModel()
+                    {
+                        ID = slot.ID,
+                        FloorNu = slot.FloorNu,
+                        ParkingSlotNumber = slot.ParkingSlotNumber,
+                        Status = slot.Status,
+                        BookingData = lastActiveBooking == null ? null : new BookingDataModel() 
+                        {
+                            BookingStatus = lastActiveBooking.BookingStatus,
+                            CheckedIn = lastActiveBooking.CheckedIn,
+                            CheckedOut = lastActiveBooking.CheckedOut,
+                            DateBooked = lastActiveBooking.DateBooked,
+                            Duration = lastActiveBooking.Duration,
+                            ID = lastActiveBooking.ID,
+                            Total = lastActiveBooking.Total,
+                            ValetService = lastActiveBooking.ValetService,
+                        },
+                        VehicleData = vehicleDataModel
+                    };
+                });
+
+            return Json(data, JsonRequestBehavior.AllowGet);
+        }
 
         /// <summary>
         /// HttpGet ActionResult to return the ParkingSlot Index view

@@ -104,7 +104,7 @@ namespace ParkEasyV1.Controllers
                     City = currentUser.City,
                     Postcode = currentUser.Postcode,
                     PhoneNo = currentUser.PhoneNumber,
-                    DepartureDate = DateTime.Today,
+                    DepartureDate1 = DateTime.Today,
                     ReturnDate = DateTime.Today.AddDays(1)
                 };
 
@@ -116,7 +116,7 @@ namespace ParkEasyV1.Controllers
                     AvailabilityViewModel availabilityModel = TempData["AvailabilityModel"] as AvailabilityViewModel;
 
                     //input the departure/return details to the CreateBookingViewModel
-                    model.DepartureDate = availabilityModel.DepartureDate;
+                    model.DepartureDate1 = availabilityModel.DepartureDate;
                     model.DepartureTime = availabilityModel.DepartureTime;
                     model.ReturnDate = availabilityModel.ReturnDate;
                     model.ReturnTime = availabilityModel.ReturnTime;                                
@@ -149,117 +149,139 @@ namespace ParkEasyV1.Controllers
                 //get Google reCaptcha API response
                 CaptchaResponse response = ValidateCaptcha(Request["g-recaptcha-response"]);
 
-                //if Google reCaptcha API response and model are valid
-                if (response.Success && ModelState.IsValid)
+                if(!ModelState.IsValid)
                 {
-                    //VALIDATION TO CHECK BOOKINGS TODAY ARE BOOKED AT LEAST 1 HOUR IN ADVANCE
-                    //check if booking departure date is today and departure time is at least 1 hour ahead of the current time
-                    if (model.DepartureDate.Equals(DateTime.Today) && model.DepartureTime < new TimeSpan(DateTime.Today.Hour, DateTime.Today.Minute, 0).Add(new TimeSpan(1,0,0)))
-                    {
-                        //set error message and return view
-                        TempData["Error"] = "Error: The departure time for booking today must be at least 1 hour in advance minimum.";
-                        return View(model);
-                    }
-
-                    //get the TimeRange for the selected dates
-                    TimeRange selectedTimeRange = new TimeRange(
-                    new DateTime(model.DepartureDate.Year, model.DepartureDate.Month, model.DepartureDate.Day, model.DepartureTime.Hours, model.DepartureTime.Minutes, 0),
-                    new DateTime(model.ReturnDate.Year, model.ReturnDate.Month, model.ReturnDate.Day, model.ReturnTime.Hours, model.ReturnTime.Minutes, 0));
-
-                    //if available parking space is NOT 0
-                    if (FindAvailableParkingSlot(selectedTimeRange)!=0)
-                    {
-                        //create customer vehicle
-                        Vehicle vehicle = db.Vehicles.Add(new Vehicle()
-                        {
-                            RegistrationNumber = model.VehicleRegistration,
-                            Make = model.VehicleMake,
-                            Model = model.VehicleModel,
-                            Colour = model.VehicleColour,
-                            NoOfPassengers = model.NoOfPassengers
-                        });
-
-                        //create customer flight
-                        Flight flight = db.Flights.Add(new Flight()
-                        {
-                            DepartureFlightNo = model.DepartureFlightNo,
-                            DepartureTime = model.DepartureTime,
-                            ReturnFlightNo = model.ReturnFlightNo,
-                            ReturnFlightTime = model.ReturnTime,
-                            DepartureDate = model.DepartureDate,
-                            ReturnDate = model.ReturnDate,
-                            DestinationAirport = model.DestinationAirport
-                        });
-
-                        //save database changes
-                        db.SaveChanges();
-
-                        //try to find the booking user by email from booking form
-                        User bookingUser = userManager.FindByEmail(model.Email);
-
-                        //if user cannot be found via email from booking form
-                        if (bookingUser == null)
-                        {
-                            //find the current logged in user
-                            bookingUser = userManager.FindByName(User.Identity.Name);
-                        }
-
-                        //create customer booking
-                        Booking booking = db.Bookings.Add(new Booking()
-                        {
-                            User = bookingUser,
-                            Flight = db.Flights.Find(flight.ID),
-                            ParkingSlot = db.ParkingSlots.Find(FindAvailableParkingSlot(selectedTimeRange)),
-                            Tariff = db.Tariffs.Find(1),
-                            DateBooked = DateTime.Now,
-                            Duration = CalculateBookingDuration(model.DepartureDate, model.ReturnDate),
-                            Total = db.Tariffs.Find(1).Amount * Convert.ToInt32(CalculateBookingDuration(model.DepartureDate, model.ReturnDate)),
-                            BookingStatus = BookingStatus.Unpaid,
-                            ValetService = false,
-                            CheckedIn = false,
-                            CheckedOut = false,
-                        });
-
-                        //save database changes
-                        db.SaveChanges();
-
-                        //create a new booking line for the booking with customer vehicle
-                        booking.BookingLines = new List<BookingLine>() { new BookingLine() { Booking = db.Bookings.Find(booking.ID), Vehicle = db.Vehicles.Find(vehicle.ID) } };
-
-                        //update the contact phone number on the user's account from the booking form
-                        bookingUser.PhoneNumber = model.PhoneNo;
-
-                        //save database changes
-                        db.SaveChanges();
-
-                        //store the booking id in a TempData
-                        TempData["bookingID"] = booking.ID;
-
-                        //return the Valet options view to the user
-                        return RedirectToAction("Valet");
-                    }
-                    //if available parking space id = 0 (no spaces are available)
-                    else                
-                    {
-                        //return view with error message
-                        TempData["Error"] = "No Parking Slots Available For Your Selected Dates. Please Enter New Dates And Try Again.";
-                        return View(model);
-                    }
-
+                    return View(model);
                 }
-                else if(response.Success==false)
+
+                var startDate = new DateTime(model.DepartureDate1.Year, model.DepartureDate1.Month, model.DepartureDate1.Day, model.DepartureTime.Hours, model.DepartureTime.Minutes, 0);
+                var endDate = new DateTime(model.ReturnDate.Year, model.ReturnDate.Month, model.ReturnDate.Day, model.ReturnTime.Hours, model.ReturnTime.Minutes, 0);
+
+                if (startDate > endDate)
                 {
-                    //return Google reCaptcha API error
-                    return Content("Error From Google ReCaptcha : " + response.ErrorMessage[0].ToString());
+                    TempData["Error"] = "Error: Invalid date range selected.";
+                    return View(model);
                 }
-            }
-            catch (Exception ex)
-            {   
-                // If exception occurs, redisplay form
+
+                //get the TimeRange for the selected dates
+                TimeRange selectedTimeRange = new TimeRange(startDate, endDate);
+                
+               
+                
+                //create customer vehicle
+                Vehicle vehicle = db.Vehicles.Add(new Vehicle()
+                {
+                    RegistrationNumber = model.VehicleRegistration,
+                    Make = model.VehicleMake,
+                    Model = model.VehicleModel,
+                    Colour = model.VehicleColour,
+                    NoOfPassengers = model.NoOfPassengers
+                });
+                
+                //create customer flight
+                Flight flight = db.Flights.Add(new Flight()
+                {
+                    DepartureFlightNo = model.DepartureFlightNo,
+                    DepartureTime = model.DepartureTime,
+                    ReturnFlightNo = model.ReturnFlightNo,
+                    ReturnFlightTime = model.ReturnTime,
+                    DepartureDate = model.DepartureDate1,
+                    ReturnDate = model.ReturnDate,
+                    DestinationAirport = model.DestinationAirport
+                });
+                
+                //save database changes
+                db.SaveChanges();
+                
+                //try to find the booking user by email from booking form
+                User bookingUser = userManager.FindByEmail(model.Email);
+                
+                //if user cannot be found via email from booking form
+                if (bookingUser == null)
+                {
+                    //find the current logged in user
+                    bookingUser = userManager.FindByName(User.Identity.Name);
+                }
+                
+                var parkingSlot = db.ParkingSlots.Include(p => p.Bookings)
+                    .FirstOrDefault((ps) => ps.ParkingSlotNumber == model.ParkingSlotNumber && ps.FloorNu == model.ParkingSlotFloor);
+                
+                if (parkingSlot == null)
+                {
+                    //set error message and return view
+                    TempData["Error"] = "Error: Selected Parking Slot is not found.";
+                    return View(model);
+                }
+                
+                if(parkingSlot.Status != Status.Available)
+                {
+                    //set error message and return view
+                    TempData["Error"] = "Error: Selected Parking Slot is not available.";
+                    return View(model);
+                }
+                
+                var existingBookings = parkingSlot.Bookings.ToList();
+                var isAvailable = IsParkingSlotAvailableByDateRange(parkingSlot, selectedTimeRange);
+                
+                if(!isAvailable)
+                {
+                    //set error message and return view
+                    TempData["Error"] = "Error: Selected Parking Slot is not available for selected dates.";
+                    return View(model);
+                }
+                
+                //create customer booking
+                Booking booking = db.Bookings.Add(new Booking()
+                {
+                    User = bookingUser,
+                    Flight = db.Flights.Find(flight.ID),
+                    ParkingSlot = parkingSlot,
+                    Tariff = db.Tariffs.Find(1),
+                    DateBooked = selectedTimeRange.Start,
+                    DateBookingEnd = selectedTimeRange.End,
+                    Duration = CalculateBookingDuration(model.DepartureDate1, model.ReturnDate),
+                    Total = db.Tariffs.Find(1).Amount * Convert.ToInt32(CalculateBookingDuration(model.DepartureDate1, model.ReturnDate)),
+                    BookingStatus = BookingStatus.Unpaid,
+                    ValetService = false,
+                    CheckedIn = false,
+                    CheckedOut = false,
+                    FirstName = model.FirstName,
+                    LastName = model.Surname,
+                    EmployeeID = model.EmployeeID,
+                    ReservationType = ReservationType.DateRange
+                });
+                
+                //save database changes
+                db.SaveChanges();
+                
+                //create a new booking line for the booking with customer vehicle
+                booking.BookingLines = new List<BookingLine>() { new BookingLine() { Booking = db.Bookings.Find(booking.ID), Vehicle = db.Vehicles.Find(vehicle.ID) } };
+                
+                //update the contact phone number on the user's account from the booking form
+                bookingUser.PhoneNumber = model.PhoneNo;
+                
+                //save database changes
+                db.SaveChanges();                
+                //set error message and return view
+                TempData["Success"] = "Success: Booking is created successfully.";
                 return View(model);
             }
-            // If we got this far, something failed, redisplay form
-            return View(model);
+            catch (Exception ex)
+            {
+                // If exception occurs, redisplay form
+                TempData["Error"] = "Error: Something went wrong please try again.";
+                return View(model);
+            }
+        }
+
+        private bool IsParkingSlotAvailableByDateRange(ParkingSlot slot, TimeRange selectedTimeRange)
+        {
+            var booking = slot.Bookings.Where(b => 
+            {   
+                return (new TimeRange(b.DateBooked, b.DateBookingEnd).OverlapsWith(selectedTimeRange)); 
+            }).OrderByDescending(b => b.ID)
+            .FirstOrDefault();
+            return booking == null;
         }
 
         /// <summary>

@@ -239,16 +239,57 @@ namespace ParkEasyV1.Models
         /// <param name="context">ApplicationDbContext</param>
         private void CreateParkingSlots(ApplicationDbContext context)
         {
-            //loop 150 times
-            for (int i = 0; i < 150; i++)
+            var parkingSlotId = 1;
+            for (int floorNumber = 1; floorNumber <= 3 ; floorNumber++)
             {
-                //create new available parking slot
-                context.ParkingSlots.Add(new ParkingSlot()
+                switch (floorNumber)
                 {
-                    ID = i,
-                    Status = Status.Available
-                });
-            }
+                    case 1:
+                        for (int parkingSlotNumber = 1; parkingSlotNumber <= 155; parkingSlotNumber++)
+                        {
+                            //create new available parking slot
+                            context.ParkingSlots.Add(new ParkingSlot()
+                            {
+                                ID = parkingSlotId,
+                                FloorNu = floorNumber,
+                                Status = Status.Available,
+                                ParkingSlotNumber = parkingSlotNumber
+                            });
+                            parkingSlotId++;
+                        }
+                        break;
+                    case 2:
+                        for (int parkingSlotNumber = 1; parkingSlotNumber <= 160; parkingSlotNumber++)
+                        {
+                            //create new available parking slot
+                            context.ParkingSlots.Add(new ParkingSlot()
+                            {
+                                ID = parkingSlotId,
+                                FloorNu = floorNumber,
+                                Status = Status.Available,
+                                ParkingSlotNumber = parkingSlotNumber
+                            });
+                            parkingSlotId++;
+                        }
+                        break;
+                    case 3:
+                        for (int parkingSlotNumber = 1; parkingSlotNumber <= 178; parkingSlotNumber++)
+                        {
+                            //create new available parking slot
+                            context.ParkingSlots.Add(new ParkingSlot()
+                            {
+                                ID = parkingSlotId,
+                                FloorNu = floorNumber,
+                                Status = Status.Available,
+                                ParkingSlotNumber = parkingSlotNumber
+                            });
+                            parkingSlotId++;
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }           
 
             //save changes
             context.SaveChanges();
@@ -337,7 +378,7 @@ namespace ParkEasyV1.Models
                 Flight = context.Flights.Find(1),
                 ParkingSlot = context.ParkingSlots.Find(99),
                 Tariff = context.Tariffs.Find(1),
-
+                DateBookingEnd = flight.DepartureDate,
                 DateBooked = DateTime.Now,
                 Duration = Convert.ToInt32(duration.TotalDays),
                 Total = price,
@@ -423,7 +464,7 @@ namespace ParkEasyV1.Models
                 Flight = context.Flights.Find(2),
                 ParkingSlot = context.ParkingSlots.Find(100),
                 Tariff = context.Tariffs.Find(1),
-
+                DateBookingEnd = flight.DepartureDate,
                 DateBooked = DateTime.Now,
                 Duration = Convert.ToInt32(duration.TotalDays),
                 Total = price,
@@ -504,7 +545,7 @@ namespace ParkEasyV1.Models
                 Flight = context.Flights.Find(3),
                 ParkingSlot = context.ParkingSlots.Find(1),
                 Tariff = context.Tariffs.Find(1),
-
+                DateBookingEnd = flight.DepartureDate,
                 DateBooked = DateTime.Now,
                 Duration = Convert.ToInt32(duration.TotalDays),
                 Total = price,
@@ -589,7 +630,7 @@ namespace ParkEasyV1.Models
                 Flight = context.Flights.Find(4),
                 ParkingSlot = context.ParkingSlots.Find(102),
                 Tariff = context.Tariffs.Find(1),
-
+                DateBookingEnd = flight.DepartureDate,
                 DateBooked = DateTime.Now,
                 Duration = Convert.ToInt32(duration.TotalDays),
                 Total = price,
@@ -662,7 +703,7 @@ namespace ParkEasyV1.Models
                 Flight = context.Flights.Find(5),
                 ParkingSlot = context.ParkingSlots.Find(2),
                 Tariff = context.Tariffs.Find(1),
-
+                DateBookingEnd = flight.DepartureDate,
                 DateBooked = DateTime.Now,
                 Duration = Convert.ToInt32(duration.TotalDays),
                 Total = price,
@@ -745,7 +786,7 @@ namespace ParkEasyV1.Models
                 Flight = context.Flights.Find(6),
                 ParkingSlot = context.ParkingSlots.Find(13),
                 Tariff = context.Tariffs.Find(1),
-
+                DateBookingEnd = flight.DepartureDate,
                 DateBooked = DateTime.Now,
                 Duration = Convert.ToInt32(duration.TotalDays),
                 Total = price,
@@ -828,7 +869,7 @@ namespace ParkEasyV1.Models
                 Flight = context.Flights.Find(7),
                 ParkingSlot = context.ParkingSlots.Find(4),
                 Tariff = context.Tariffs.Find(1),
-
+                DateBookingEnd = flight.DepartureDate,
                 DateBooked = DateTime.Now,
                 Duration = Convert.ToInt32(duration.TotalDays),
                 Total = price,
@@ -900,7 +941,7 @@ namespace ParkEasyV1.Models
                 Flight = context.Flights.Find(8),
                 ParkingSlot = context.ParkingSlots.Find(5),
                 Tariff = context.Tariffs.Find(1),
-
+                DateBookingEnd = flight.DepartureDate,
                 DateBooked = DateTime.Now,
                 Duration = Convert.ToInt32(duration.TotalDays),
                 Total = price,
