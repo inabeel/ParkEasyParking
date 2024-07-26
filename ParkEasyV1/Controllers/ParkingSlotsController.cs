@@ -1,15 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Data.Entity;
+using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Web;
 using System.Web.Mvc;
+using DocumentFormat.OpenXml.Drawing.Charts;
 using DocumentFormat.OpenXml.EMMA;
 using Itenso.TimePeriod;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
+using Newtonsoft.Json;
 using ParkEasyV1.Models;
 
 namespace ParkEasyV1.Controllers
@@ -49,40 +54,15 @@ namespace ParkEasyV1.Controllers
     {
         public int ID { get; set; }
 
-        /// <summary>
-        /// Date the booking was created
-        /// </summary>
-        public DateTime DateBooked { get; set; }
+        public string EmployeeID { get; set; }
 
-        /// <summary>
-        /// Length of booking
-        /// </summary>
-        public int Duration { get; set; }
+        public string FirstName { get; set; }
 
-        /// <summary>
-        /// Total cost of booking
-        /// </summary>
-        public double Total { get; set; }
+        public string LastName { get; set; }
 
-        /// <summary>
-        /// Enum status of booking
-        /// </summary>
-        public BookingStatus BookingStatus { get; set; }
+        public DateTime DateStart { get; set; }
 
-        /// <summary>
-        /// Valet service selected boolean
-        /// </summary>
-        public bool ValetService { get; set; }
-
-        /// <summary>
-        /// Attribute to determine if the booking has checked in
-        /// </summary>
-        public bool CheckedIn { get; set; }
-
-        /// <summary>
-        /// Attribute to determine if the booking has checked out
-        /// </summary>
-        public bool CheckedOut { get; set; }
+        public DateTime DateEnd { get; set; }
     }
 
     public class ParkingSlotDataModel
@@ -95,6 +75,91 @@ namespace ParkEasyV1.Controllers
         public VehicleDataModel VehicleData {  get; set; }
     }
 
+    public class VoidResponse
+    {
+        public bool IsSuccessful {  get; set; }
+        public string Message { get; set; }
+    }
+
+    public class ChangeStatusRequest
+    {
+        public int SlotNumber { get; set; }
+        public int FloorNumber { get; set; }
+        public Status Status { get; set; }
+    }
+
+    public class ClearBookingRequest
+    {
+        public int BookingID { get; set; }
+    }
+
+    public class SearchParkingSlotsViewModel
+    {
+        /// <summary>
+        /// booking start date
+        /// </summary>
+        [Required]
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
+        [Display(Name = "Start Date")]
+        public DateTime DepartureDate1 { get; set; }
+
+
+        [Required]
+        [StringLength(10, ErrorMessage = "The {0} must be {2} characters long.", MinimumLength = 10)]
+        [Display(Name = "Employee ID")]
+        public string EmployeeID { get; set; }
+
+        /// <summary>
+        /// booking start time
+        /// </summary>
+        [Required]
+        [DataType(DataType.Time)]
+        [Display(Name = "Start Time")]
+        public TimeSpan DepartureTime { get; set; }
+
+        /// <summary>
+        /// booking end date
+        /// </summary>
+        [Required]
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
+        [Display(Name = "End Date")]
+        public DateTime ReturnDate { get; set; }
+
+        /// <summary>
+        /// booking end time
+        /// </summary>
+        [Required]
+        [DataType(DataType.Time)]
+        [Display(Name = "End Time")]
+        public TimeSpan ReturnTime { get; set; }
+
+        [Required]
+        [RegularExpression("(.*[1-9].*)|(.*[.].*[1-9].*)", ErrorMessage = "Invalid Slot Number.")]
+        [Range(1, int.MaxValue, ErrorMessage = "Invalid Floor Number.")]
+        [Display(Name = "Selected Parking Slot Number")]
+        public int ParkingSlotNumber { get; set; }
+
+        [Required]
+        [RegularExpression("(.*[1-9].*)|(.*[.].*[1-9].*)", ErrorMessage = "Invalid Floor Number.")]
+        [Range(1, int.MaxValue, ErrorMessage = "Invalid Floor Number.")]
+        [Display(Name = "Selected Parking Slot Floor")]
+        public int ParkingSlotFloor { get; set; }
+    }
+
+    internal class JsonNetModelBinder : IModelBinder
+    {
+        public object BindModel(ControllerContext controllerContext, ModelBindingContext bindingContext)
+        {
+            controllerContext.HttpContext.Request.InputStream.Position = 0;
+            var stream = controllerContext.RequestContext.HttpContext.Request.InputStream;
+            var readStream = new StreamReader(stream, Encoding.UTF8);
+            var json = readStream.ReadToEnd();
+            return JsonConvert.DeserializeObject(json, bindingContext.ModelType);
+        }
+    }
+
     /// <summary>
     /// Controller to handle all Parking Slot actions and events
     /// </summary>
@@ -104,6 +169,42 @@ namespace ParkEasyV1.Controllers
         /// Global instance of the ApplicationDbContext
         /// </summary>
         private ApplicationDbContext db = new ApplicationDbContext();
+
+        [HttpPost]
+        public JsonResult ChangeStatus([ModelBinder(typeof(JsonNetModelBinder))] ChangeStatusRequest _request)
+        {
+            var slot = db.ParkingSlots.FirstOrDefault(ps => ps.ParkingSlotNumber == _request.SlotNumber && ps.FloorNu == _request.FloorNumber);
+
+            if (slot != null)
+            {
+                slot.Status = _request.Status;
+                db.SaveChanges();
+            }
+
+            return Json(new VoidResponse() 
+            {
+                IsSuccessful = true,
+                Message = ""
+            });
+        }
+
+        [HttpPost]
+        public JsonResult ClearBooking([ModelBinder(typeof(JsonNetModelBinder))] ClearBookingRequest _request)
+        {
+            var booking = db.Bookings.FirstOrDefault(b => b.ID == _request.BookingID);
+
+            if(booking != null)
+            {
+                db.Bookings.Remove(booking);
+                db.SaveChanges();
+            }
+
+            return Json(new VoidResponse()
+            {
+                IsSuccessful = true,
+                Message = ""
+            });
+        }
 
         public JsonResult GetParkingSlotsData(int floorNumber, DateTime dateStart, DateTime dateEnd, TimeSpan timeStart, TimeSpan timeEnd)
         {
@@ -145,14 +246,12 @@ namespace ParkEasyV1.Controllers
                         Status = slot.Status,
                         BookingData = lastActiveBooking == null ? null : new BookingDataModel() 
                         {
-                            BookingStatus = lastActiveBooking.BookingStatus,
-                            CheckedIn = lastActiveBooking.CheckedIn,
-                            CheckedOut = lastActiveBooking.CheckedOut,
-                            DateBooked = lastActiveBooking.DateBooked,
-                            Duration = lastActiveBooking.Duration,
+                            DateEnd = lastActiveBooking.DateBookingEnd,
+                            FirstName = lastActiveBooking.FirstName,
+                            DateStart = lastActiveBooking.DateBooked,
+                            EmployeeID = lastActiveBooking.EmployeeID,
                             ID = lastActiveBooking.ID,
-                            Total = lastActiveBooking.Total,
-                            ValetService = lastActiveBooking.ValetService,
+                            LastName = lastActiveBooking.LastName
                         },
                         VehicleData = vehicleDataModel
                     };
@@ -176,31 +275,16 @@ namespace ParkEasyV1.Controllers
 
             //store user id in viewbag for front-end display
             ViewBag.UserID = loggedInUser.Id;
-
-            //create a list to hold active bookings in parking slots
-            List<Booking> activeBookings = new List<Booking>();
-
-            //loop through all parking slots
-            foreach (var slot in db.ParkingSlots.ToList())
-            {
-                //loop through all bookings associated with the parking slot
-                foreach (var booking in slot.Bookings)
-                {
-                    //if the booking has been checked in and NOT checked out
-                    //the booking is currently an active booking
-                    if (booking.CheckedIn == true && booking.CheckedOut==false)
-                    {
-                        //add the booking to the list
-                        activeBookings.Add(booking);
-                    }
-                }
-            }
-
-            //store the ActiveBookings in a TempData to be used on the front-end
-            TempData["ActiveBookings"] = activeBookings;
+            var model = new SearchParkingSlotsViewModel();
+            var startDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, 0, 0);
+            var endDate = startDate.AddMinutes(60);
+            model.DepartureDate1 = startDate;
+            model.DepartureTime = startDate.TimeOfDay;
+            model.ReturnDate = endDate;
+            model.ReturnTime = endDate.TimeOfDay;
 
             //return the full list of parking slots
-            return View(db.ParkingSlots.ToList());
+            return View(model);
         }
 
         /// <summary>

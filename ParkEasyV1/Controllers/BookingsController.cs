@@ -457,6 +457,11 @@ namespace ParkEasyV1.Controllers
                 //get the booking via id
                 Booking booking = db.Bookings.Find(model.BookingID);
 
+                if (booking == null) 
+                {
+                    return HttpNotFound();
+                }
+
                 //get the vehicle linked to booking via bookingline
                 Vehicle vehicle = db.Vehicles.Find(booking.BookingLines.First().VehicleID);
 
@@ -528,54 +533,6 @@ namespace ParkEasyV1.Controllers
                 TempData["Error_Booking_EDIT"] = "Error: Something went wrong please try again.";
                 return View(model);
             }
-
-            //check if model state is valid
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    //get the booking via id
-                    Booking booking = db.Bookings.Find(model.BookingID);
-
-                    //get the vehicle linked to booking via bookingline
-                    Vehicle vehicle = db.Vehicles.Find(booking.BookingLines.First().VehicleID);
-
-                    //check if the booking departure date is later than the current date - 24hours and departure date is earlier than the current date
-                    if (DateTime.Now <= booking.Flight.DepartureDate.AddHours(-24))
-                    {
-                        ////update booking
-                        booking.User.FirstName = model.FirstName;
-                        booking.User.LastName = model.Surname;
-                        booking.User.AddressLine1 = model.AddressLine1;
-                        booking.User.AddressLine2 = model.AddressLine2;
-                        booking.User.City = model.City;
-                        booking.User.Email = model.Email;
-                        booking.User.PhoneNumber = model.PhoneNo;
-                        vehicle.Make = model.VehicleMake;
-                        vehicle.Model = model.VehicleModel;
-                        vehicle.Colour = model.VehicleColour;
-                        vehicle.RegistrationNumber = model.VehicleRegistration;
-                        vehicle.NoOfPassengers = model.NoOfPassengers;
-
-                        ////save changes
-                        db.SaveChanges();
-
-
-                        //store success message in tempdata
-                        TempData["Success"] = "Booking Successfully Updated";
-
-                        //return staff to manage bookings
-                        return RedirectToAction("Manage", "Bookings");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    //if exception occurs, redisplay view
-                    return View(model);
-                }             
-            }
-            //if model state is not valid, return view with model
-            return View(model);
         }
 
         /// <summary>
