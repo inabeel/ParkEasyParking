@@ -19,30 +19,8 @@ $(function () {
 
 });
 
-$("#DepartureTime").timepicker({
-    timeFormat: 'HH:mm',
-    interval: 60,
-    minTime: '00:00',
-    maxTime: '23:00',
-    startTime: '00:00',
-    dynamic: false,
-    dropdown: true,
-    scrollbar: true
-});
-
-$("#ReturnTime").timepicker({
-    timeFormat: 'HH:mm',
-    interval: 60,
-    minTime: '00:00',
-    maxTime: '23:00',
-    startTime: '00:00',
-    dynamic: false,
-    dropdown: true,
-    scrollbar: true
-});
-
 $(function () {
-     window.ParkingSlotsMap = function () {
+    window.ParkingSlotsMap = function () {
         // -- this context
         const self = this;
 
@@ -2590,14 +2568,93 @@ $(function () {
         self.selectedListHTML = document.getElementById('selected-list');
         self.floorSelectDdl = document.getElementById('floor-select');
         self.clearBtn = document.getElementById('clear-btn');
+
+        
+
+        // Booking Form Fields
+        self.EditBookingID = null;
         self.inputFloorNumber = document.getElementById('ParkingSlotFloor');
         self.inputSlotNumber = document.getElementById('ParkingSlotNumber');
-
         self.inputStartDate = document.getElementById('DepartureDate1');
-        self.inputStartTime = document.getElementById('DepartureTime');
-
         self.inputEndDate = document.getElementById('ReturnDate');
-        self.inputEndTime = document.getElementById('ReturnTime');
+        self.inputFirstName = document.getElementById('FirstName');
+        self.inputLastName = document.getElementById('LastName');
+        self.inputEmployeeID = document.getElementById('EmployeeID');
+        self.inputVehicleMake = document.getElementById('VehicleMake');
+        self.inputVehicleModel = document.getElementById('VehicleModel');
+        self.inputVehicleColour = document.getElementById('VehicleColour');
+        self.inputVehicleRegistration = document.getElementById('VehicleRegistration');
+        self.selectBookingRangeType = document.getElementById('booking-range-type');
+
+        self.divDateSelectSection = document.getElementById('divDateSelectSection');
+        if (self.selectBookingRangeType.value == '1') {
+            $(self.divDateSelectSection).hide();
+        }
+
+        self.spanResponseValidation = document.getElementById('ResponseValidation');
+
+        self.spanFirstNameValidation = document.getElementById('FirstNameValidation');
+        self.spanLastNameValidation = document.getElementById('LastNameValidation');
+        self.spanEmployeeIDValidation = document.getElementById('EmployeeIDValidation');
+        self.spanParkingSlotFloorValidation = document.getElementById('ParkingSlotFloorValidation');
+        self.spanParkingSlotNumberValidation = document.getElementById('ParkingSlotNumberValidation');
+
+
+        $("#dialog").dialog({
+            minWidth: 1100,
+            buttons: [
+                {
+                    text: "Save",
+                    click: async function () {
+
+                        let isValid = self.validateBookingForm();
+                        if (!isValid) {
+                            return;
+                        }
+
+                        let formData = self.getBookingFormData();
+
+                        if (self.EditBookingID && self.EditBookingID > 0) {
+                            // edit
+                            formData.BookingID = self.EditBookingID;
+                            let result = await self.EditBooking(formData);
+                            if (!result.IsSuccessful) {
+                                if (result.Message) {
+                                    self.spanResponseValidation.innerHTML = result.Message;
+                                    $(self.spanResponseValidation).show();
+                                }
+                            } else {
+                                $(self.spanResponseValidation).hide();
+                                await self.InitChart();
+                                self.bookingModal.close();
+                            }
+
+                        } else {
+                            // create
+                            let result = await self.CreateBooking(formData);
+                            if (!result.IsSuccessful) {
+                                if (result.Message) {
+                                    self.spanResponseValidation.innerHTML = result.Message;
+                                    $(self.spanResponseValidation).show();
+                                }
+                            } else {
+                                $(self.spanResponseValidation).hide();
+                                await self.InitChart();
+                                self.bookingModal.close();
+                            }
+                        }
+                    }
+                },
+                {
+                    text: "Close",
+                    click: function () {
+                        self.bookingModal.close();
+                    }
+                }
+            ]
+        });
+        self.bookingModal = $("#dialog").dialog("instance");
+        self.bookingModal.close();
 
         // -- methods
 
@@ -2680,8 +2737,8 @@ $(function () {
             return {
                 startDate: encodeURIComponent(self.inputStartDate.value),
                 endDate: encodeURIComponent(self.inputEndDate.value),
-                startTime: encodeURIComponent(self.inputStartTime.value),
-                endTime: encodeURIComponent(self.inputEndTime.value)
+                startTime: encodeURIComponent('00:00'),
+                endTime: encodeURIComponent('23:59')
             }
         }
 
@@ -2689,6 +2746,14 @@ $(function () {
             self.floorSelectDdl.onchange = function () {
                 self.selectedFloor = Number.parseInt(self.floorSelectDdl.value);
                 self.InitChart();
+            }
+
+            self.selectBookingRangeType.onchange = function () {
+                if (self.selectBookingRangeType.value == '1') {
+                    $(self.divDateSelectSection).hide();
+                } else {
+                    $(self.divDateSelectSection).show();
+                }
             }
 
             self.clearBtn.onclick = function () {
@@ -2699,23 +2764,183 @@ $(function () {
                 self.selectedSlotValue = null;
                 self.toggleSelection(null);
             }
+        }
 
-            self.inputEndDate.onchange = function () {
-                self.InitChart();
+        self.validateBookingForm = () => {
+            $(self.spanFirstNameValidation).hide();
+            $(self.spanLastNameValidation).hide();
+            $(self.spanEmployeeIDValidation).hide();
+            $(self.spanParkingSlotFloorValidation).hide();
+            $(self.spanParkingSlotNumberValidation).hide();
+
+            let formData = self.getBookingFormData();
+
+            let isValid = true;
+
+            if (!formData.FirstName) {
+                $(self.spanFirstNameValidation).show();
+                isValid = false;
             }
-            self.inputStartDate.onchange = function () {
-                self.InitChart();
+
+            if (!formData.LastName) {
+                $(self.spanLastNameValidation).show();
+                isValid = false;
             }
-            self.inputEndTime.onblur = function () {
-                setTimeout(() => {
-                    self.InitChart();
-                }, 100)
+
+            if (!formData.EmployeeID) {
+                $(self.spanEmployeeIDValidation).show();
+                isValid = false;
             }
-            self.inputStartTime.onblur = function () {
-                setTimeout(() => {
-                    self.InitChart();
-                }, 100)
+
+            if (!formData.ParkingSlotFloor) {
+                $(self.spanParkingSlotFloorValidation).show();
+                isValid = false;
+                
             }
+
+            if (!formData.ParkingSlotNumber) {
+                $(self.spanParkingSlotNumberValidation).show();
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+        self.clearBookingForm = () => {
+            let currentDate = new Date();
+
+            // Booking Form Fields
+            self.inputFloorNumber.value = null;
+            self.inputSlotNumber.value = null
+            self.inputStartDate.value = `${currentDate.getMonth() + 1}/${currentDate.getDate()}/${currentDate.getFullYear()}`;
+            self.inputEndDate.value = `${currentDate.getMonth() + 1}/${currentDate.getDate()}/${currentDate.getFullYear()}`;
+            self.inputFirstName.value = null;
+            self.inputLastName.value = null;
+            self.inputEmployeeID.value = null;
+            self.inputVehicleMake.value = null;
+            self.inputVehicleModel.value = null;
+            self.inputVehicleColour.value = null;
+            self.inputVehicleRegistration.value = null;
+            self.selectBookingRangeType.value = '1';
+        };
+
+        self.fillBookingForm = (data) => {
+            self.inputFloorNumber.value = data.ParkingSlotFloor;
+            self.inputSlotNumber.value = data.ParkingSlotNumber;
+            self.inputStartDate.value = data.DepartureDate1;
+            self.inputEndDate.value = data.ReturnDate;
+            self.inputFirstName.value = data.FirstName;
+            self.inputLastName.value = data.LastName;
+            self.inputEmployeeID.value = data.EmployeeID;
+            self.inputVehicleMake.value = data.VehicleMake;
+            self.inputVehicleModel.value = data.VehicleModel;
+            self.inputVehicleColour.value = data.VehicleColour;
+            self.inputVehicleRegistration.value = data.VehicleRegistration;
+            self.selectBookingRangeType.value = data.BookingRangeType;
+
+            if (self.selectBookingRangeType.value == '1') {
+                $(self.divDateSelectSection).hide();
+            } else {
+                $(self.divDateSelectSection).show();
+            }
+        }
+
+        self.getBookingFormData = () => {
+            return {
+                ParkingSlotFloor: self.inputFloorNumber.value,
+                ParkingSlotNumber: self.inputSlotNumber.value,
+                DepartureDate1: self.inputStartDate.value,
+                ReturnDate: self.inputEndDate.value,
+                FirstName: self.inputFirstName.value,
+                LastName: self.inputLastName.value,
+                EmployeeID: self.inputEmployeeID.value,
+                VehicleMake: self.inputVehicleMake.value,
+                VehicleModel: self.inputVehicleModel.value,
+                VehicleColour: self.inputVehicleColour.value,
+                VehicleRegistration: self.inputVehicleRegistration.value,
+                BookingRangeType: self.selectBookingRangeType.value
+            }
+        }
+
+        self.formatDigitLength = (digit) => {
+            if (digit.toString().length == 1) {
+                return '0' + digit;
+            }
+
+            return digit.toString();
+        }
+
+        self.getFormatedDate = (date) => {
+            let month = self.formatDigitLength(date.getMonth() + 1);
+
+            let day = self.formatDigitLength(date.getDate());
+
+            let year = self.formatDigitLength(date.getFullYear());
+
+            return `${month}/${day}/${year}`;
+        }
+
+        self.getFormatedDateWithTime = (date) => {
+            let month = self.formatDigitLength(date.getMonth() + 1);
+
+            let day = self.formatDigitLength(date.getDate());
+
+            let year = self.formatDigitLength(date.getFullYear());
+
+            let hours = self.formatDigitLength(date.getHours());
+
+            let minutes = self.formatDigitLength(date.getMinutes());
+
+            return `${month}/${day}/${year}-${hours}:${minutes}`;
+        }
+
+        self.openBookingModal = function (slot) {
+            let _that = slot;
+            self.EditBookingID = null;
+            self.clearBookingForm();
+
+
+            let slotNumber = Number.parseInt(_that.name.replace('P', ''))
+            let itemData = self.data.find(item => item.ParkingSlotNumber == slotNumber);
+
+            self.inputSlotNumber.value = slotNumber;
+            self.inputFloorNumber.value = _that.floor;
+
+            self.bookingModal.option('title', `${_that.name} - Create Booking`);
+
+            if (itemData.BookingData) {
+                self.EditBookingID = itemData.BookingData.ID;
+                self.bookingModal.option('title', `${_that.name}; Booking ID: #${itemData.BookingData.ID} - View Booking`);
+
+                let dateStart = new Date(Number.parseInt(itemData.BookingData.DateStart.replace('/Date(', '').replace(')/')));
+                let dateEnd = new Date(Number.parseInt(itemData.BookingData.DateEnd.replace('/Date(', '').replace(')/')));
+
+                let formatedDateStart = self.getFormatedDate(dateStart);
+                let formatedDateEnd = self.getFormatedDate(dateEnd);
+
+                self.fillBookingForm({
+                    ParkingSlotFloor: itemData.FloorNu,
+                    ParkingSlotNumber: itemData.ParkingSlotNumber,
+                    DepartureDate1: formatedDateStart,
+                    ReturnDate: formatedDateEnd,
+                    FirstName: itemData.BookingData.FirstName,
+                    LastName: itemData.BookingData.LastName,
+                    EmployeeID: itemData.BookingData.EmployeeID,
+                    VehicleMake: itemData.VehicleData.Make,
+                    VehicleModel: itemData.VehicleData.Model,
+                    VehicleColour: itemData.VehicleData.Colour,
+                    VehicleRegistration: itemData.VehicleData.RegistrationNumber,
+                    BookingRangeType: itemData.BookingData.BookingRangeType,
+                });
+            }
+
+            if (self.selectBookingRangeType.value == '1') {
+                $(self.divDateSelectSection).hide();
+            } else {
+                $(self.divDateSelectSection).show();
+            }
+
+            self.bookingModal.open();
         }
 
         self.InitChart = async (isOnload) => {
@@ -2727,12 +2952,6 @@ $(function () {
                 }
                 if (!self.inputStartDate.value) {
                     self.inputStartDate.value = `${currentDate.getMonth() + 1}/${currentDate.getDate()}/${currentDate.getFullYear()}`;
-                }
-                if (!self.inputEndTime.value) {
-                    self.inputEndTime.value = `${new Date(currentDate.getTime() + (1000 * 60 * 60)).getHours()}:00`;
-                }
-                if (!self.inputStartTime.value) {
-                    self.inputStartTime.value = `${currentDate.getHours()}:00`;
                 }
 
                 if (self.inputFloorNumber.value == '0') {
@@ -2815,11 +3034,12 @@ $(function () {
                 //    return [p.name, angle, self.slotPossibleValues.special.toString()]; // Special parking category and free now.
                 //}
 
-                if (p.Status == 1) {
-                    return ['P' + p.ParkingSlotNumber, angle, self.slotPossibleValues.allocated.toString()]; // allocated
-                }
-
                 if (p.BookingData) {
+
+                    if (p.BookingData.BookingRangeType == 1) {
+                        return ['P' + p.ParkingSlotNumber, angle, self.slotPossibleValues.allocated.toString()]; // allocated
+                    }
+
                     return ['P' + p.ParkingSlotNumber, angle, self.slotPossibleValues.allocatedTemporary.toString()]; // allocated temp
                 }
 
@@ -2875,44 +3095,14 @@ $(function () {
                             {{bookingInfo}}
                         </div>
                     `;
-
-            let formatDigitLength = (digit) => {
-                if (digit.toString().length == 1) {
-                    return '0' + digit;
-                }
-
-                return digit.toString();
-            }
-
-            let getFormatedDate = (date) => {
-                let month = formatDigitLength(date.getMonth() + 1);
-
-                let day = formatDigitLength(date.getDate());
-
-                let year = formatDigitLength(date.getFullYear());
-
-                let hours = formatDigitLength(date.getHours());
-
-                let minutes = formatDigitLength(date.getMinutes());
-
-                return `${month}/${day}/${year}-${hours}:${minutes}`;
-            }
+            
 
             let getSlotInfoMarkup = (slot) => {
-                let status = 'Free';
+                let status = 'Available';
                 let backGroundColor = '#5FA55A';
 
                 if (slot.itemData.ParkingSlotNumber == 1 || slot.itemData.ParkingSlotNumber == 2) {
                     backGroundColor = '#A849A3';
-                }
-
-                if (slot.itemData.Status == 1) {
-                    status = 'Allocated';
-                    backGroundColor = '#D9534F';
-                }
-                if (slot.itemData.BookingData) {
-                    status = 'Booked';
-                    backGroundColor = '#FAD02E';
                 }
 
                 let template = contextMenuSlotInfoTemplate
@@ -2927,8 +3117,26 @@ $(function () {
                 let dateStart = new Date(Number.parseInt(slot.itemData.BookingData.DateStart.replace('/Date(', '').replace(')/')));
                 let dateEnd = new Date(Number.parseInt(slot.itemData.BookingData.DateEnd.replace('/Date(', '').replace(')/')));
 
-                let formatedDateStart = getFormatedDate(dateStart);
-                let formatedDateEnd = getFormatedDate(dateEnd);
+                let formatedDateStart = self.getFormatedDateWithTime(dateStart);
+                let formatedDateEnd = self.getFormatedDateWithTime(dateEnd);
+                
+                if (slot.itemData.BookingData) {
+                    status = 'Temporary Booking';
+                    backGroundColor = '#FAD02E';
+
+                    if (slot.itemData.BookingData.BookingRangeType == 1) {
+                        status = 'Permanent Booking';
+                        backGroundColor = '#D9534F';
+
+                        formatedDateStart = '';
+                        formatedDateEnd = '';
+                    }
+                }
+
+                template = contextMenuSlotInfoTemplate
+                    .replace('{{name}}', slot.point.name)
+                    .replace('{{backGroundColor}}', backGroundColor)
+                    .replace('{{status}}', status);
 
                 let bookingTemplate = contextMenuSlotInfoBookingTemplate
                     .replace('{{id}}', slot.itemData.BookingData.ID)
@@ -2943,12 +3151,93 @@ $(function () {
                 return template;
             }
 
+            
+
             self.chart = Highcharts.mapChart('container', {
+                responsive: {
+                    rules: [
+                        {
+                            chartOptions: {
+                                chart: {
+                                    width: 1900,
+                                    height: 1400,
+                                },
+                                plotOptions: {
+                                    series: {
+                                        dataLabels: {
+                                            style: {
+                                                fontSize: '14px'
+                                            }
+                                        },
+                                    }
+                                },
+                            },
+                            condition: {
+                                minWidth: 1900
+                            }
+                        },
+                        {
+                            chartOptions: {
+                                chart: {
+                                    width: 1373,
+                                    height: 1011,
+                                },
+                                plotOptions: {
+                                    series: {
+                                        dataLabels: {
+                                            style: {
+                                                fontSize: '10px'
+                                            }
+                                        },
+                                    }
+                                },
+                            },
+                            condition: {
+                                maxWidth: 1899,
+                                minWidth: 1615
+                            }
+                        },
+
+                        {
+                            chartOptions: {
+                                chart: {
+                                    width: 1373,
+                                    height: 1011,
+                                },
+                                plotOptions: {
+                                    series: {
+                                        dataLabels: {
+                                            style: {
+                                                fontSize: '10px'
+                                            }
+                                        },
+                                    }
+                                },
+                            },
+                            condition: {
+                                maxWidth: 1614,
+                                minWidth: 1373
+                            }
+                        },
+
+                        {
+                            chartOptions: {
+                                chart: {
+                                    width: 1166,
+                                    height: 860,
+                                }
+                            },
+                            condition: {
+                                maxWidth: 1372,
+                                minWidth: 1166
+                            }
+                        }
+                    ]
+                },
                 chart: {
                     backgroundColor: '#0000005e',
                     events: {
                         load: function () {
-
                             let show = function (options) {
 
                                 // Add class to the menu
@@ -2962,15 +3251,11 @@ $(function () {
 
                                 options.items.allocate.$node['0'].classList.add('d-none');
                                 options.items.deallocate.$node['0'].classList.add('d-none');
-                                options.items.clearBooking.$node['0'].classList.add('d-none');
                                 options.items.view.$node['0'].classList.add('d-none');
 
-                                if (slot.itemData.Status == 1) {
-                                    // 'Allocated';
-                                    options.items.deallocate.$node['0'].classList.remove('d-none');
-                                } else if (slot.itemData.BookingData) {
+                                if (slot.itemData.BookingData) {
                                     // 'Booked';
-                                    options.items.clearBooking.$node['0'].classList.remove('d-none');
+                                    options.items.deallocate.$node['0'].classList.remove('d-none');
                                     options.items.view.$node['0'].classList.remove('d-none');
                                 } else {
                                     // 'Free'
@@ -2986,30 +3271,19 @@ $(function () {
                                 let slot = getSlot(options);
 
                                 if (key == 'allocate') {
-                                    await self.ChangeStatus({
-                                        SlotNumber: slot.itemData.ParkingSlotNumber,
-                                        FloorNumber: slot.itemData.FloorNu,
-                                        Status: 1
-                                    });
+                                    // create booking
+                                    self.openBookingModal(slot.point);
                                 }
 
                                 if (key == 'deallocate') {
-                                    await self.ChangeStatus({
-                                        SlotNumber: slot.itemData.ParkingSlotNumber,
-                                        FloorNumber: slot.itemData.FloorNu,
-                                        Status: 2
-                                    });
-                                }
-
-                                if (key == 'clearBooking') {
                                     await self.ClearBooking({ BookingID: slot.itemData.BookingData.ID });
+                                    await self.InitChart();
                                 }
 
                                 if (key == 'view') {
-                                    location.href = `/Bookings/Edit/${slot.itemData.BookingData.ID}`;
-                                }
-
-                                await self.InitChart();
+                                    // edit booking
+                                    self.openBookingModal(slot.point);
+                                }                                
                             }
 
                             let contextMenuSettings = {
@@ -3026,13 +3300,12 @@ $(function () {
                                         html: `<div class="slot-info">Parking Slot</div>`
                                     },
                                     sep1: "---------",
-                                    allocate: { name: "Allocate" },
+                                    allocate: { name: "Create Booking" },
                                     deallocate: { name: "Deallocate" },
-                                    clearBooking: { name: "Clear Booking" },
                                     view: { name: "View Booking" },
                                     sep2: "---------",
                                     quit: {
-                                        name: "Quit"
+                                        name: "Cancel"
                                     }
                                 }
                             };
@@ -3068,15 +3341,9 @@ $(function () {
                     text: 'Parking Slots plan',
                     x: 10
                 },
-                subtitle: {
-                    text: 'Click to select',
-                    x: 10
-                },
-
                 legend: {
-                    enabled: false
+                    enabled: true
                 },
-
                 mapNavigation: {
                     enabled: false
                 },
@@ -3084,17 +3351,40 @@ $(function () {
                     outside: true,
                     format: 'Parking slot <b>{point.name}</b>'
                 },
-                colorAxis: {
-                    stops: [
-                        [self.slotPossibleValues.available / self.slotPossibleValues.max, '#5FA55A'], // Green - Parking is available. (0.1)
-                        [self.slotPossibleValues.allocated / self.slotPossibleValues.max, '#D9534F'], // Red - Parking is allocated. (0.2)
-                        [self.slotPossibleValues.allocatedTemporary / self.slotPossibleValues.max, '#FAD02E'], // Yellow - Parking is allocated temporarily. (0.3)
-                        [self.slotPossibleValues.handicapped / self.slotPossibleValues.max, '#A849A3'], // Purple - Parking is designated for handicapped. (0.4)
-                        [self.slotPossibleValues.special / self.slotPossibleValues.max, '#FFFFFF'], // White - Special parking category. (0.5)
-                    ],
-                    min: 0,
-                    max: self.slotPossibleValues.max
-                },
+                colorAxis: [{
+                    dataClasses: [
+                        {
+                            color: '#5FA55A',
+                            name: 'Available',
+                            from: 1,
+                            to: 2,
+                        },
+                        {
+                            color: '#D9534F',
+                            name: 'Permanent Booking',
+                            from: 2,
+                            to: 3,
+                        },
+                        {
+                            color: '#FAD02E',
+                            name: 'Temporary Booking',
+                            from: 3,
+                            to: 4,
+                        },
+                        {
+                            color: '#A849A3',
+                            name: 'Designated for handicapped',
+                            from: 4,
+                            to: 5,
+                        },
+                        {
+                            color: '#FFFFFF',
+                            name: 'Special',
+                            from: 5,
+                            to: 6,
+                        }
+                    ]
+                }],
                 series: [
                     {
                         id: 'Slots',
@@ -3111,7 +3401,9 @@ $(function () {
                         point: {
                             events: {
                                 click: function () {
-                                    self.toggleSelection(this);
+                                    // self.toggleSelection(this);
+                                    let _that = this;
+                                    self.openBookingModal(_that)
                                 }
                             }
                         },
@@ -3145,30 +3437,48 @@ $(function () {
         }
 
         // requests 
-        self.GetParkingSlotsData = async (floorNumber, dateRange) => {
-            let getSlotsDataRequest = fetch(`/ParkingSlots/GetParkingSlotsData?floorNumber=${floorNumber}&dateStart=${dateRange.startDate}&dateEnd=${dateRange.endDate}&timeStart=${dateRange.startTime}&timeEnd=${dateRange.endTime}`);
+        self.GetParkingSlotsData = async (floorNumber) => {
+            let getSlotsDataRequest = fetch(`/ParkingSlots/GetParkingSlotsData?floorNumber=${floorNumber}`);
             let response = await getSlotsDataRequest;
             let slotsData = await response.json();
 
             return slotsData;
-         }
+        }
 
-         self.ChangeStatus = async (data) => {
-             let response = await fetch("/ParkingSlots/ChangeStatus", {
-                 method: "POST",
-                 body: JSON.stringify(data),
-             });
-             let ret = await response.json();
-             return ret;
-         }
+        self.ChangeStatus = async (data) => {
+            let response = await fetch("/ParkingSlots/ChangeStatus", {
+                method: "POST",
+                body: JSON.stringify(data),
+            });
+            let ret = await response.json();
+            return ret;
+        }
 
-         self.ClearBooking = async (data) => {
-             let response = await fetch("/ParkingSlots/ClearBooking", {
-                 method: "POST",
-                 body: JSON.stringify(data),
-             });
-             let ret = await response.json();
-             return ret;
-         }
+        self.ClearBooking = async (data) => {
+            let response = await fetch("/ParkingSlots/ClearBooking", {
+                method: "POST",
+                body: JSON.stringify(data),
+            });
+            let ret = await response.json();
+            return ret;
+        }
+
+        self.CreateBooking = async (data) => {
+            let response = await fetch("/Bookings/CreateBooking", {
+                method: "POST",
+                body: JSON.stringify(data),
+            });
+            let ret = await response.json();
+            return ret;
+        }
+
+        self.EditBooking = async (data) => {
+            let response = await fetch("/Bookings/EditBooking", {
+                method: "POST",
+                body: JSON.stringify(data),
+            });
+            let ret = await response.json();
+            return ret;
+        }
     };
 });

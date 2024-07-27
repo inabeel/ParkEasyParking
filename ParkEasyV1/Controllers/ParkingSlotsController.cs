@@ -63,6 +63,8 @@ namespace ParkEasyV1.Controllers
         public DateTime DateStart { get; set; }
 
         public DateTime DateEnd { get; set; }
+
+        public BookingRangeType BookingRangeType { get; set; }
     }
 
     public class ParkingSlotDataModel
@@ -206,21 +208,17 @@ namespace ParkEasyV1.Controllers
             });
         }
 
-        public JsonResult GetParkingSlotsData(int floorNumber, DateTime dateStart, DateTime dateEnd, TimeSpan timeStart, TimeSpan timeEnd)
+        public JsonResult GetParkingSlotsData(int floorNumber)
         {
-
-            TimeRange selectedTimeRange = new TimeRange(
-            new DateTime(dateStart.Year, dateStart.Month, dateStart.Day, timeStart.Hours, timeStart.Minutes, 0),
-            new DateTime(dateEnd.Year, dateEnd.Month, dateEnd.Day, timeEnd.Hours, timeEnd.Minutes, 0));
-
             var data = db.ParkingSlots
             .Where(ps => ps.FloorNu == floorNumber)
             .ToList()
             .Select((slot) =>
             {
+                // get last not ended booking
                 var lastActiveBooking = slot.Bookings.Where(b =>
                 {
-                    return (new TimeRange(b.DateBooked, b.DateBookingEnd).OverlapsWith(selectedTimeRange));
+                    return b.DateBookingEnd > DateTime.Now;
                 }).OrderByDescending(b => b.ID)
                 .FirstOrDefault();
                 VehicleDataModel vehicleDataModel = null;
@@ -251,7 +249,8 @@ namespace ParkEasyV1.Controllers
                             DateStart = lastActiveBooking.DateBooked,
                             EmployeeID = lastActiveBooking.EmployeeID,
                             ID = lastActiveBooking.ID,
-                            LastName = lastActiveBooking.LastName
+                            LastName = lastActiveBooking.LastName,
+                            BookingRangeType = lastActiveBooking.ReservationType == ReservationType.Permanent ? BookingRangeType.Permanent : BookingRangeType.Temporary
                         },
                         VehicleData = vehicleDataModel
                     };

@@ -1,150 +1,179 @@
-﻿@model ParkEasyV1.Models.ViewModels.AvailabilityViewModel
+﻿@model ParkEasyV1.Controllers.SearchParkingSlotsViewModel
+@using ParkEasyV1.Models
+@using ParkEasyV1.Controllers
 
 @{
-    ViewBag.Title = "Home Page";
+    ViewBag.Title = "Parking";
 }
 
 <link href="~/Content/themes/base/jquery-ui.min.css" rel="stylesheet" />
 <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.css">
-@section scripts{
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.7.1/jquery.contextMenu.min.css">
 
+@section scripts{
     <script src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.js"></script>
-
+    <script src="https://code.highcharts.com/maps/highmaps.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.7.1/jquery.contextMenu.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.7.1/jquery.ui.position.js"></script>
+    <script src="~/Scripts/parking-slots-map.js"></script>
     <script>
         $(function () {
-            $("#DepartureDate").datepicker({
-                dateFormat: "dd/mm/yy",
-                changeMonth: true,
-                changeYear: true,
-                minDate: -0,
-                maxDate: "+12M +0D",
-            });
-        });
-    </script>
-    <script>
-        $(function () {
-            $("#ReturnDate").datepicker({
-                dateFormat: "dd/mm/yy",
-                changeMonth: true,
-                changeYear: true,
-                minDate: -0,
-                maxDate: "+12M +0D"
-
-            });
-        });
-    </script>
-
-    <script>
-        $("#DepartureTime").timepicker({
-            timeFormat: 'HH:mm',
-            interval: 60,
-            minTime: '00:00',
-            maxTime: '23:00',
-            defaultTime: '00:00',
-            startTime: '00:00',
-            dynamic: false,
-            dropdown: true,
-            scrollbar: true
-        });
-    </script>
-
-    <script>
-        $("#ReturnTime").timepicker({
-            timeFormat: 'HH:mm',
-            interval: 60,
-            minTime: '00:00',
-            maxTime: '23:00',
-            defaultTime: '00:00',
-            startTime: '00:00',
-            dynamic: false,
-            dropdown: true,
-            scrollbar: true
+            let parkingSlotMap = new ParkingSlotsMap();
+            parkingSlotMap.Init();
         });
     </script>
 }
 
-<div class="container body-content">
-    <div class="m-3">
-        <h4 class="text-center">ParkEasy Airport Parking - Glasgow</h4>
-        <h6 class="text-center">Check our availability and prices for parking your vehicle with our safe and secure storage while you travel!</h6>
-    </div>
-    <center>
-                @using (Html.BeginForm("Availability", "Bookings", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
-                {
-                    @Html.AntiForgeryToken()
+<div id="dialog" style="display: none;">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="FirstName" class="control-label col-md-4">First Name</label>
+                <div class="col-md-10">
+                    <input required type="text" name="FirstName" id="FirstName" value="" class="form-control" />
+                    <span style="display: none;" id="FirstNameValidation" class="field-validation-error text-danger">The First Name field is required.</span>
+                </div>
+            </div>
 
-                <div class="col-md-12 bg-dark-blue rounded">
-                    <div class="row" style="padding-bottom: 20px;">
-                        <div class="form-group">
-                            @Html.LabelFor(model => model.DepartureDate, htmlAttributes: new { @class = "control-label col-md-12 text-white offset-1 font-weight-bold" })
-                            <div class="col-md-12 offset-1">
-                                @Html.TextBoxFor(model => model.DepartureDate, new { @class = "form-control", @placeholder = "dd/mm/yyyy" })
-                                @Html.ValidationMessageFor(model => model.DepartureDate, "", new { @class = "text-danger" })
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            @Html.LabelFor(model => model.DepartureTime, htmlAttributes: new { @class = "control-label col-md-12 text-white offset-1 font-weight-bold" })
-                            <div class="col-md-12 offset-1">
-                                @Html.TextBoxFor(model => model.DepartureTime, new { @class = "form-control" })
-                                @Html.ValidationMessageFor(model => model.DepartureTime, "", new { @class = "text-danger" })
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            @Html.LabelFor(model => model.ReturnDate, htmlAttributes: new { @class = "control-label col-md-12 text-white offset-1 font-weight-bold" })
-                            <div class="col-md-12 offset-1">
-                                @Html.TextBoxFor(model => model.ReturnDate, new { @class = "form-control", @placeholder = "dd/mm/yyyy" })
-                                @Html.ValidationMessageFor(model => model.ReturnDate, "", new { @class = "text-danger" })
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            @Html.LabelFor(model => model.ReturnTime, htmlAttributes: new { @class = "control-label col-md-12 text-white offset-1 font-weight-bold" })
-                            <div class="col-md-12 offset-1">
-                                @Html.TextBoxFor(model => model.ReturnTime, new { @class = "form-control" })
-                                @Html.ValidationMessageFor(model => model.ReturnTime, "", new { @class = "text-danger" })
-                            </div>
+            <div class="form-group">
+                <label for="LastName" class="control-label col-md-4">Last Name</label>
+                <div class="col-md-10">
+                    <input required type="text" name="LastName" id="LastName" value="" class="form-control" />
+                    <span style="display: none;" id="LastNameValidation" class="field-validation-error text-danger">The Last Name field is required.</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="EmployeeID" class="control-label col-md-4">Employee ID</label>
+                <div class="col-md-10">
+                    <input required type="text" name="EmployeeID" id="EmployeeID" value="" class="form-control" />
+                    <span style="display: none;" id="EmployeeIDValidation" class="field-validation-error text-danger">The Employee ID field is required.</span>
+                </div>
+            </div>
+
+        </div>
+        <div class="col-md-6">
+
+            <div class="form-group">
+                <label for="VehicleMake" class="control-label col-md-4">Vehicle Make</label>
+                <div class="col-md-10">
+                    <input type="text" name="VehicleMake" id="VehicleMake" value="" class="form-control" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="VehicleModel" class="control-label col-md-4">Vehicle Model</label>
+                <div class="col-md-10">
+                    <input type="text" name="VehicleModel" id="VehicleModel" value="" class="form-control" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="VehicleColour" class="control-label col-md-4">Vehicle Color</label>
+                <div class="col-md-10">
+                    <input type="text" name="VehicleColour" id="VehicleColour" value="" class="form-control" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="VehicleRegistration" class="control-label col-md-4">Vehicle Registration</label>
+                <div class="col-md-10">
+                    <input type="text" name="VehicleRegistration" id="VehicleRegistration" value="" class="form-control" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="ParkingSlotFloor" class="control-label col-md-7">Parking Slot Floor</label>
+                <div class="col-md-10">
+                    <input readonly="readonly" required type="number" min="1" name="ParkingSlotFloor" id="ParkingSlotFloor" value="" class="form-control" />
+                    <span style="display: none;" id="ParkingSlotFloorValidation" class="field-validation-error text-danger">The Parking Slot Floor field is required.</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="ParkingSlotNumber" class="control-label col-md-7">Parking Slot Number</label>
+                <div class="col-md-10">
+                    <input readonly="readonly" required type="number" min="1" name="ParkingSlotNumber" id="ParkingSlotNumber" value="" class="form-control" />
+                    <span style="display: none;" id="ParkingSlotNumberValidation" class="field-validation-error text-danger">The Parking Slot Number field is required.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="booking-range-type" class="control-label col-md-7">
+                    Booking Range type
+                </label>
+                <div class="col-md-10">
+                    <select name="booking-range-type" class="form-control" id="booking-range-type">
+                        <option selected="selected" value="1">Permanent</option>
+                        <option value="2">Temporary</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div id="divDateSelectSection" class="col-md-6">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.DepartureDate1, htmlAttributes: new { @class = "control-label col-md-8" })
+                        <div class="col-md-10">
+                            @Html.TextBoxFor(model => model.DepartureDate1, "{0:MM/dd/yyyy}", new { @class = "form-control", @placeholder = "mm/dd/yyyy" })
+                            @Html.ValidationMessageFor(model => model.DepartureDate1, "", new { @class = "text-danger" })
                         </div>
                     </div>
-                    <center>
-                        <div class="form-group">
-                            <center><input type="submit" class="btn btn-white font-weight-bold my-2" value="Check Availability" /></center>
-                        </div>
-                    </center>
                 </div>
-                }
-    </center>
-
-    <h4 class="text-center">What We Offer</h4>
-
-    <div class="row col-md-12 justify-content-center" style="margin-bottom: 40px;">
-        <div class="col-md-3 bg-light rounded thinborder m-3">
-            <center><i class="fas fa-lock fa-3x" style="padding-top: 20px; padding-bottom: 20px;"></i></center>
-            <h6 class="text-center text-darkblue">Safe &amp; Secure Parking</h6><br />
-            <p>
-                <i class="fas fa-check text-darkblue"></i> CCTV <br />
-                <i class="fas fa-check text-darkblue"></i> 24/7 Security Staff <br />
-                <i class="fas fa-check text-darkblue"></i> Controlled Entry/Exit Barriers <br />
-                <i class="fas fa-check text-darkblue"></i> Fully Insured Parking <br />
-            </p>
-        </div>
-
-        <div class="col-md-3 bg-light rounded thinborder m-3">
-            <center><i class="fas fa-car fa-3x" style="padding-top: 20px; padding-bottom: 20px;"></i></center>
-            <h6 class="text-center text-darkblue">Professional Valet Service</h6><br />
-            <p>
-                We offer a new professional 5-star valet service that is carried out on-site by our quality valet staff. Make your return home even better with a spotless and sparkling clean valet.
-            </p><br />
-            <center style="padding-bottom: 20px;"><button class="btn btn-darkblue font-weight-bold" onclick="location.href='@Url.Action("Services")'">Learn More</button></center>
-        </div>
-
-        <div class="col-md-3 bg-light rounded thinborder m-3">
-            <center><i class="fas fa-user-cog fa-3x" style="padding-top: 20px; padding-bottom: 20px;"></i></center>
-            <h6 class="text-center text-darkblue">Online Booking Management</h6><br />
-            <p>
-                View and amend your booking with ease using our simple online web system. Have full control of your booking and make changes hassle free.
-            </p><br />
-            <center style="padding-bottom: 20px;"><button class="btn btn-darkblue font-weight-bold" onclick="location.href='@Url.Action("MyBookings", "Users")'">Manage My Booking</button></center>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.ReturnDate, htmlAttributes: new { @class = "control-label col-md-6" })
+                        <div class="col-md-10">
+                            @Html.TextBoxFor(model => model.ReturnDate, "{0:MM/dd/yyyy}", new { @class = "form-control", @placeholder = "mm/dd/yyyy" })
+                            @Html.ValidationMessageFor(model => model.ReturnDate, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+
+    <div class="w-100 d-flex justify-content-center align-items-center">
+        <span id="ResponseValidation" style="display: none;" class="field-validation-error text-danger"></span>
+    </div>
+
     
+</div>
+
+<div style="display: none;" id="selected-list">
+    floor - None, Slot: None
+</div>
+<div style="display: none;">
+    <button type="button" id="clear-btn">Clear Selection</button>
+</div>
+<div class="raw mt-3">
+    <div class="col-md-4">
+        <div class="form-group">
+            <select class="form-control" id="floor-select">
+                <option selected="selected" value="1">First Basement (B1)</option>
+                <option value="2">Second Basement (B2)</option>
+                <option value="3">Third Basement (B3)</option>
+            </select>
+        </div>
+    </div>
+</div>
+<div id="container" class="d-flex align-items-center justify-content-center">
+    <div class="w-100 h-100 d-flex align-items-center justify-content-center">
+        <div>
+            LOADING MAP...
+        </div>
+    </div>
 </div>

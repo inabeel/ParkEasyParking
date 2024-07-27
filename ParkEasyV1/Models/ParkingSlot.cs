@@ -27,8 +27,6 @@ namespace ParkEasyV1.Models
         /// </summary>
         public int ParkingSlotNumber { get; set; }
 
-        public int TestChange { get; set; }
-
         /// <summary>
         /// Enum for ParkingSlot status
         /// </summary>

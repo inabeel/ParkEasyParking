@@ -115,7 +115,7 @@ namespace ParkEasyV1.Models
         /// </summary>
         [ForeignKey("Flight")]
         [Display(Name = "Flight")]
-        public int FlightID { get; set; }
+        public int? FlightID { get; set; }
         public virtual Flight Flight { get; set; }
 
         /// <summary>
