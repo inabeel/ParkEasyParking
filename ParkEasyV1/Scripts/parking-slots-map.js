@@ -3060,16 +3060,63 @@
                     return ['P' + p.ParkingSlotNumber, angle, self.slotPossibleValues.allocatedTemporary.toString()]; // allocated temp
                 }
 
+                // Handicapped Slots
+                if (floorNumber == 1) {
+                    var handicappedSlots = [1, 2, 3, 4, 5, 6, 7, 8, 148, 149, 150, 151, 152, 153, 154, 155];
 
+                    if (handicappedSlots.indexOf(p.ParkingSlotNumber) >= 0){
+                        return ['P' + p.ParkingSlotNumber, angle, self.slotPossibleValues.handicapped.toString()]; // designated for handicapped and free now.
+                    }
+                }
 
-                if (p.ParkingSlotNumber == 1 || p.ParkingSlotNumber == 2) {
-                    return ['P' + p.ParkingSlotNumber, angle, self.slotPossibleValues.handicapped.toString()]; // designated for handicapped and free now.
+                // Handicapped Slots
+                if (floorNumber == 2) {
+                    var handicappedSlots = [1, 2, 3, 4, 5, 6, 7, 8, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160];
+
+                    if (handicappedSlots.indexOf(p.ParkingSlotNumber) >= 0) {
+                        return ['P' + p.ParkingSlotNumber, angle, self.slotPossibleValues.handicapped.toString()]; // designated for handicapped and free now.
+                    }
+                }
+
+                // Handicapped Slots
+                if (floorNumber == 3) {
+                    var handicappedSlots = [1, 2, 3, 4, 5, 6, 7, 8, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161];
+
+                    if (handicappedSlots.indexOf(p.ParkingSlotNumber) >= 0) {
+                        return ['P' + p.ParkingSlotNumber, angle, self.slotPossibleValues.handicapped.toString()]; // designated for handicapped and free now.
+                    }
+                }
+
+                // Special Slots
+                if (floorNumber == 1) {
+                    var handicappedSlots = [60];
+
+                    if (handicappedSlots.indexOf(p.ParkingSlotNumber) >= 0) {
+                        return ['P' + p.ParkingSlotNumber, angle, self.slotPossibleValues.special.toString()]; // Special parking category and free now.
+                    }
+                }
+
+                // Special Slots
+                if (floorNumber == 2) {
+                    var handicappedSlots = [61];
+
+                    if (handicappedSlots.indexOf(p.ParkingSlotNumber) >= 0) {
+                        return ['P' + p.ParkingSlotNumber, angle, self.slotPossibleValues.special.toString()]; // Special parking category and free now.
+                    }
+                }
+
+                // Special Slots
+                if (floorNumber == 3) {
+                    var handicappedSlots = [62];
+
+                    if (handicappedSlots.indexOf(p.ParkingSlotNumber) >= 0) {
+                        return ['P' + p.ParkingSlotNumber, angle, self.slotPossibleValues.special.toString()]; // Special parking category and free now.
+                    }
                 }
 
                 // by default return available.
                 return ['P' + p.ParkingSlotNumber, angle, self.slotPossibleValues.available.toString()]; // available
             });
-
 
 
             let getSlot = (options) => {
