@@ -109,7 +109,7 @@
                 <label for="EmployeeID" class="control-label col-md-4">Employee ID</label>
                 <div class="col-md-10">
                     <input required type="text" name="EmployeeID" id="EmployeeID" value="" class="form-control" />
-                    <span style="display: none;" id="EmployeeIDValidation" class="field-validation-error text-danger">The Employee ID field is required.</span>
+                    <span style="display: none;" id="EmployeeIDValidation" class="field-validation-error text-danger">The Employee ID field is required and must be 16 characters long.</span>
                 </div>
             </div>
 
@@ -234,7 +234,7 @@
     <div id="container" class="w-100 vh-100 d-flex align-items-center justify-content-center">
     </div>
 
-    <div id="loadingIndicator" class="d-none align-items-center justify-content-center position-absolute">
+    <div id="loadingIndicator" class="d-none align-items-center justify-content-center position-absolute" style="z-index: 10000;">
         <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
     </div>
 </div>

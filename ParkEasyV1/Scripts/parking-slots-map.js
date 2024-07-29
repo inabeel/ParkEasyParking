@@ -2613,6 +2613,7 @@
 
                         if (self.EditBookingID && self.EditBookingID > 0) {
                             // edit
+                            self.loading(true);
                             formData.BookingID = self.EditBookingID;
                             let result = await self.EditBooking(formData);
                             if (!result.IsSuccessful) {
@@ -2625,9 +2626,11 @@
                                 await self.InitChart();
                                 self.bookingModal.close();
                             }
+                            self.loading(false);
 
                         } else {
                             // create
+                            self.loading(true);
                             let result = await self.CreateBooking(formData);
                             if (!result.IsSuccessful) {
                                 if (result.Message) {
@@ -2639,6 +2642,7 @@
                                 await self.InitChart();
                                 self.bookingModal.close();
                             }
+                            self.loading(false);
                         }
                     }
                 },
@@ -2785,7 +2789,7 @@
                 isValid = false;
             }
 
-            if (!formData.EmployeeID) {
+            if (!formData.EmployeeID || formData.EmployeeID.length < 16) {
                 $(self.spanEmployeeIDValidation).show();
                 isValid = false;
             }
@@ -3260,8 +3264,10 @@
                                 }
 
                                 if (key == 'deallocate') {
+                                    self.loading(true);
                                     await self.ClearBooking({ BookingID: slot.itemData.BookingData.ID });
                                     await self.InitChart();
+                                    self.loading(false);
                                 }
 
                                 if (key == 'view') {

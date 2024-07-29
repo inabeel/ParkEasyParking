@@ -95,12 +95,12 @@ namespace ParkEasyV1.Controllers
                     });
                 }
 
-                if (string.IsNullOrEmpty(_request.EmployeeID))
+                if (string.IsNullOrEmpty(_request.EmployeeID) || _request.EmployeeID.Length < 16)
                 {
                     return Json(new VoidResponse()
                     {
                         IsSuccessful = false,
-                        Message = "Employee ID is required."
+                        Message = "The Employee ID field is required and must be 16 characters long."
                     });
                 }
 
