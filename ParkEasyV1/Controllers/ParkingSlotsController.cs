@@ -97,57 +97,11 @@ namespace ParkEasyV1.Controllers
 
     public class SearchParkingSlotsViewModel
     {
-        /// <summary>
-        /// booking start date
-        /// </summary>
-        [Required]
-        [DataType(DataType.Date)]
-        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         [Display(Name = "Start Date")]
         public DateTime DepartureDate1 { get; set; }
 
-
-        [Required]
-        [StringLength(10, ErrorMessage = "The {0} must be {2} characters long.", MinimumLength = 10)]
-        [Display(Name = "Employee ID")]
-        public string EmployeeID { get; set; }
-
-        /// <summary>
-        /// booking start time
-        /// </summary>
-        [Required]
-        [DataType(DataType.Time)]
-        [Display(Name = "Start Time")]
-        public TimeSpan DepartureTime { get; set; }
-
-        /// <summary>
-        /// booking end date
-        /// </summary>
-        [Required]
-        [DataType(DataType.Date)]
-        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         [Display(Name = "End Date")]
         public DateTime ReturnDate { get; set; }
-
-        /// <summary>
-        /// booking end time
-        /// </summary>
-        [Required]
-        [DataType(DataType.Time)]
-        [Display(Name = "End Time")]
-        public TimeSpan ReturnTime { get; set; }
-
-        [Required]
-        [RegularExpression("(.*[1-9].*)|(.*[.].*[1-9].*)", ErrorMessage = "Invalid Slot Number.")]
-        [Range(1, int.MaxValue, ErrorMessage = "Invalid Floor Number.")]
-        [Display(Name = "Selected Parking Slot Number")]
-        public int ParkingSlotNumber { get; set; }
-
-        [Required]
-        [RegularExpression("(.*[1-9].*)|(.*[.].*[1-9].*)", ErrorMessage = "Invalid Floor Number.")]
-        [Range(1, int.MaxValue, ErrorMessage = "Invalid Floor Number.")]
-        [Display(Name = "Selected Parking Slot Floor")]
-        public int ParkingSlotFloor { get; set; }
     }
 
     internal class JsonNetModelBinder : IModelBinder
@@ -172,42 +126,7 @@ namespace ParkEasyV1.Controllers
         /// </summary>
         private ApplicationDbContext db = new ApplicationDbContext();
 
-        [HttpPost]
-        public JsonResult ChangeStatus([ModelBinder(typeof(JsonNetModelBinder))] ChangeStatusRequest _request)
-        {
-            var slot = db.ParkingSlots.FirstOrDefault(ps => ps.ParkingSlotNumber == _request.SlotNumber && ps.FloorNu == _request.FloorNumber);
-
-            if (slot != null)
-            {
-                slot.Status = _request.Status;
-                db.SaveChanges();
-            }
-
-            return Json(new VoidResponse() 
-            {
-                IsSuccessful = true,
-                Message = ""
-            });
-        }
-
-        [HttpPost]
-        public JsonResult ClearBooking([ModelBinder(typeof(JsonNetModelBinder))] ClearBookingRequest _request)
-        {
-            var booking = db.Bookings.FirstOrDefault(b => b.ID == _request.BookingID);
-
-            if(booking != null)
-            {
-                db.Bookings.Remove(booking);
-                db.SaveChanges();
-            }
-
-            return Json(new VoidResponse()
-            {
-                IsSuccessful = true,
-                Message = ""
-            });
-        }
-
+        [HttpGet]
         public JsonResult GetParkingSlotsData(int floorNumber)
         {
             var data = db.ParkingSlots
@@ -224,7 +143,7 @@ namespace ParkEasyV1.Controllers
                 VehicleDataModel vehicleDataModel = null;
                 if (lastActiveBooking != null)
                 {
-                        var vehicle = lastActiveBooking.BookingLines.First().Vehicle;
+                        var vehicle = lastActiveBooking.Vehicle;
                         vehicleDataModel = new VehicleDataModel()
                         {
                             ID = vehicle.ID,
@@ -257,162 +176,6 @@ namespace ParkEasyV1.Controllers
                 });
 
             return Json(data, JsonRequestBehavior.AllowGet);
-        }
-
-        /// <summary>
-        /// HttpGet ActionResult to return the ParkingSlot Index view
-        /// </summary>
-        /// <returns>Index view</returns>
-        // GET: ParkingSlots
-        public ActionResult Index()
-        {
-            //create instance of the usermanager
-            UserManager<User> userManager = new UserManager<User>(new UserStore<User>(db));
-
-            //get the current logged in user 
-            User loggedInUser = userManager.FindByEmail(User.Identity.GetUserName());
-
-            //store user id in viewbag for front-end display
-            ViewBag.UserID = loggedInUser.Id;
-            var model = new SearchParkingSlotsViewModel();
-            var startDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, 0, 0);
-            var endDate = startDate.AddMinutes(60);
-            model.DepartureDate1 = startDate;
-            model.DepartureTime = startDate.TimeOfDay;
-            model.ReturnDate = endDate;
-            model.ReturnTime = endDate.TimeOfDay;
-
-            //return the full list of parking slots
-            return View(model);
-        }
-
-        /// <summary>
-        /// HttpGet ActionResult to return the Details view
-        /// </summary>
-        /// <param name="id">Parking slot id</param>
-        /// <returns>Details view</returns>
-        // GET: ParkingSlots/Details/5
-        public ActionResult Details(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            ParkingSlot parkingSlot = db.ParkingSlots.Find(id);
-            if (parkingSlot == null)
-            {
-                return HttpNotFound();
-            }
-            return View(parkingSlot);
-        }
-
-        /// <summary>
-        /// HttpGet ActionResult to return the create parking slot view
-        /// </summary>
-        /// <returns>Create view</returns>
-        // GET: ParkingSlots/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        /// <summary>
-        /// HttpPost ActionResult to create a parking slot
-        /// </summary>
-        /// <param name="parkingSlot">Created parking slot</param>
-        /// <returns>Parking slot index view</returns>
-        // POST: ParkingSlots/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "ID,Status")] ParkingSlot parkingSlot)
-        {
-            if (ModelState.IsValid)
-            {
-                db.ParkingSlots.Add(parkingSlot);
-                db.SaveChanges();
-                return RedirectToAction("Index");
-            }
-
-            return View(parkingSlot);
-        }
-
-        /// <summary>
-        /// HttpGet ActionResult to return the edit parking slot view
-        /// </summary>
-        /// <param name="id">Parking slot id</param>
-        /// <returns>Edit view</returns>
-        // GET: ParkingSlots/Edit/5
-        public ActionResult Edit(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            ParkingSlot parkingSlot = db.ParkingSlots.Find(id);
-            if (parkingSlot == null)
-            {
-                return HttpNotFound();
-            }
-            return View(parkingSlot);
-        }
-
-        /// <summary>
-        /// HttpPost ActionResult to update a parking slot
-        /// </summary>
-        /// <param name="parkingSlot">Updated parking slot</param>
-        /// <returns>Index view</returns>
-        // POST: ParkingSlots/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "ID,Status")] ParkingSlot parkingSlot)
-        {
-            if (ModelState.IsValid)
-            {
-                db.Entry(parkingSlot).State = EntityState.Modified;
-                db.SaveChanges();
-                return RedirectToAction("Index");
-            }
-            return View(parkingSlot);
-        }
-
-        /// <summary>
-        /// HttpGet ActionResult to return the delete parking slot view
-        /// </summary>
-        /// <param name="id">Parking slot id</param>
-        /// <returns>Delete view</returns>
-        // GET: ParkingSlots/Delete/5
-        public ActionResult Delete(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            ParkingSlot parkingSlot = db.ParkingSlots.Find(id);
-            if (parkingSlot == null)
-            {
-                return HttpNotFound();
-            }
-            return View(parkingSlot);
-        }
-
-        /// <summary>
-        /// HttpPost ActionResult to delete a parking slot
-        /// </summary>
-        /// <param name="id">Parking slot id</param>
-        /// <returns>ParkingSlot index</returns>
-        // POST: ParkingSlots/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(int id)
-        {
-            ParkingSlot parkingSlot = db.ParkingSlots.Find(id);
-            db.ParkingSlots.Remove(parkingSlot);
-            db.SaveChanges();
-            return RedirectToAction("Index");
         }
 
         /// <summary>

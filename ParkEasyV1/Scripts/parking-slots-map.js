@@ -1,25 +1,4 @@
 ﻿$(function () {
-    $("#DepartureDate1").datepicker({
-        dateFormat: "mm/dd/yy",
-        changeMonth: true,
-        changeYear: true,
-        minDate: -0,
-        maxDate: "+12M +0D"
-    });
-});
-
-$(function () {
-    $("#ReturnDate").datepicker({
-        dateFormat: "mm/dd/yy",
-        changeMonth: true,
-        changeYear: true,
-        minDate: -0,
-        maxDate: "+12M +0D",
-    });
-
-});
-
-$(function () {
     window.ParkingSlotsMap = function () {
         // -- this context
         const self = this;
@@ -2565,9 +2544,8 @@ $(function () {
         self.data = null;
 
         // -- nodes
-        self.selectedListHTML = document.getElementById('selected-list');
         self.floorSelectDdl = document.getElementById('floor-select');
-        self.clearBtn = document.getElementById('clear-btn');
+        
 
         
 
@@ -2585,6 +2563,7 @@ $(function () {
         self.inputVehicleColour = document.getElementById('VehicleColour');
         self.inputVehicleRegistration = document.getElementById('VehicleRegistration');
         self.selectBookingRangeType = document.getElementById('booking-range-type');
+        self.divContainer = document.getElementById('container');
 
         self.divDateSelectSection = document.getElementById('divDateSelectSection');
         if (self.selectBookingRangeType.value == '1') {
@@ -2599,6 +2578,24 @@ $(function () {
         self.spanParkingSlotFloorValidation = document.getElementById('ParkingSlotFloorValidation');
         self.spanParkingSlotNumberValidation = document.getElementById('ParkingSlotNumberValidation');
 
+        // loading
+        self.divLoading = document.getElementById('loadingIndicator');
+
+        $("#ReturnDate").datepicker({
+            dateFormat: "mm/dd/yy",
+            changeMonth: true,
+            changeYear: true,
+            minDate: -0,
+            maxDate: "+12M +0D",
+        });
+
+        $("#DepartureDate1").datepicker({
+            dateFormat: "mm/dd/yy",
+            changeMonth: true,
+            changeYear: true,
+            minDate: -0,
+            maxDate: "+0"
+        });
 
         $("#dialog").dialog({
             minWidth: 1100,
@@ -2657,6 +2654,18 @@ $(function () {
         self.bookingModal.close();
 
         // -- methods
+
+        self.loading = (show) => {
+            
+            if (show) {
+                self.divLoading.classList.remove('d-none');
+                self.divLoading.classList.add('d-flex');
+                return;
+            }
+
+            self.divLoading.classList.add('d-none');
+            self.divLoading.classList.remove('d-flex');
+        }
 
         self.canBeSelectedByValue = (value) => {
             if (!value) {
@@ -2729,8 +2738,6 @@ $(function () {
                 }
             });
             self.chart.redraw();
-
-            self.selectedListHTML.innerHTML = self.getSelectedDisplayString();
         }
 
         self.GetEncodedDateRange = () => {
@@ -2754,15 +2761,6 @@ $(function () {
                 } else {
                     $(self.divDateSelectSection).show();
                 }
-            }
-
-            self.clearBtn.onclick = function () {
-                if (!self.chart) {
-                    return;
-                }
-
-                self.selectedSlotValue = null;
-                self.toggleSelection(null);
             }
         }
 
@@ -2906,11 +2904,11 @@ $(function () {
             self.inputSlotNumber.value = slotNumber;
             self.inputFloorNumber.value = _that.floor;
 
-            self.bookingModal.option('title', `${_that.name} - Create Booking`);
+            self.bookingModal.option('title', `${_that.name}(B${_that.floor}) - Create Booking`);
 
             if (itemData.BookingData) {
                 self.EditBookingID = itemData.BookingData.ID;
-                self.bookingModal.option('title', `${_that.name}; Booking ID: #${itemData.BookingData.ID} - View Booking`);
+                self.bookingModal.option('title', `${_that.name}(B${_that.floor}); Booking ID: #${itemData.BookingData.ID} - View Booking`);
 
                 let dateStart = new Date(Number.parseInt(itemData.BookingData.DateStart.replace('/Date(', '').replace(')/')));
                 let dateEnd = new Date(Number.parseInt(itemData.BookingData.DateEnd.replace('/Date(', '').replace(')/')));
@@ -2943,7 +2941,24 @@ $(function () {
             self.bookingModal.open();
         }
 
+        self.getFloorName = () => {
+            if (self.selectedFloor == 1) {
+                return 'First Basement (B1)';
+            }
+
+            if (self.selectedFloor == 2) {
+                return 'Second Basement (B2)';
+            }
+
+            if (self.selectedFloor == 3) {
+                return 'Third Basement (B3)';
+            }
+        }
+
         self.InitChart = async (isOnload) => {
+            self.loading(true);
+
+
             if (isOnload) {
                 let currentDate = new Date();
 
@@ -2972,6 +2987,8 @@ $(function () {
                         floor: self.inputFloorNumber.value
                     });
                 }
+            } else {
+
             }
 
             let dateRange = self.GetEncodedDateRange();
@@ -3154,88 +3171,8 @@ $(function () {
             
 
             self.chart = Highcharts.mapChart('container', {
-                responsive: {
-                    rules: [
-                        {
-                            chartOptions: {
-                                chart: {
-                                    width: 1900,
-                                    height: 1400,
-                                },
-                                plotOptions: {
-                                    series: {
-                                        dataLabels: {
-                                            style: {
-                                                fontSize: '14px'
-                                            }
-                                        },
-                                    }
-                                },
-                            },
-                            condition: {
-                                minWidth: 1900
-                            }
-                        },
-                        {
-                            chartOptions: {
-                                chart: {
-                                    width: 1373,
-                                    height: 1011,
-                                },
-                                plotOptions: {
-                                    series: {
-                                        dataLabels: {
-                                            style: {
-                                                fontSize: '10px'
-                                            }
-                                        },
-                                    }
-                                },
-                            },
-                            condition: {
-                                maxWidth: 1899,
-                                minWidth: 1615
-                            }
-                        },
-
-                        {
-                            chartOptions: {
-                                chart: {
-                                    width: 1373,
-                                    height: 1011,
-                                },
-                                plotOptions: {
-                                    series: {
-                                        dataLabels: {
-                                            style: {
-                                                fontSize: '10px'
-                                            }
-                                        },
-                                    }
-                                },
-                            },
-                            condition: {
-                                maxWidth: 1614,
-                                minWidth: 1373
-                            }
-                        },
-
-                        {
-                            chartOptions: {
-                                chart: {
-                                    width: 1166,
-                                    height: 860,
-                                }
-                            },
-                            condition: {
-                                maxWidth: 1372,
-                                minWidth: 1166
-                            }
-                        }
-                    ]
-                },
                 chart: {
-                    backgroundColor: '#0000005e',
+                    backgroundColor: '#bdbdbd',
                     events: {
                         load: function () {
                             let show = function (options) {
@@ -3338,10 +3275,13 @@ $(function () {
                     }
                 },
                 title: {
-                    text: 'Parking Slots plan',
+                    text: self.getFloorName(),
                     x: 10
                 },
                 legend: {
+                    align: 'left',
+                    verticalAlign: 'top',
+                    layout: 'vertical',
                     enabled: true
                 },
                 mapNavigation: {
@@ -3411,7 +3351,7 @@ $(function () {
                     },
                     {
                         id: 'walls',
-                        nullColor: '#ccc',
+                        nullColor: '#e3e2e2',
                         mapData: wallsDataMap
                     }
                 ]
@@ -3427,6 +3367,8 @@ $(function () {
                 });
                 self.chart.redraw();
             }
+
+            self.loading(false);
         }
 
         self.Init = async () => {
@@ -3445,17 +3387,8 @@ $(function () {
             return slotsData;
         }
 
-        self.ChangeStatus = async (data) => {
-            let response = await fetch("/ParkingSlots/ChangeStatus", {
-                method: "POST",
-                body: JSON.stringify(data),
-            });
-            let ret = await response.json();
-            return ret;
-        }
-
         self.ClearBooking = async (data) => {
-            let response = await fetch("/ParkingSlots/ClearBooking", {
+            let response = await fetch("/Bookings/ClearBooking", {
                 method: "POST",
                 body: JSON.stringify(data),
             });

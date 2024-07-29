@@ -42,11 +42,9 @@ namespace ParkEasyV1.Models
         /// </summary>
         public int NoOfPassengers { get; set; }
 
-        //navigational properties
-
         /// <summary>
-        /// Virtual collection of BookingLines to model One to Many relationship with BookingLine
+        /// Virtual list of Bookings to model One to Many relationship with Booking
         /// </summary>
-        public virtual List<BookingLine> BookingLines { get; set; }
+        public virtual List<Booking> Bookings { get; set; }
     }
 }
