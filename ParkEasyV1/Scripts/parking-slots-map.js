@@ -2657,7 +2657,31 @@
         self.bookingModal = $("#dialog").dialog("instance");
         self.bookingModal.close();
 
+        self.spanErrorPromptText = document.getElementById('errorPromptText');
+        $("#errorPrompt").dialog({
+            minWidth: 1100,
+            buttons: [
+                {
+                    text: "Close",
+                    click: function () {
+                        self.errorPrompt.close();
+                    }
+                }
+            ]
+        });
+        self.errorPrompt = $("#errorPrompt").dialog("instance");
+        self.errorPrompt.close();
+
         // -- methods
+
+        self.ShowErrorPrompt = (text) => {
+            if (!text) {
+                return;
+            }
+
+            self.spanErrorPromptText.innerHTML = text;
+            self.errorPrompt.open();
+        }
 
         self.loading = (show) => {
             
@@ -3433,38 +3457,72 @@
 
         // requests 
         self.GetParkingSlotsData = async (floorNumber) => {
-            let getSlotsDataRequest = fetch(`/ParkingSlots/GetParkingSlotsData?floorNumber=${floorNumber}`);
-            let response = await getSlotsDataRequest;
-            let slotsData = await response.json();
+            try {
+                let getSlotsDataRequest = fetch(`/ParkingSlots/GetParkingSlotsData?floorNumber=${floorNumber}`);
+                let response = await getSlotsDataRequest;
+                let slotsData = await response.json();
 
-            return slotsData;
+                return slotsData;
+            } catch (e) {
+                self.ShowErrorPrompt('Something went wrong during retrieving parking slots data.');
+                return [];
+            }
         }
 
         self.ClearBooking = async (data) => {
-            let response = await fetch("/Bookings/ClearBooking", {
-                method: "POST",
-                body: JSON.stringify(data),
-            });
-            let ret = await response.json();
-            return ret;
+            try {
+                let response = await fetch("/Bookings/ClearBooking", {
+                    method: "POST",
+                    body: JSON.stringify(data),
+                });
+                let ret = await response.json();
+                return ret;
+            } catch (e) {
+                let message = "Something went wrong during deallocate request.";
+                self.ShowErrorPrompt(message);
+                return {
+                    IsSuccessful: false,
+                    Message: message
+                }
+            }
+            
         }
 
         self.CreateBooking = async (data) => {
-            let response = await fetch("/Bookings/CreateBooking", {
-                method: "POST",
-                body: JSON.stringify(data),
-            });
-            let ret = await response.json();
-            return ret;
+            try {
+                let response = await fetch("/Bookings/CreateBooking", {
+                    method: "POST",
+                    body: JSON.stringify(data),
+                });
+                let ret = await response.json();
+                return ret;
+            } catch (e) {
+                let message = "Something went wrong during create booking request.";
+                self.ShowErrorPrompt(message);
+                return {
+                    IsSuccessful: false,
+                    Message: message
+                }
+            }
+            
         }
 
         self.EditBooking = async (data) => {
-            let response = await fetch("/Bookings/EditBooking", {
-                method: "POST",
-                body: JSON.stringify(data),
-            });
-            let ret = await response.json();
-            return ret;
+            try {
+                let response = await fetch("/Bookings/EditBooking", {
+                    method: "POST",
+                    body: JSON.stringify(data),
+                });
+                let ret = await response.json();
+                return ret;
+            } catch (e) {
+                let message = "Something went wrong during edit booking request.";
+                self.ShowErrorPrompt(message);
+                return {
+                    IsSuccessful: false,
+                    Message: message
+                }
+            }
         }
     };
 });
